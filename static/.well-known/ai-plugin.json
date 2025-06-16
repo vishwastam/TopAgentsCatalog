@@ -1,0 +1,17 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "Top Agents Directory",
+  "name_for_model": "top_agents",
+  "description_for_human": "Comprehensive directory of 143 AI agents across 40+ categories. Find and compare AI tools for coding, writing, marketing, customer support and more.",
+  "description_for_model": "Access a comprehensive directory of AI agents and tools. Search through 143 verified AI agents across categories like coding assistants, writing tools, image generators, customer service bots, marketing automation, and productivity enhancers. Get detailed information about each agent including pricing, features, use cases, and user ratings.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://localhost:5000/openapi.json"
+  },
+  "logo_url": "https://localhost:5000/static/favicon.ico",
+  "contact_email": "support@topagents.com",
+  "legal_info_url": "https://localhost:5000/legal"
+}

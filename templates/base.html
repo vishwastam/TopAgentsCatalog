@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Top Agents - AI Agents Directory{% endblock %}</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="{% block description %}Comprehensive directory of AI agents - discover, compare and find the perfect AI tools for your needs{% endblock %}">
+    <meta name="keywords" content="AI agents, artificial intelligence, chatbots, AI tools, directory">
+    <meta name="author" content="Top Agents">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="{% block og_title %}Top Agents - AI Agents Directory{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Comprehensive directory of AI agents{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{{ url_for('static', filename='images/top-agents-logo.svg', _external=True) }}{% endblock %}">
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:site_name" content="Top Agents">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}Top Agents - AI Agents Directory{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}Comprehensive directory of AI agents{% endblock %}">
+    <meta name="twitter:image" content="{% block twitter_image %}{{ url_for('static', filename='images/top-agents-logo.svg', _external=True) }}{% endblock %}">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{% block canonical_url %}{{ url_for(request.endpoint, _external=True, **request.view_args) }}{% endblock %}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/top-agents-logo.svg') }}">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <!-- Logo Loader -->
+    <script src="{{ url_for('static', filename='js/logo-loader.js') }}"></script>
+    
+    <!-- Social Sharing -->
+    <script src="{{ url_for('static', filename='js/social-share.js') }}"></script>
+    
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    
+    <!-- JSON-LD Structured Data -->
+    {% block structured_data %}{% endblock %}
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        blue: {
+                            50: '#eff6ff',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Navigation -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <a href="{{ url_for('index') }}" class="flex items-center space-x-2 sm:space-x-3">
+                        <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
+                            <i data-lucide="brain" class="h-5 w-5 sm:h-6 sm:w-6 text-white"></i>
+                        </div>
+                        <h1 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">Top Agents</h1>
+                    </a>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center space-x-6">
+                    <a href="{{ url_for('index') }}" class="text-gray-700 hover:text-gray-900 font-medium">Home</a>
+                    <a href="{{ url_for('agents') }}" class="text-gray-700 hover:text-gray-900 font-medium">Agents</a>
+                    <a href="{{ url_for('recipes') }}" class="text-gray-700 hover:text-gray-900 font-medium">Recipes</a>
+                    <a href="{{ url_for('recipes_hub') }}" class="text-gray-700 hover:text-gray-900 font-medium">Stories</a>
+                    <a href="{{ url_for('enterprise_integration') }}" class="text-gray-700 hover:text-gray-900 font-medium">Enterprise</a>
+                    <a href="{{ url_for('dashboard') }}" class="text-gray-700 hover:text-gray-900 font-medium">Dashboard</a>
+                    <a href="{{ url_for('api_docs') }}" class="text-gray-700 hover:text-gray-900 font-medium">API</a>
+                    
+                    {% if current_user %}
+                    <div class="flex items-center space-x-3">
+                        <div class="flex items-center space-x-2">
+                            {% if current_user.profile_image %}
+                            <img src="{{ current_user.profile_image }}" alt="Profile" class="w-8 h-8 rounded-full">
+                            {% else %}
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                <span class="text-blue-600 text-sm font-medium">{{ current_user.first_name[0] if current_user.first_name else current_user.email[0].upper() }}</span>
+                            </div>
+                            {% endif %}
+                            <span class="text-gray-700 text-sm">{{ current_user.first_name or current_user.email.split('@')[0] }}</span>
+                        </div>
+                        <a href="{{ url_for('logout') }}" class="text-gray-600 hover:text-gray-900 text-sm">Sign out</a>
+                    </div>
+                    {% else %}
+                    <div class="flex items-center space-x-3">
+                        <a href="{{ url_for('login') }}" class="text-gray-700 hover:text-gray-900 font-medium">Sign in</a>
+                        <a href="{{ url_for('signup') }}" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
+                            Sign up
+                        </a>
+                    </div>
+                    {% endif %}
+                </nav>
+                
+                <!-- Mobile Menu Button -->
+                <div class="flex md:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-gray-700 hover:text-gray-900 p-2">
+                        <i data-lucide="menu" class="h-6 w-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden border-t border-gray-200 bg-white">
+            <div class="px-4 py-3 space-y-3">
+                <a href="{{ url_for('index') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Home</a>
+                <a href="{{ url_for('agents') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Agents</a>
+                <a href="{{ url_for('recipes') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Recipes</a>
+                <a href="{{ url_for('recipes_hub') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Stories</a>
+                <a href="{{ url_for('enterprise_integration') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Enterprise</a>
+                <a href="{{ url_for('dashboard') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Dashboard</a>
+                <a href="{{ url_for('api_docs') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">API</a>
+                
+                {% if current_user %}
+                <div class="border-t border-gray-200 pt-3 mt-3">
+                    <div class="flex items-center space-x-3 mb-3">
+                        {% if current_user.profile_image %}
+                        <img src="{{ current_user.profile_image }}" alt="Profile" class="w-8 h-8 rounded-full">
+                        {% else %}
+                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <span class="text-blue-600 text-sm font-medium">{{ current_user.first_name[0] if current_user.first_name else current_user.email[0].upper() }}</span>
+                        </div>
+                        {% endif %}
+                        <span class="text-gray-700 text-sm">{{ current_user.first_name or current_user.email.split('@')[0] }}</span>
+                    </div>
+                    <a href="{{ url_for('logout') }}" class="block text-gray-600 hover:text-gray-900 py-2">Sign out</a>
+                </div>
+                {% else %}
+                <div class="border-t border-gray-200 pt-3 mt-3 space-y-2">
+                    <a href="{{ url_for('login') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Sign in</a>
+                    <a href="{{ url_for('signup') }}" class="block bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 text-center">
+                        Sign up
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
+                            <i data-lucide="brain" class="h-6 w-6 text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900">Top Agents</h3>
+                    </div>
+                    <p class="text-gray-600 mb-4">
+                        The most comprehensive directory of AI agents. Discover, compare, and find the perfect AI tools for your needs.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-gray-900 mb-4">Directory</h4>
+                    <ul class="space-y-2 text-gray-600">
+                        <li><a href="#" class="hover:text-gray-900">Categories</a></li>
+                        <li><a href="#" class="hover:text-gray-900">Featured</a></li>
+                        <li><a href="#" class="hover:text-gray-900">New Agents</a></li>
+                        <li><a href="#" class="hover:text-gray-900">Popular</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-gray-900 mb-4">Company</h4>
+                    <ul class="space-y-2 text-gray-600">
+                        <li><a href="#" class="hover:text-gray-900">About</a></li>
+                        <li><a href="#" class="hover:text-gray-900">Submit Agent</a></li>
+                        <li><a href="#" class="hover:text-gray-900">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-200 mt-8 pt-8 text-center text-gray-500">
+                <p>&copy; 2024 Top Agents. Built for the AI community.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Initialize Lucide Icons -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+        });
+        
+        function scrollToFilters() {
+            const filtersSection = document.getElementById('filters-section');
+            if (filtersSection) {
+                filtersSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('hidden');
+        }
+    </script>
+    
+    <!-- Custom JavaScript -->
+    {% block scripts %}{% endblock %}
+</body>
+</html>

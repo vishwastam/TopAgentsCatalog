@@ -1,0 +1,641 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block description %}{{ meta_description }}{% endblock %}
+
+{% block canonical_url %}{{ url_for('agent_detail', slug=agent.slug, _external=True) }}{% endblock %}
+
+{% block og_title %}{{ agent.name }} by {{ agent.creator }} - AI Agent{% endblock %}
+{% block og_description %}{{ agent.short_desc }} | Platform: {{ agent.platform }} | Pricing: {{ agent.pricing }}{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{{ json_ld|safe }}
+</script>
+{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<div class="bg-white border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div class="flex items-center space-x-2 text-sm">
+            <a href="{{ url_for('index') }}" class="text-blue-600 hover:text-blue-800">Directory</a>
+            <span class="text-gray-400">/</span>
+            <span class="text-blue-600">{{ agent.primary_domain }}</span>
+            <span class="text-gray-400">/</span>
+            <span class="text-gray-600">{{ agent.name }}</span>
+        </div>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+        <!-- Main Content -->
+        <div class="lg:col-span-2">
+            <!-- Agent Header -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-6">
+                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-4">
+                    <div class="flex items-start space-x-3" data-agent-name="{{ agent.name }}" data-agent-creator="{{ agent.creator }}">
+                        {% if agent.primary_domain == "Software Development" %}
+                            <i data-lucide="code" class="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 shrink-0"></i>
+                        {% elif agent.primary_domain == "Writing" %}
+                            <i data-lucide="pen-tool" class="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 shrink-0"></i>
+                        {% elif agent.primary_domain == "Marketing" %}
+                            <i data-lucide="megaphone" class="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 shrink-0"></i>
+                        {% elif agent.primary_domain == "Productivity" %}
+                            <i data-lucide="zap" class="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 shrink-0"></i>
+                        {% else %}
+                            <i data-lucide="brain" class="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 shrink-0"></i>
+                        {% endif %}
+                        <div class="min-w-0 flex-1">
+                            <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 break-words">{{ h1_title }}</h1>
+                            <p class="text-gray-600 mb-3 text-sm sm:text-base">by {{ agent.creator }}</p>
+                            
+                            <!-- Rating Display -->
+                            <div class="flex items-center gap-2">
+                                <div class="flex items-center">
+                                    {% for i in range(1, 6) %}
+                                        {% if rating_data.average_rating >= i %}
+                                            <i data-lucide="star" class="h-5 w-5 text-yellow-400 fill-current"></i>
+                                        {% elif rating_data.average_rating >= i - 0.5 %}
+                                            <i data-lucide="star" class="h-5 w-5 text-yellow-400 fill-current opacity-50"></i>
+                                        {% else %}
+                                            <i data-lucide="star" class="h-5 w-5 text-gray-300"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                {% if rating_data.total_ratings > 0 %}
+                                    <span class="text-sm text-gray-600">
+                                        {{ rating_data.average_rating }}/5 ({{ rating_data.total_ratings }} review{{ 's' if rating_data.total_ratings != 1 else '' }})
+                                    </span>
+                                {% else %}
+                                    <span class="text-sm text-gray-500">No ratings yet</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:space-x-2">
+                        <button onclick="saveAgent()" class="border border-gray-300 text-gray-700 px-3 py-2 rounded-md text-sm hover:bg-gray-50 flex items-center justify-center gap-2">
+                            <i data-lucide="bookmark" class="h-4 w-4"></i>
+                            <span class="hidden sm:inline">Save</span>
+                        </button>
+                        <div class="relative">
+                            <button onclick="toggleShareDropdown('agent-share')" class="border border-gray-300 text-gray-700 px-3 py-2 rounded-md text-sm hover:bg-gray-50 flex items-center justify-center gap-2">
+                                <i data-lucide="share-2" class="h-4 w-4"></i>
+                                <span class="hidden sm:inline">Share</span>
+                            </button>
+                            <div id="agent-share" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-10">
+                                <div class="py-1">
+                                    <button onclick="shareAgent('{{ agent.name }}', '{{ agent.creator }}', '{{ agent.short_desc }}', '{{ request.url }}').twitter()" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2">
+                                        <i data-lucide="twitter" class="h-4 w-4"></i>
+                                        Share on Twitter
+                                    </button>
+                                    <button onclick="shareAgent('{{ agent.name }}', '{{ agent.creator }}', '{{ agent.short_desc }}', '{{ request.url }}').linkedin()" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2">
+                                        <i data-lucide="linkedin" class="h-4 w-4"></i>
+                                        Share on LinkedIn
+                                    </button>
+                                    <button onclick="shareAgent('{{ agent.name }}', '{{ agent.creator }}', '{{ agent.short_desc }}', '{{ request.url }}').facebook()" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2">
+                                        <i data-lucide="facebook" class="h-4 w-4"></i>
+                                        Share on Facebook
+                                    </button>
+                                    <button onclick="shareAgent('{{ agent.name }}', '{{ agent.creator }}', '{{ agent.short_desc }}', '{{ request.url }}').copy()" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2">
+                                        <i data-lucide="copy" class="h-4 w-4"></i>
+                                        Copy Link
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="{{ agent.url }}" target="_blank" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700 flex items-center justify-center gap-2">
+                            <i data-lucide="external-link" class="h-4 w-4"></i>
+                            Try {{ agent.name }}
+                        </a>
+                    </div>
+                </div>
+
+                <p class="text-lg text-gray-700 mb-6">{{ agent.short_desc }}</p>
+
+                <div class="flex flex-wrap items-center gap-4 mb-6">
+                    {% if agent.underlying_model and agent.underlying_model != 'nan' %}
+                    <div class="flex items-center gap-1">
+                        <i data-lucide="cpu" class="h-5 w-5 text-gray-600"></i>
+                        <span class="text-sm text-gray-600">{{ agent.underlying_model[:30] }}{% if agent.underlying_model|length > 30 %}...{% endif %}</span>
+                    </div>
+                    {% endif %}
+                    {% if agent.platform_list %}
+                    <div class="flex items-center gap-1 text-gray-600">
+                        <i data-lucide="globe" class="h-5 w-5"></i>
+                        <span class="text-sm">{{ agent.platform_list|join(', ') }}</span>
+                    </div>
+                    {% endif %}
+                    <span class="inline-block px-2 py-1 
+                        {% if agent.pricing_clean == 'Free' %}bg-green-100 text-green-800
+                        {% elif agent.pricing_clean == 'Freemium' %}bg-blue-100 text-blue-800
+                        {% else %}bg-gray-100 text-gray-800{% endif %} 
+                        text-sm rounded-md font-medium">
+                        {{ agent.pricing_clean }}
+                    </span>
+                    <span class="inline-block px-2 py-1 bg-blue-50 text-blue-700 border border-blue-200 text-sm rounded-md font-medium">
+                        Featured
+                    </span>
+                </div>
+
+                <div class="flex flex-wrap gap-2 mb-6">
+                    {% for tag in agent.use_case_list %}
+                        <span class="inline-flex items-center gap-1 px-2 py-1 border border-gray-300 text-gray-700 text-sm rounded-md">
+                            <i data-lucide="tag" class="h-3 w-3"></i>
+                            {{ tag }}
+                        </span>
+                    {% endfor %}
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3">
+                    {% if agent.url and agent.url != 'nan' %}
+                        <a href="{{ agent.url }}" 
+                           target="_blank" 
+                           rel="noopener noreferrer"
+                           class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 font-medium text-center flex items-center justify-center gap-2">
+                            <i data-lucide="external-link" class="h-4 w-4"></i>
+                            Visit {{ agent.name }}
+                        </a>
+                    {% endif %}
+                    <button class="border border-gray-300 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 font-medium flex items-center justify-center gap-2">
+                        <i data-lucide="message-square" class="h-4 w-4"></i>
+                        Try Demo
+                    </button>
+                </div>
+            </div>
+
+            <!-- Detailed Information Tabs -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                <div class="border-b border-gray-200">
+                    <nav class="flex space-x-8 px-6" aria-label="Tabs">
+                        <button onclick="showTab('overview')" id="tab-overview" class="tab-button py-4 px-1 border-b-2 border-blue-500 font-medium text-sm text-blue-600">
+                            Overview
+                        </button>
+                        <button onclick="showTab('features')" id="tab-features" class="tab-button py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                            Features
+                        </button>
+                        <button onclick="showTab('pricing')" id="tab-pricing" class="tab-button py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                            Pricing
+                        </button>
+                        <button onclick="showTab('reviews')" id="tab-reviews" class="tab-button py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                            User Reviews
+                        </button>
+                    </nav>
+                </div>
+
+                <div id="tab-content-overview" class="tab-content p-6">
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="text-lg font-semibold mb-3">About {{ agent.name }}</h3>
+                            <p class="text-gray-700 leading-relaxed">{{ agent.long_desc }}</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-3">Key Use Cases</h4>
+                                <ul class="space-y-2">
+                                    {% for use_case in agent.use_case_list %}
+                                    <li class="flex items-start gap-2">
+                                        <div class="w-1.5 h-1.5 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
+                                        <span class="text-gray-700">{{ use_case }}</span>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-3">Domains</h4>
+                                <div class="space-y-2">
+                                    {% for domain in agent.domain_list %}
+                                    <div class="flex items-center gap-2">
+                                        <i data-lucide="check" class="h-4 w-4 text-green-500"></i>
+                                        <span class="text-gray-700">{{ domain }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-content-features" class="tab-content p-6 hidden">
+                    <h3 class="text-lg font-semibold mb-4">Key Features</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {% for platform in agent.platform_list %}
+                        <div class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                            <i data-lucide="zap" class="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0"></i>
+                            <span class="text-gray-700">Available on {{ platform }}</span>
+                        </div>
+                        {% endfor %}
+                        
+                        {% if agent.underlying_model and agent.underlying_model != 'nan' %}
+                        <div class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                            <i data-lucide="cpu" class="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0"></i>
+                            <span class="text-gray-700">Powered by {{ agent.underlying_model }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if agent.deployment and agent.deployment != 'nan' %}
+                        <div class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                            <i data-lucide="cloud" class="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0"></i>
+                            <span class="text-gray-700">{{ agent.deployment }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div id="tab-content-pricing" class="tab-content p-6 hidden">
+                    <div class="space-y-6">
+                        <h3 class="text-lg font-semibold">Pricing Information</h3>
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i data-lucide="dollar-sign" class="h-5 w-5 text-green-600"></i>
+                                <h4 class="font-semibold">{{ agent.pricing_clean }}</h4>
+                            </div>
+                            <p class="text-gray-700">{{ agent.pricing if agent.pricing != agent.pricing_clean else "Pricing details available on the official website." }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-content-reviews" class="tab-content p-6 hidden">
+                    <div class="space-y-6">
+                        <div class="flex items-center gap-2 mb-4">
+                            <i data-lucide="message-square" class="h-5 w-5 text-blue-600"></i>
+                            <h3 class="text-lg font-semibold">What Users Think</h3>
+                        </div>
+                        
+                        {% if agent.what_users_think and agent.what_users_think != 'nan' %}
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                            <div class="flex items-start gap-3">
+                                <i data-lucide="users" class="h-5 w-5 text-blue-600 mt-1 flex-shrink-0"></i>
+                                <div>
+                                    <h4 class="font-semibold text-blue-900 mb-2">Real User Feedback</h4>
+                                    <p class="text-blue-800 leading-relaxed">{{ agent.what_users_think }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-xs text-gray-500 mt-4 p-3 bg-gray-50 rounded">
+                            <i data-lucide="info" class="h-3 w-3 inline mr-1"></i>
+                            This feedback is compiled from authentic user reviews across Reddit, Twitter, GitHub, product review sites, and community discussions.
+                        </div>
+                        {% else %}
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+                            <i data-lucide="message-circle" class="h-8 w-8 text-gray-400 mx-auto mb-3"></i>
+                            <h4 class="font-semibold text-gray-600 mb-2">Limited User Feedback</h4>
+                            <p class="text-gray-500">User reviews for this agent are not yet available in our database.</p>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Rating Integration -->
+                        {% if rating_data.recent_reviews %}
+                        <div class="border-t pt-6">
+                            <h4 class="font-semibold text-gray-900 mb-4">Recent Community Ratings</h4>
+                            <div class="space-y-3">
+                                {% for review in rating_data.recent_reviews[:3] %}
+                                <div class="bg-white border border-gray-200 rounded-lg p-4">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <div class="flex items-center">
+                                            {% for i in range(1, 6) %}
+                                                {% if i <= review.rating %}
+                                                    <i data-lucide="star" class="h-4 w-4 text-yellow-400 fill-current"></i>
+                                                {% else %}
+                                                    <i data-lucide="star" class="h-4 w-4 text-gray-300"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                        <span class="text-xs text-gray-500">{{ review.timestamp[:10] }}</span>
+                                    </div>
+                                    {% if review.feedback %}
+                                    <p class="text-gray-700 text-sm">{{ review.feedback }}</p>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Quick Info -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold">Quick Info</h3>
+                </div>
+                <div class="p-4 sm:p-6 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600 text-sm sm:text-base">Category</span>
+                        <span class="inline-block px-2 py-1 border border-gray-300 text-gray-700 text-xs rounded-md">
+                            {{ agent.primary_domain }}
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600 text-sm sm:text-base">Creator</span>
+                        <span class="font-medium text-sm sm:text-base text-right max-w-[60%] break-words">{{ agent.creator }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600 text-sm sm:text-base">Pricing</span>
+                        <span class="inline-block px-2 py-1 
+                            {% if agent.pricing_clean == 'Free' %}bg-green-100 text-green-800
+                            {% elif agent.pricing_clean == 'Freemium' %}bg-blue-100 text-blue-800
+                            {% else %}bg-gray-100 text-gray-800{% endif %} 
+                            text-xs rounded-md font-medium">
+                            {{ agent.pricing_clean }}
+                        </span>
+                    </div>
+                    {% if agent.url and agent.url != 'nan' %}
+                    <div class="pt-4 border-t border-gray-200">
+                        <a href="{{ agent.url }}" 
+                           target="_blank" 
+                           rel="noopener noreferrer"
+                           class="flex items-center gap-2 text-blue-600 hover:text-blue-800 text-sm">
+                            <i data-lucide="globe" class="h-4 w-4 shrink-0"></i>
+                            <span class="truncate">Visit Website</span>
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Rating & Review Section -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold">Rate this Agent</h3>
+                </div>
+                <div class="p-4 sm:p-6">
+                    <!-- Success/Error Messages -->
+                    {% if rating_success %}
+                    <div class="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
+                        <div class="flex items-center">
+                            <i data-lucide="check-circle" class="h-4 w-4 text-green-600 mr-2 shrink-0"></i>
+                            <span class="text-green-800 text-sm font-medium">Rating submitted successfully!</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if rating_error %}
+                    <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+                        <div class="flex items-center">
+                            <i data-lucide="alert-circle" class="h-4 w-4 text-red-600 mr-2 shrink-0"></i>
+                            <span class="text-red-800 text-sm font-medium">
+                                {% if rating_error == 'invalid_rating' %}
+                                    Please select a valid rating (1-5 stars).
+                                {% elif rating_error == 'rating_failed' %}
+                                    Error saving rating. Please try again.
+                                {% else %}
+                                    An error occurred. Please try again.
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <form method="POST" action="{{ url_for('rate_agent') }}" class="space-y-4">
+                        <input type="hidden" name="agent_slug" value="{{ agent.slug }}">
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Your Rating</label>
+                            <div class="flex items-center gap-1 justify-start" id="star-rating">
+                                {% for i in range(1, 6) %}
+                                <button type="button" class="star-btn text-gray-300 hover:text-yellow-400 focus:text-yellow-400 focus:outline-none" data-rating="{{ i }}">
+                                    <i data-lucide="star" class="h-6 w-6 sm:h-7 sm:w-7"></i>
+                                </button>
+                                {% endfor %}
+                            </div>
+                            <input type="hidden" name="rating" id="rating-value" required>
+                        </div>
+                        
+                        <div>
+                            <label for="feedback" class="block text-sm font-medium text-gray-700 mb-2">
+                                Your Review <span class="text-gray-500">(optional)</span>
+                            </label>
+                            <textarea id="feedback" name="feedback" rows="3" 
+                                      class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                      placeholder="Share your experience with this AI agent..."></textarea>
+                        </div>
+                        
+                        <button type="submit" 
+                                class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium text-sm focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                id="submit-rating" disabled>
+                            Submit Rating
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Reviews Section -->
+            {% if rating_data.recent_reviews %}
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold">Recent Reviews</h3>
+                </div>
+                <div class="p-6 space-y-4">
+                    {% for review in rating_data.recent_reviews %}
+                    <div class="border-b border-gray-100 pb-4 last:border-b-0 last:pb-0">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="flex items-center">
+                                {% for i in range(1, 6) %}
+                                    {% if i <= review.rating %}
+                                        <i data-lucide="star" class="h-4 w-4 text-yellow-400 fill-current"></i>
+                                    {% else %}
+                                        <i data-lucide="star" class="h-4 w-4 text-gray-300"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <span class="text-xs text-gray-500">{{ review.timestamp[:10] }}</span>
+                        </div>
+                        <p class="text-gray-700 text-sm">{{ review.feedback }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Related Agents -->
+{% if related_agents %}
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    <h3 class="text-xl sm:text-2xl font-bold text-gray-900 mb-6">Related Agents</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        {% for related_agent in related_agents %}
+        <a href="{{ url_for('agent_detail', slug=related_agent.slug) }}" class="block">
+            <div class="bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer h-full">
+                <div class="p-4 sm:p-6">
+                    <h4 class="text-base sm:text-lg font-semibold text-gray-900 mb-2 break-words">{{ related_agent.name }}</h4>
+                    <p class="text-gray-600 mb-4 line-clamp-3 text-sm">{{ related_agent.short_desc[:100] }}{% if related_agent.short_desc|length > 100 %}...{% endif %}</p>
+                    <div class="flex items-center justify-between">
+                        <span class="inline-block px-2 py-1 
+                            {% if related_agent.pricing_clean == 'Free' %}bg-green-100 text-green-800
+                            {% elif related_agent.pricing_clean == 'Freemium' %}bg-blue-100 text-blue-800
+                            {% else %}bg-gray-100 text-gray-800{% endif %} 
+                            text-xs rounded-md font-medium">
+                            {{ related_agent.pricing_clean }}
+                        </span>
+                        <span class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            View Details →
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- Back to Directory -->
+<section class="bg-gray-900 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
+        <a href="{{ url_for('index') }}" class="inline-flex items-center gap-2 border border-gray-600 text-white px-6 py-3 rounded-md hover:bg-gray-800">
+            <i data-lucide="arrow-left" class="h-4 w-4"></i>
+            Back to Directory
+        </a>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function showTab(tabName) {
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.add('hidden');
+    });
+    
+    // Remove active state from all tab buttons
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.classList.remove('border-blue-500', 'text-blue-600');
+        button.classList.add('border-transparent', 'text-gray-500');
+    });
+    
+    // Show selected tab content
+    document.getElementById('tab-content-' + tabName).classList.remove('hidden');
+    
+    // Add active state to selected tab button
+    const activeButton = document.getElementById('tab-' + tabName);
+    activeButton.classList.remove('border-transparent', 'text-gray-500');
+    activeButton.classList.add('border-blue-500', 'text-blue-600');
+}
+
+function saveAgent() {
+    // Mock save functionality
+    const button = event.target.closest('button');
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i data-lucide="check" class="h-4 w-4"></i> Saved!';
+    lucide.createIcons();
+    
+    setTimeout(() => {
+        button.innerHTML = originalText;
+        lucide.createIcons();
+    }, 2000);
+}
+
+function shareAgent() {
+    const url = window.location.href;
+    if (navigator.share) {
+        navigator.share({
+            title: '{{ agent.name }} - AI Agent',
+            text: '{{ agent.short_desc }}',
+            url: url
+        });
+    } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(() => {
+            const button = event.target.closest('button');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i data-lucide="check" class="h-4 w-4"></i> Copied!';
+            lucide.createIcons();
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                lucide.createIcons();
+            }, 2000);
+        });
+    }
+}
+
+// Add line-clamp CSS
+const style = document.createElement('style');
+style.textContent = `
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+`;
+document.head.appendChild(style);
+
+// Initialize star rating functionality
+document.addEventListener('DOMContentLoaded', function() {
+    initializeStarRating();
+});
+
+function initializeStarRating() {
+    const starButtons = document.querySelectorAll('.star-btn');
+    const ratingValue = document.getElementById('rating-value');
+    const submitButton = document.getElementById('submit-rating');
+    
+    if (!starButtons.length || !ratingValue || !submitButton) return;
+    
+    starButtons.forEach((button, index) => {
+        button.addEventListener('click', function() {
+            const rating = parseInt(this.getAttribute('data-rating'));
+            ratingValue.value = rating;
+            
+            // Update star appearance
+            starButtons.forEach((btn, btnIndex) => {
+                const star = btn.querySelector('i');
+                if (star) {
+                    if (btnIndex < rating) {
+                        btn.className = 'star-btn text-yellow-400 hover:text-yellow-400 focus:text-yellow-400 focus:outline-none';
+                        star.classList.add('fill-current');
+                    } else {
+                        btn.className = 'star-btn text-gray-300 hover:text-yellow-400 focus:text-yellow-400 focus:outline-none';
+                        star.classList.remove('fill-current');
+                    }
+                }
+            });
+            
+            // Enable submit button
+            if (submitButton) {
+                submitButton.disabled = false;
+                submitButton.className = 'w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium text-sm focus:ring-2 focus:ring-blue-500 focus:ring-offset-2';
+            }
+        });
+        
+        // Hover effects
+        button.addEventListener('mouseenter', function() {
+            const rating = parseInt(this.getAttribute('data-rating'));
+            starButtons.forEach((btn, btnIndex) => {
+                if (btnIndex < rating && btn) {
+                    btn.classList.add('text-yellow-400');
+                    btn.classList.remove('text-gray-300');
+                }
+            });
+        });
+        
+        button.addEventListener('mouseleave', function() {
+            const currentRating = parseInt(ratingValue.value || 0);
+            starButtons.forEach((btn, btnIndex) => {
+                if (btn) {
+                    if (btnIndex < currentRating) {
+                        btn.classList.add('text-yellow-400');
+                        btn.classList.remove('text-gray-300');
+                    } else {
+                        btn.classList.add('text-gray-300');
+                        btn.classList.remove('text-yellow-400');
+                    }
+                }
+            });
+        });
+    });
+}
+</script>
+{% endblock %}

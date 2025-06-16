@@ -1,0 +1,89 @@
+{
+  "schema_version": "v1",
+  "name_for_model": "top_agents",
+  "name_for_human": "Top Agents Directory",
+  "description_for_model": "A comprehensive directory of 143 AI agents across 40+ categories. Search, discover, and retrieve detailed information about AI tools including ChatGPT, Midjourney, Claude, and many others. Each agent includes pricing, use cases, creator information, and user ratings.",
+  "description_for_human": "Discover and explore AI agents with detailed information, ratings, and use cases.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://topagents.com/openapi.json"
+  },
+  "logo_url": "https://topagents.com/static/images/top-agents-logo.svg",
+  "contact_email": "hello@topagents.com",
+  "legal_info_url": "https://topagents.com/legal",
+  "capabilities": [
+    "search_agents",
+    "get_agent_details", 
+    "list_categories",
+    "get_recipes",
+    "semantic_search"
+  ],
+  "endpoints": {
+    "search": {
+      "url": "/api/agents/search",
+      "method": "GET",
+      "description": "Search AI agents by name, category, use case, or natural language query",
+      "parameters": {
+        "q": "Search query (e.g., 'coding assistants', 'writing tools', 'image generation')",
+        "category": "Filter by category (optional)",
+        "pricing": "Filter by pricing model (Free, Freemium, Paid)",
+        "limit": "Number of results to return (default: 20)"
+      }
+    },
+    "get_agent": {
+      "url": "/api/agents/{slug}",
+      "method": "GET", 
+      "description": "Get detailed information about a specific AI agent",
+      "parameters": {
+        "slug": "Agent identifier (e.g., 'chatgpt', 'midjourney', 'claude')"
+      }
+    },
+    "list_all": {
+      "url": "/api/agents",
+      "method": "GET",
+      "description": "Get all AI agents with complete metadata",
+      "parameters": {
+        "format": "Response format (json, structured)"
+      }
+    },
+    "categories": {
+      "url": "/api/categories",
+      "method": "GET",
+      "description": "Get all available categories and domains"
+    },
+    "recipes": {
+      "url": "/api/recipes", 
+      "method": "GET",
+      "description": "Get AI agent implementation recipes and use cases"
+    }
+  },
+  "semantic_retrieval": {
+    "enabled": true,
+    "content_types": ["agents", "recipes", "categories"],
+    "indexable_fields": [
+      "name",
+      "description", 
+      "use_cases",
+      "domains",
+      "creator",
+      "pricing",
+      "platform"
+    ]
+  },
+  "structured_data": {
+    "schema_org": true,
+    "json_ld": true,
+    "microdata": false,
+    "rdfa": false
+  },
+  "ai_integration": {
+    "chatgpt_plugin": true,
+    "claude_integration": true,
+    "llm_friendly": true,
+    "semantic_search": true,
+    "natural_language_queries": true
+  }
+}

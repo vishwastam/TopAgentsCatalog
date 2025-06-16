@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to Top Agents{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8 text-center">
+        <!-- Success Icon -->
+        <div class="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-green-100 mb-8">
+            <i data-lucide="check-circle" class="h-12 w-12 text-green-600"></i>
+        </div>
+        
+        <!-- Main Message -->
+        <div class="space-y-6">
+            <h1 class="text-3xl font-bold text-gray-900">Welcome to Top Agents!</h1>
+            <p class="text-lg text-gray-600">
+                Your account has been created successfully.
+            </p>
+            
+            <!-- Personal Touch Message -->
+            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <i data-lucide="mail" class="h-6 w-6 text-blue-500"></i>
+                    </div>
+                    <div class="ml-3 text-left">
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">We'll be in touch soon</h3>
+                        <p class="text-gray-600">
+                            Our team will reach out to you within the next 24 hours to help you get the most out of Top Agents. 
+                            In the meantime, explore what our community is building.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Call to Action -->
+            <div class="space-y-4">
+                <p class="text-gray-600">
+                    Ready to discover what teams are creating with AI agents?
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <a href="{{ url_for('recipes_hub') }}" 
+                       class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                        <i data-lucide="book-open" class="h-5 w-5 mr-2"></i>
+                        Explore Team Stories
+                    </a>
+                    
+                    <a href="{{ url_for('dashboard') }}" 
+                       class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                        <i data-lucide="layout-dashboard" class="h-5 w-5 mr-2"></i>
+                        Go to Dashboard
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Additional Info -->
+            <div class="mt-8 pt-6 border-t border-gray-200">
+                <p class="text-sm text-gray-500">
+                    Need immediate help? 
+                    <a href="mailto:support@topagents.com" class="font-medium text-blue-600 hover:text-blue-500">
+                        Contact our support team
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Auto-redirect with countdown -->
+<div id="redirect-notice" class="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg border p-4 max-w-sm hidden">
+    <div class="flex items-center">
+        <div class="flex-shrink-0">
+            <i data-lucide="clock" class="h-5 w-5 text-blue-500"></i>
+        </div>
+        <div class="ml-3">
+            <p class="text-sm text-gray-600">
+                Redirecting to Team Stories in <span id="countdown">10</span> seconds...
+            </p>
+            <button onclick="cancelRedirect()" class="text-xs text-blue-600 hover:text-blue-500">
+                Stay on this page
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+let redirectTimer;
+let countdownInterval;
+let timeLeft = 10;
+
+// Show redirect notice after 3 seconds
+setTimeout(() => {
+    document.getElementById('redirect-notice').classList.remove('hidden');
+    startCountdown();
+}, 3000);
+
+function startCountdown() {
+    countdownInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('countdown').textContent = timeLeft;
+        
+        if (timeLeft <= 0) {
+            clearInterval(countdownInterval);
+            window.location.href = "{{ url_for('recipes_hub') }}";
+        }
+    }, 1000);
+}
+
+function cancelRedirect() {
+    clearInterval(countdownInterval);
+    document.getElementById('redirect-notice').classList.add('hidden');
+}
+
+// Initialize icons
+document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+});
+</script>
+{% endblock %}

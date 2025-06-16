@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block title %}AI Agents Directory - Top Agents{% endblock %}
+
+{% block canonical_url %}{{ canonical_url }}{% endblock %}
+
+{% block og_title %}AI Agents Directory - 143 Curated AI Tools{% endblock %}
+{% block og_description %}Discover 143 AI agents across 40+ categories. From ChatGPT to AutoGPT, find the perfect AI tool for your needs with advanced filtering and search.{% endblock %}
+{% block og_type %}website{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Header Section -->
+    <div class="bg-white border-b border-gray-200">
+        <div class="container mx-auto px-6 py-12">
+            <div class="max-w-4xl mx-auto text-center">
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">AI Agents Directory</h1>
+                <p class="text-xl text-gray-600 mb-8">
+                    Discover {{ agents|length }} curated AI agents across 40+ categories. 
+                    Find the perfect AI tool for your specific needs.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <section class="bg-white py-8 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <form method="GET" action="{{ url_for('agents') }}" class="space-y-6">
+                <!-- Search Bar -->
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="search" class="h-5 w-5 text-gray-400"></i>
+                    </div>
+                    <input type="text" 
+                           name="q" 
+                           value="{{ request.args.get('q', '') }}"
+                           placeholder="Search AI agents by name, description, or use case..." 
+                           class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+
+                <!-- Filter Pills -->
+                <div class="flex flex-wrap gap-4">
+                    <!-- Category Filter -->
+                    <div class="flex-1 min-w-0">
+                        <select name="category" 
+                                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="">All Categories</option>
+                            {% for category in filter_options.domains %}
+                                <option value="{{ category }}" {% if request.args.get('category') == category %}selected{% endif %}>
+                                    {{ category }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Pricing Filter -->
+                    <div class="flex-1 min-w-0">
+                        <select name="pricing" 
+                                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="">All Pricing</option>
+                            {% for pricing in filter_options.pricing %}
+                                <option value="{{ pricing }}" {% if request.args.get('pricing') == pricing %}selected{% endif %}>
+                                    {{ pricing }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Platform Filter -->
+                    <div class="flex-1 min-w-0">
+                        <select name="platform" 
+                                class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="">All Platforms</option>
+                            {% for platform in filter_options.platforms %}
+                                <option value="{{ platform }}" {% if request.args.get('platform') == platform %}selected{% endif %}>
+                                    {{ platform }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" 
+                            class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors">
+                        Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Active Filters Display -->
+    {% set current_query = request.args.get('q', '') %}
+    {% set current_filters = {} %}
+    {% if request.args.get('category') %}{% set _ = current_filters.update({'category': request.args.get('category')}) %}{% endif %}
+    {% if request.args.get('pricing') %}{% set _ = current_filters.update({'pricing': request.args.get('pricing')}) %}{% endif %}
+    {% if request.args.get('platform') %}{% set _ = current_filters.update({'platform': request.args.get('platform')}) %}{% endif %}
+
+    {% if current_query or current_filters %}
+    <div class="bg-gray-50 px-4 sm:px-6 lg:px-8 py-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="text-sm text-gray-600">Active filters:</span>
+                
+                {% if current_query %}
+                    <span class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 rounded-md text-sm">
+                        Search: "{{ current_query }}"
+                        <a href="{{ url_for('agents', **current_filters) }}" class="text-blue-600 hover:text-blue-800">×</a>
+                    </span>
+                {% endif %}
+                
+                {% for key, value in current_filters.items() %}
+                    <span class="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-800 rounded-md text-sm">
+                        {{ key.replace('_', ' ').title() }}: {{ value }}
+                        <a href="{{ url_for('agents', q=current_query, **dict(current_filters, **{key: None})) }}" class="text-gray-600 hover:text-gray-800">×</a>
+                    </span>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Results Section -->
+    <section class="py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {% if agents %}
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">
+                        {% if current_query or current_filters %}
+                            Search Results
+                        {% else %}
+                            All AI Agents
+                        {% endif %}
+                    </h2>
+                    <p class="text-gray-600">
+                        {{ agents|length }} agent{{ 's' if agents|length != 1 else '' }} found
+                        {% if current_query or current_filters %} 
+                            matching your criteria
+                        {% endif %}
+                    </p>
+                </div>
+
+                <!-- Agents Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for agent in agents %}
+                    <a href="{{ url_for('agent_detail', slug=agent.slug) }}" 
+                       class="block bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-200 hover:border-indigo-200 group">
+                        <div class="p-6">
+                            <!-- Agent Header -->
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                        <img src="{{ agent.logo_url }}" 
+                                             alt="{{ agent.name }} logo" 
+                                             class="w-8 h-8 rounded object-cover"
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                        <i data-lucide="bot" class="h-6 w-6 text-white hidden"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <h3 class="text-lg font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                                            {{ agent.name }}
+                                        </h3>
+                                        <p class="text-sm text-gray-500">{{ agent.creator }}</p>
+                                    </div>
+                                </div>
+                                <div class="text-indigo-600 group-hover:text-indigo-700 transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <!-- Description -->
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ agent.short_desc }}</p>
+
+                            <!-- Tags -->
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                {% for domain in agent.domain_list[:2] %}
+                                    <span class="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">
+                                        {{ domain }}
+                                    </span>
+                                {% endfor %}
+                                {% if agent.domain_list|length > 2 %}
+                                    <span class="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">
+                                        +{{ agent.domain_list|length - 2 }} more
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            <!-- Footer -->
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-gray-500">{{ agent.pricing_clean }}</span>
+                                {% if agent.rating %}
+                                    <div class="flex items-center">
+                                        <span class="text-yellow-500">★</span>
+                                        <span class="text-gray-600 ml-1">{{ "%.1f"|format(agent.rating) }}</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-12">
+                    <i data-lucide="search-x" class="h-16 w-16 text-gray-400 mx-auto mb-4"></i>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">No agents found</h3>
+                    <p class="text-gray-500 mb-4">Try adjusting your search criteria or filters.</p>
+                    <a href="{{ url_for('agents') }}" 
+                       class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
+                        <i data-lucide="refresh-cw" class="h-4 w-4 mr-2"></i>
+                        Clear all filters
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+</div>
+
+<script>
+// Auto-submit form on filter change
+document.querySelectorAll('select[name="category"], select[name="pricing"], select[name="platform"]').forEach(select => {
+    select.addEventListener('change', function() {
+        this.form.submit();
+    });
+});
+
+// Agent logo error handling
+document.addEventListener('DOMContentLoaded', function() {
+    const logos = document.querySelectorAll('img[alt$=" logo"]');
+    logos.forEach(logo => {
+        logo.addEventListener('error', function() {
+            console.log(`Failed to load logo for ${this.alt.replace(' logo', '')}, keeping default icon`);
+        });
+    });
+});
+</script>
+{% endblock %}

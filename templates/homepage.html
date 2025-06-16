@@ -1,0 +1,889 @@
+{% extends "base.html" %}
+
+{% block title %}Top Agents - Your AI Stack—Organized, Trusted, and Team-Ready{% endblock %}
+
+{% block canonical_url %}{{ canonical_url }}{% endblock %}
+
+{% block og_title %}Top Agents - Internal AI Marketplace for Businesses{% endblock %}
+{% block og_description %}An internal marketplace to discover, manage, and share AI agents across your org. Built for fast-moving teams experimenting with AI, and for leaders who need visibility.{% endblock %}
+{% block og_type %}website{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-white">
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 pt-16 pb-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <div class="flex justify-center mb-6">
+                    <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-3 rounded-2xl">
+                        <i data-lucide="brain" class="h-12 w-12 text-white"></i>
+                    </div>
+                </div>
+                <h1 class="text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+                    Your AI Stack—<br>
+                    <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        Organized, Trusted, and Team-Ready
+                    </span>
+                </h1>
+                <p class="text-xl text-gray-600 mb-10 max-w-4xl mx-auto leading-relaxed">
+                    An internal marketplace to discover, manage, and share AI agents across your org.<br>
+                    Built for fast-moving teams experimenting with AI, and for leaders who need visibility.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button onclick="scrollToDemo()" class="inline-flex items-center px-8 py-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                        <i data-lucide="play-circle" class="h-5 w-5 mr-2"></i>
+                        Request Demo
+                    </button>
+                    <a href="{{ url_for('dashboard') }}" class="inline-flex items-center px-8 py-4 bg-white text-blue-600 border-2 border-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+                        <i data-lucide="external-link" class="h-5 w-5 mr-2"></i>
+                        See Live Preview
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Visual placeholder for internal portal -->
+            <div class="relative max-w-7xl mx-auto">
+                <div class="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
+                    <!-- Top Navigation -->
+                    <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="flex space-x-1">
+                                    <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                                    <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                                    <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                                </div>
+                                <span class="text-sm text-gray-700 font-semibold">Top Agents Dashboard</span>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <div class="relative">
+                                    <input type="text" placeholder="Find agents by name, use case..." class="pl-8 pr-4 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:border-blue-500 w-64">
+                                    <i data-lucide="search" class="h-4 w-4 text-gray-400 absolute left-2.5 top-2.5"></i>
+                                </div>
+                                <div class="relative">
+                                    <i data-lucide="bell" class="h-5 w-5 text-gray-500"></i>
+                                    <div class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Insights Banner -->
+                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-4 sm:px-6 py-3 border-b border-gray-200">
+                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                            <div class="flex items-center text-gray-700">
+                                <i data-lucide="users" class="h-4 w-4 mr-2 text-blue-600 flex-shrink-0"></i>
+                                <span class="font-semibold">256</span>
+                                <span class="hidden sm:inline ml-1">Active Users</span>
+                                <span class="sm:hidden ml-1">Users</span>
+                            </div>
+                            <div class="flex items-center text-gray-700">
+                                <i data-lucide="zap" class="h-4 w-4 mr-2 text-green-600 flex-shrink-0"></i>
+                                <span class="font-semibold">3.2K</span>
+                                <span class="hidden sm:inline ml-1">Agent Runs This Month</span>
+                                <span class="sm:hidden ml-1">Runs</span>
+                            </div>
+                            <div class="flex items-center text-gray-700">
+                                <i data-lucide="layers" class="h-4 w-4 mr-2 text-purple-600 flex-shrink-0"></i>
+                                <span class="font-semibold">8</span>
+                                <span class="hidden sm:inline ml-1">Custom Agents Deployed</span>
+                                <span class="sm:hidden ml-1">Custom</span>
+                            </div>
+                            <div class="flex items-center text-gray-700">
+                                <i data-lucide="shield-alert" class="h-4 w-4 mr-2 text-orange-600 flex-shrink-0"></i>
+                                <span class="font-semibold">2</span>
+                                <span class="hidden sm:inline ml-1">Agents Flagged for Review</span>
+                                <span class="sm:hidden ml-1">Flagged</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Dashboard Layout -->
+                    <div class="flex flex-col xl:flex-row min-h-96 gap-4 xl:gap-0">
+                        <!-- Left Sidebar: Team Filters -->
+                        <div class="xl:w-48 bg-gray-50 border border-gray-200 xl:border-r xl:border-t-0 xl:border-l-0 xl:border-b-0 rounded-lg xl:rounded-none p-4 flex flex-col">
+                            <h3 class="text-sm font-semibold text-gray-900 mb-3">Filter by Team</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-1 gap-2 xl:space-y-2 xl:gap-0">
+                                <div class="flex items-center text-sm text-gray-700 p-2 rounded-lg bg-blue-100 border border-blue-200">
+                                    <div class="w-2 h-2 bg-gray-500 rounded-full mr-2"></div>
+                                    <span class="hidden sm:inline">All ({{ total_agents }})</span>
+                                    <span class="sm:hidden">All</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600 p-2 hover:bg-gray-100 rounded-lg cursor-pointer">
+                                    <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                                    <span class="hidden sm:inline">Marketing (24)</span>
+                                    <span class="sm:hidden">Marketing</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600 p-2 hover:bg-gray-100 rounded-lg cursor-pointer">
+                                    <div class="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                                    <span class="hidden sm:inline">Engineering (18)</span>
+                                    <span class="sm:hidden">Engineering</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600 p-2 hover:bg-gray-100 rounded-lg cursor-pointer">
+                                    <div class="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
+                                    <span class="hidden sm:inline">Product (12)</span>
+                                    <span class="sm:hidden">Product</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600 p-2 hover:bg-gray-100 rounded-lg cursor-pointer">
+                                    <div class="w-2 h-2 bg-yellow-500 rounded-full mr-2"></div>
+                                    <span class="hidden sm:inline">Support (8)</span>
+                                    <span class="sm:hidden">Support</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600 p-2 hover:bg-gray-100 rounded-lg cursor-pointer">
+                                    <div class="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
+                                    <span class="hidden sm:inline">Custom (3)</span>
+                                    <span class="sm:hidden">Custom</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6 flex-grow">
+                                <h3 class="text-sm font-semibold text-gray-900 mb-3">Quick Filters</h3>
+                                <div class="grid grid-cols-3 xl:grid-cols-1 gap-2 xl:space-y-2 xl:gap-0 text-sm">
+                                    <div class="text-gray-600 p-2 hover:bg-gray-100 rounded-lg cursor-pointer">Most Used</div>
+                                    <div class="text-gray-600 p-2 hover:bg-gray-100 rounded-lg cursor-pointer">Recently Added</div>
+                                    <div class="text-gray-600 p-2 hover:bg-gray-100 rounded-lg cursor-pointer">My Team's Picks</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Main Content Area -->
+                        <div class="flex flex-col xl:flex-row flex-1">
+                            <!-- Agent Cards Grid -->
+                            <div class="flex-1 p-4 xl:p-6">
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                    {% for agent in featured_agents[:2] %}
+                                    <div class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
+                                        <div class="flex items-start justify-between mb-3">
+                                            <div class="flex items-center space-x-3">
+                                                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                                    <i data-lucide="bot" class="h-5 w-5 text-white"></i>
+                                                </div>
+                                                <div class="min-w-0">
+                                                    <h4 class="font-semibold text-gray-900 text-sm truncate">{{ agent.name[:20] }}{% if agent.name|length > 20 %}...{% endif %}</h4>
+                                                    <div class="flex items-center space-x-2 mt-1">
+                                                        <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Marketing</span>
+                                                        <span class="text-xs text-gray-500">Public</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="relative">
+                                                <button class="text-gray-400 hover:text-gray-600">
+                                                    <i data-lucide="more-horizontal" class="h-4 w-4"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <div class="flex items-center justify-between text-sm mb-2">
+                                                <span class="text-gray-600">142 Runs This Week</span>
+                                                <div class="flex items-center">
+                                                    <span class="text-yellow-500 mr-1">⭐</span>
+                                                    <span class="text-gray-700 font-medium">4.8</span>
+                                                    <span class="text-gray-500 ml-1">(23)</span>
+                                                </div>
+                                            </div>
+                                            <p class="text-xs text-gray-600 line-clamp-2">{{ agent.short_desc[:60] }}...</p>
+                                        </div>
+                                        
+                                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                                            <button class="flex-1 bg-blue-600 text-white text-xs py-2 px-3 rounded-lg hover:bg-blue-700 transition-colors">
+                                                Run Agent
+                                            </button>
+                                            <button class="text-xs text-gray-600 border border-gray-300 py-2 px-3 rounded-lg hover:bg-gray-50 transition-colors">
+                                                Add to Stack
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <!-- Right Sidebar: Featured Recipes -->
+                            <div class="xl:w-64 bg-gray-50 border border-gray-200 xl:border-l xl:border-t-0 xl:border-r-0 xl:border-b-0 rounded-lg xl:rounded-none p-4 flex flex-col">
+                            <h3 class="text-sm font-semibold text-gray-900 mb-4">Featured Recipes</h3>
+                            
+                            <div class="space-y-4 flex-grow">
+                                <div class="bg-white rounded-lg p-3 border border-gray-200">
+                                    <div class="flex items-center mb-2">
+                                        <i data-lucide="rocket" class="h-4 w-4 text-orange-600 mr-2"></i>
+                                        <h4 class="text-sm font-semibold text-gray-900">Launch Prep Stack</h4>
+                                    </div>
+                                    <div class="space-y-1 text-xs mb-3">
+                                        <div class="flex items-center text-gray-600">
+                                            <div class="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></div>
+                                            Feature explainer generator
+                                        </div>
+                                        <div class="flex items-center text-gray-600">
+                                            <div class="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></div>
+                                            Tweet writer
+                                        </div>
+                                        <div class="flex items-center text-gray-600">
+                                            <div class="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></div>
+                                            QA checklist agent
+                                        </div>
+                                    </div>
+                                    <button class="text-xs text-blue-600 hover:text-blue-700">View Recipe →</button>
+                                </div>
+                                
+                                <div class="bg-white rounded-lg p-3 border border-gray-200">
+                                    <div class="flex items-center mb-2">
+                                        <i data-lucide="calendar" class="h-4 w-4 text-purple-600 mr-2"></i>
+                                        <h4 class="text-sm font-semibold text-gray-900">Weekly Ops Stack</h4>
+                                    </div>
+                                    <div class="space-y-1 text-xs mb-3">
+                                        <div class="flex items-center text-gray-600">
+                                            <div class="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></div>
+                                            Meeting summarizer
+                                        </div>
+                                        <div class="flex items-center text-gray-600">
+                                            <div class="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></div>
+                                            Sprint retrospective
+                                        </div>
+                                    </div>
+                                    <button class="text-xs text-blue-600 hover:text-blue-700">View Recipe →</button>
+                                </div>
+                                
+                                <div class="bg-white rounded-lg p-3 border border-gray-200">
+                                    <div class="flex items-center mb-2">
+                                        <i data-lucide="zap" class="h-4 w-4 text-yellow-600 mr-2"></i>
+                                        <h4 class="text-sm font-semibold text-gray-900">Content Creation</h4>
+                                    </div>
+                                    <div class="space-y-1 text-xs mb-3">
+                                        <div class="flex items-center text-gray-600">
+                                            <div class="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></div>
+                                            Blog post generator
+                                        </div>
+                                        <div class="flex items-center text-gray-600">
+                                            <div class="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></div>
+                                            Social media scheduler
+                                        </div>
+                                    </div>
+                                    <button class="text-xs text-blue-600 hover:text-blue-700">View Recipe →</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trusted by Modern Teams -->
+    <section class="py-16 bg-white border-t border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h3 class="text-lg font-semibold text-gray-900 mb-8">Trusted by Modern Teams</h3>
+            <p class="text-gray-600 mb-8">Built for startups, scale-ups, and distributed AI-first teams.</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center justify-items-center opacity-70">
+                <!-- Stripe -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 flex items-center justify-center">
+                        <svg viewBox="0 0 60 25" class="h-6 w-auto">
+                            <path fill="#6772E5" d="M59.5 12.6c0-7.4-3.4-12.6-8.9-12.6-5.5 0-9.2 5.2-9.2 12.5 0 8.3 3.7 12.5 9.7 12.5 2.8 0 4.9-.6 6.5-1.6l-.9-3.7c-1.4.8-2.9 1.2-4.8 1.2-3.1 0-5.3-1.6-5.6-5.8h13.1c.1-.5.1-1.3.1-2.5zm-13.1-2.2c0-3.6 1.7-5.8 4.2-5.8s4.1 2.2 4.1 5.8h-8.3zm-21.9-9.1c-2.4 0-4.1 1.1-4.9 1.9l-.3-1.5H14v23.3l5.4-1.1V19c.9.6 2.4 1.5 4.7 1.5 4.5 0 8.6-3.5 8.6-12.6 0-8-4-12.4-8.6-12.4zm-1.3 19.3c-1.5 0-2.4-.6-3.1-1.3V7.6c.7-.6 1.6-1.2 3.1-1.2 2.4 0 4.1 2.7 4.1 7.5s-1.7 7.7-4.1 7.7zM0 7.3c0 1.9-.6 3.5-1.9 4.7l4.9 7.2h6.2l-6.2-8.9C4.8 9.4 6 7.8 6 5.4V0H0v7.3z"/>
+                        </svg>
+                    </div>
+                    <span class="text-lg font-semibold text-gray-700">Stripe</span>
+                </div>
+                
+                <!-- Notion -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 flex items-center justify-center">
+                        <svg viewBox="0 0 100 100" class="h-6 w-6">
+                            <path fill="currentColor" d="M6.017 4.313l55.333 -4.087c6.797 -0.583 8.543 -0.19 12.817 2.917l17.663 12.443c2.913 2.14 3.883 2.723 3.883 5.053v68.243c0 4.277 -1.553 6.807 -6.99 7.193L24.467 99.967c-4.08 0.193 -6.023 -0.39 -8.16 -3.113L3.3 79.94c-2.333 -3.113 -3.3 -5.443 -3.3 -8.167V11.113c0 -3.497 1.553 -6.413 6.017 -6.8z"/>
+                        </svg>
+                    </div>
+                    <span class="text-lg font-semibold text-gray-700">Notion</span>
+                </div>
+                
+                <!-- Linear -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 flex items-center justify-center">
+                        <svg viewBox="0 0 100 100" class="h-6 w-6">
+                            <defs>
+                                <linearGradient id="linear-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#5E6AD2"/>
+                                    <stop offset="100%" style="stop-color:#C5A3FF"/>
+                                </linearGradient>
+                            </defs>
+                            <path fill="url(#linear-gradient)" d="M1,99 L99,1 L99,38 L38,99 Z"/>
+                        </svg>
+                    </div>
+                    <span class="text-lg font-semibold text-gray-700">Linear</span>
+                </div>
+                
+                <!-- Vercel -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 flex items-center justify-center">
+                        <svg fill="currentColor" viewBox="0 0 75 65" class="h-5 w-5">
+                            <path d="M37.5 0L75 65H0z"/>
+                        </svg>
+                    </div>
+                    <span class="text-lg font-semibold text-gray-700">Vercel</span>
+                </div>
+                
+                <!-- Figma -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 flex items-center justify-center">
+                        <svg viewBox="0 0 200 300" class="h-6 w-4">
+                            <path fill="#f24e1e" d="M50 300c27.6 0 50-22.4 50-50v-50H50c-27.6 0-50 22.4-50 50s22.4 50 50 50z"/>
+                            <path fill="#a259ff" d="M0 150c0-27.6 22.4-50 50-50h50v100H50c-27.6 0-50-22.4-50-50z"/>
+                            <path fill="#ff7262" d="M0 50C0 22.4 22.4 0 50 0h50v100H50C22.4 100 0 77.6 0 50z"/>
+                            <path fill="#1abcfe" d="M100 0h50c27.6 0 50 22.4 50 50s-22.4 50-50 50h-50z"/>
+                            <path fill="#0acf83" d="M200 150c0 27.6-22.4 50-50 50s-50-22.4-50-50 22.4-50 50-50 50 22.4 50 50z"/>
+                        </svg>
+                    </div>
+                    <span class="text-lg font-semibold text-gray-700">Figma</span>
+                </div>
+                
+                <!-- Anthropic -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 flex items-center justify-center">
+                        <svg viewBox="0 0 100 100" class="h-6 w-6">
+                            <circle cx="50" cy="50" r="45" fill="#D2691E" stroke="#B8860B" stroke-width="2"/>
+                            <text x="50" y="60" text-anchor="middle" fill="white" font-family="Arial" font-size="40" font-weight="bold">A</text>
+                        </svg>
+                    </div>
+                    <span class="text-lg font-semibold text-gray-700">Anthropic</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Platform Capabilities -->
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">What You Get</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Everything your team needs to organize, deploy, and govern AI agents at scale.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                    <div class="bg-blue-100 w-12 h-12 rounded-lg flex items-center justify-center mb-6">
+                        <i data-lucide="search" class="h-6 w-6 text-blue-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Unified Discovery</h3>
+                    <p class="text-gray-600">Browse approved AI agents in one place—tagged by team, use case, or function.</p>
+                </div>
+                
+                <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                    <div class="bg-purple-100 w-12 h-12 rounded-lg flex items-center justify-center mb-6">
+                        <i data-lucide="git-fork" class="h-6 w-6 text-purple-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Custom Agents + Forking</h3>
+                    <p class="text-gray-600">Teams can clone & adapt agents with private prompts or API credentials.</p>
+                </div>
+                
+                <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                    <div class="bg-green-100 w-12 h-12 rounded-lg flex items-center justify-center mb-6">
+                        <i data-lucide="users" class="h-6 w-6 text-green-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Role-Based Access & Permissions</h3>
+                    <p class="text-gray-600">Control who can use, edit, or approve agents across functions.</p>
+                </div>
+                
+                <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                    <div class="bg-orange-100 w-12 h-12 rounded-lg flex items-center justify-center mb-6">
+                        <i data-lucide="bar-chart-3" class="h-6 w-6 text-orange-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Usage Analytics</h3>
+                    <p class="text-gray-600">See which agents drive value across teams. Know what's being used—and what isn't.</p>
+                </div>
+                
+                <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                    <div class="bg-red-100 w-12 h-12 rounded-lg flex items-center justify-center mb-6">
+                        <i data-lucide="shield-check" class="h-6 w-6 text-red-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Governance Ready</h3>
+                    <p class="text-gray-600">Block agents that break policy. Enforce compliance across AI usage.</p>
+                </div>
+                
+                <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                    <div class="bg-indigo-100 w-12 h-12 rounded-lg flex items-center justify-center mb-6">
+                        <i data-lucide="zap" class="h-6 w-6 text-indigo-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Quick Deployment</h3>
+                    <p class="text-gray-600">Get teams up and running with proven agents in minutes, not weeks.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why This Matters -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Why This Matters</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Stop the chaos. Start organizing your AI stack.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Problem -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-red-100 w-12 h-12 rounded-lg flex items-center justify-center mr-4">
+                            <i data-lucide="alert-triangle" class="h-6 w-6 text-red-600"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900">Problem</h3>
+                    </div>
+                    <ul class="text-gray-600 space-y-2 text-sm">
+                        <li class="flex items-start">
+                            <span class="text-red-500 mr-2 mt-1">•</span>
+                            <span>Teams experimenting in silos</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-red-500 mr-2 mt-1">•</span>
+                            <span>Nobody knows what's working</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-red-500 mr-2 mt-1">•</span>
+                            <span>Security teams in the dark</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-red-500 mr-2 mt-1">•</span>
+                            <span>Duplicated effort across teams</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Solution -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-blue-100 w-12 h-12 rounded-lg flex items-center justify-center mr-4">
+                            <i data-lucide="lightbulb" class="h-6 w-6 text-blue-600"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900">Solution</h3>
+                    </div>
+                    <ul class="text-gray-600 space-y-2 text-sm">
+                        <li class="flex items-start">
+                            <span class="text-blue-500 mr-2 mt-1">•</span>
+                            <span>System of record for AI usage</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-blue-500 mr-2 mt-1">•</span>
+                            <span>Standardize the best agents</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-blue-500 mr-2 mt-1">•</span>
+                            <span>Fork for your needs</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-blue-500 mr-2 mt-1">•</span>
+                            <span>Monitor everything</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Outcomes -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-green-100 w-12 h-12 rounded-lg flex items-center justify-center mr-4">
+                            <i data-lucide="trending-up" class="h-6 w-6 text-green-600"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900">Outcomes</h3>
+                    </div>
+                    <ul class="text-gray-600 space-y-2 text-sm">
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-2 mt-1">✓</span>
+                            <span>Shorter team onboarding</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-2 mt-1">✓</span>
+                            <span>Less duplication of effort</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-2 mt-1">✓</span>
+                            <span>Measurable AI adoption</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-2 mt-1">✓</span>
+                            <span>Safer experimentation</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Use Cases by Team -->
+    <section class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-gray-900 mb-3">Use Cases by Team</h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                    See how different teams across your organization can leverage AI agents.
+                </p>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-base font-semibold text-gray-900">Team</th>
+                                <th class="px-6 py-4 text-left text-base font-semibold text-gray-900">Use Case Examples</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center">
+                                        <div class="bg-pink-100 w-8 h-8 rounded-lg flex items-center justify-center mr-3">
+                                            <i data-lucide="megaphone" class="h-4 w-4 text-pink-600"></i>
+                                        </div>
+                                        <span class="font-medium text-gray-900">Marketing</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-gray-600 text-sm">Content generators, SEO tools, AI copy reviewers</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center">
+                                        <div class="bg-green-100 w-8 h-8 rounded-lg flex items-center justify-center mr-3">
+                                            <i data-lucide="trending-up" class="h-4 w-4 text-green-600"></i>
+                                        </div>
+                                        <span class="font-medium text-gray-900">Growth</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-gray-600 text-sm">Scrapers, lead-gen agents, email optimizers</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center">
+                                        <div class="bg-blue-100 w-8 h-8 rounded-lg flex items-center justify-center mr-3">
+                                            <i data-lucide="package" class="h-4 w-4 text-blue-600"></i>
+                                        </div>
+                                        <span class="font-medium text-gray-900">Product</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-gray-600 text-sm">User research agents, PRD generators, roadmap writers</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center">
+                                        <div class="bg-purple-100 w-8 h-8 rounded-lg flex items-center justify-center mr-3">
+                                            <i data-lucide="code" class="h-4 w-4 text-purple-600"></i>
+                                        </div>
+                                        <span class="font-medium text-gray-900">Engineering</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-gray-600 text-sm">Linter bots, code review agents, CI/CD copilots</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center">
+                                        <div class="bg-orange-100 w-8 h-8 rounded-lg flex items-center justify-center mr-3">
+                                            <i data-lucide="headphones" class="h-4 w-4 text-orange-600"></i>
+                                        </div>
+                                        <span class="font-medium text-gray-900">Support</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-gray-600 text-sm">Ticket responders, FAQ agents</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Simple, Transparent Pricing</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Choose the plan that fits your team's size and needs.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <!-- Starter -->
+                <div class="bg-white border-2 border-gray-200 rounded-2xl p-8 hover:border-blue-300 transition-colors flex flex-col h-full">
+                    <div class="text-center flex-grow">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Starter</h3>
+                        <div class="text-4xl font-bold text-gray-900 mb-4">$99<span class="text-lg text-gray-600">/month</span></div>
+                        <p class="text-gray-600 mb-8">For up to 10 users</p>
+                        <ul class="text-left space-y-3 mb-8">
+                            <li class="flex items-center">
+                                <i data-lucide="check" class="h-5 w-5 text-green-500 mr-3"></i>
+                                <span class="text-gray-700">Basic agent discovery</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i data-lucide="check" class="h-5 w-5 text-green-500 mr-3"></i>
+                                <span class="text-gray-700">Team collaboration</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i data-lucide="check" class="h-5 w-5 text-green-500 mr-3"></i>
+                                <span class="text-gray-700">Basic permissions</span>
+                            </li>
+                            <li class="invisible">
+                                <i data-lucide="check" class="h-5 w-5 text-green-500 mr-3"></i>
+                                <span class="text-gray-700">Placeholder</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <button onclick="scrollToDemo()" class="w-full bg-gray-600 text-white py-3 rounded-lg font-semibold hover:bg-gray-700 transition-colors mt-auto">
+                        Get Started
+                    </button>
+                </div>
+                
+                <!-- Growth -->
+                <div class="bg-blue-50 border-2 border-blue-500 rounded-2xl p-8 relative flex flex-col h-full">
+                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
+                        <span class="bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg whitespace-nowrap">Most Popular</span>
+                    </div>
+                    <div class="text-center flex-grow">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Growth</h3>
+                        <div class="text-4xl font-bold text-gray-900 mb-4">$499<span class="text-lg text-gray-600">/month</span></div>
+                        <p class="text-gray-600 mb-8">Includes usage analytics + Slack integration</p>
+                        <ul class="text-left space-y-3 mb-8">
+                            <li class="flex items-center">
+                                <i data-lucide="check" class="h-5 w-5 text-green-500 mr-3"></i>
+                                <span class="text-gray-700">Everything in Starter</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i data-lucide="check" class="h-5 w-5 text-green-500 mr-3"></i>
+                                <span class="text-gray-700">Usage analytics & reporting</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i data-lucide="check" class="h-5 w-5 text-green-500 mr-3"></i>
+                                <span class="text-gray-700">Slack integration</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i data-lucide="check" class="h-5 w-5 text-green-500 mr-3"></i>
+                                <span class="text-gray-700">Advanced permissions</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <button onclick="scrollToDemo()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors mt-auto">
+                        Start Free Trial
+                    </button>
+                </div>
+                
+                <!-- Enterprise -->
+                <div class="bg-white border-2 border-gray-200 rounded-2xl p-8 hover:border-purple-300 transition-colors flex flex-col h-full">
+                    <div class="text-center flex-grow">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Enterprise</h3>
+                        <div class="text-4xl font-bold text-gray-900 mb-4">Custom</div>
+                        <p class="text-gray-600 mb-8">White-label, SSO, priority support</p>
+                        <ul class="text-left space-y-3 mb-8">
+                            <li class="flex items-center">
+                                <i data-lucide="check" class="h-5 w-5 text-green-500 mr-3"></i>
+                                <span class="text-gray-700">Everything in Growth</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i data-lucide="check" class="h-5 w-5 text-green-500 mr-3"></i>
+                                <span class="text-gray-700">White-label solution</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i data-lucide="check" class="h-5 w-5 text-green-500 mr-3"></i>
+                                <span class="text-gray-700">SSO integration</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i data-lucide="check" class="h-5 w-5 text-green-500 mr-3"></i>
+                                <span class="text-gray-700">Priority support</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <button onclick="scrollToDemo()" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors mt-auto">
+                        Contact Sales
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Metrics -->
+    <section class="py-20 bg-gradient-to-br from-blue-900 to-purple-900 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Trusted by Growing Teams</h2>
+                <p class="text-xl text-blue-100">Real metrics from real deployments</p>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div>
+                    <div class="text-4xl font-bold text-blue-300 mb-2">100+</div>
+                    <div class="text-blue-100">Teams Deployed</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold text-purple-300 mb-2">{{ total_agents }}</div>
+                    <div class="text-blue-100">Agents Reviewed</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold text-pink-300 mb-2">10,000+</div>
+                    <div class="text-blue-100">Monthly Agent Runs</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold text-green-300 mb-2">95%</div>
+                    <div class="text-blue-100">Team Satisfaction</div>
+                </div>
+            </div>
+            
+            <!-- Roadmap -->
+            <div class="mt-16 bg-white/10 backdrop-blur rounded-2xl p-8">
+                <h3 class="text-2xl font-bold mb-8 text-center">Coming Soon</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                            <i data-lucide="check" class="h-4 w-4 text-white"></i>
+                        </div>
+                        <span class="text-blue-100">Internal portal</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                            <i data-lucide="check" class="h-4 w-4 text-white"></i>
+                        </div>
+                        <span class="text-blue-100">Fork & deploy agents</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                            <i data-lucide="clock" class="h-4 w-4 text-white"></i>
+                        </div>
+                        <span class="text-blue-100">Team-wide usage graphs</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                            <i data-lucide="clock" class="h-4 w-4 text-white"></i>
+                        </div>
+                        <span class="text-blue-100">Agent performance scoring</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section id="demo" class="py-20 bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-5xl font-bold text-gray-900 mb-6">Bring Order to Your AI Stack</h2>
+            <p class="text-xl text-gray-600 mb-10 max-w-3xl mx-auto">
+                Stop experimenting in silos. Start building with confidence. 
+                Get your team organized around AI that actually works.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+                <button onclick="openDemoForm()" class="inline-flex items-center px-8 py-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                    <i data-lucide="calendar" class="h-5 w-5 mr-2"></i>
+                    Request a Demo
+                </button>
+                <a href="{{ url_for('dashboard') }}" class="inline-flex items-center px-8 py-4 bg-white text-blue-600 border-2 border-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+                    <i data-lucide="eye" class="h-5 w-5 mr-2"></i>
+                    Try It Live
+                </a>
+            </div>
+            
+            <!-- Demo Form (Hidden by default) -->
+            <div id="demoForm" class="hidden bg-white rounded-2xl shadow-xl p-8 max-w-md mx-auto">
+                <h3 class="text-2xl font-bold text-gray-900 mb-6">Request Your Demo</h3>
+                <form id="demoFormElement" class="space-y-4" onsubmit="submitDemoRequest(event)">
+                    <input type="text" id="companyName" placeholder="Company Name" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <input type="email" id="workEmail" placeholder="Work Email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <input type="text" id="teamSize" placeholder="Team Size" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <textarea id="aiUsage" placeholder="Tell us about your AI usage..." rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                    <button type="submit" id="submitBtn" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                        Schedule Demo
+                    </button>
+                </form>
+                <div id="demoMessage" class="hidden mt-4 p-3 rounded-lg"></div>
+                <button onclick="closeDemoForm()" class="mt-4 text-gray-500 hover:text-gray-700">Cancel</button>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+function scrollToDemo() {
+    document.getElementById('demo').scrollIntoView({ behavior: 'smooth' });
+}
+
+function openDemoForm() {
+    document.getElementById('demoForm').classList.remove('hidden');
+}
+
+function closeDemoForm() {
+    document.getElementById('demoForm').classList.add('hidden');
+    // Reset form and hide message
+    document.getElementById('demoFormElement').reset();
+    document.getElementById('demoMessage').classList.add('hidden');
+}
+
+async function submitDemoRequest(event) {
+    event.preventDefault();
+    
+    const submitBtn = document.getElementById('submitBtn');
+    const messageDiv = document.getElementById('demoMessage');
+    
+    // Show loading state
+    submitBtn.textContent = 'Submitting...';
+    submitBtn.disabled = true;
+    messageDiv.classList.add('hidden');
+    
+    // Collect form data
+    const formData = {
+        company_name: document.getElementById('companyName').value,
+        email: document.getElementById('workEmail').value,
+        team_size: document.getElementById('teamSize').value,
+        ai_usage: document.getElementById('aiUsage').value
+    };
+    
+    try {
+        const response = await fetch('/demo-request', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            messageDiv.className = 'mt-4 p-3 rounded-lg bg-green-100 text-green-800';
+            messageDiv.textContent = result.message;
+            document.getElementById('demoFormElement').reset();
+        } else {
+            messageDiv.className = 'mt-4 p-3 rounded-lg bg-red-100 text-red-800';
+            messageDiv.textContent = result.message;
+        }
+        
+        messageDiv.classList.remove('hidden');
+        
+    } catch (error) {
+        messageDiv.className = 'mt-4 p-3 rounded-lg bg-red-100 text-red-800';
+        messageDiv.textContent = 'Network error. Please try again.';
+        messageDiv.classList.remove('hidden');
+    }
+    
+    // Reset button
+    submitBtn.textContent = 'Schedule Demo';
+    submitBtn.disabled = false;
+}
+
+// Agent logo error handling
+document.addEventListener('DOMContentLoaded', function() {
+    const logos = document.querySelectorAll('img[alt$=" logo"]');
+    logos.forEach(logo => {
+        logo.addEventListener('error', function() {
+            console.log(`Failed to load logo for ${this.alt.replace(' logo', '')}, keeping default icon`);
+        });
+    });
+});
+</script>
+
+<script>
+// Agent logo error handling
+document.addEventListener('DOMContentLoaded', function() {
+    const logos = document.querySelectorAll('img[alt$=" logo"]');
+    logos.forEach(logo => {
+        logo.addEventListener('error', function() {
+            console.log(`Failed to load logo for ${this.alt.replace(' logo', '')}, keeping default icon`);
+        });
+    });
+});
+</script>
+{% endblock %}

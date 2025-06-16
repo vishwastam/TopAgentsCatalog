@@ -1,0 +1,33 @@
+User-agent: *
+Allow: /
+Allow: /.well-known/ai-plugin.json
+Allow: /sitemap.xml
+Allow: /openapi.json
+
+# AI and LLM specific crawl guidance
+User-agent: ChatGPT-User
+Allow: /
+Allow: /.well-known/ai-plugin.json
+Allow: /openapi.json
+
+User-agent: GPTBot
+Allow: /
+Allow: /.well-known/ai-plugin.json
+Allow: /openapi.json
+
+User-agent: ClaudeBot
+Allow: /
+Allow: /.well-known/ai-plugin.json
+Allow: /openapi.json
+
+User-agent: Google-Extended
+Allow: /
+Allow: /.well-known/ai-plugin.json
+Allow: /openapi.json
+
+# Sitemaps
+Sitemap: https://localhost:5000/sitemap.xml
+Sitemap: https://localhost:5000/static/sitemap.xml
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1

@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+
+{% block title %}API Documentation - Top Agents{% endblock %}
+{% block description %}REST API documentation for accessing AI agents directory data programmatically. Get comprehensive agent information via JSON API.{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="text-center mb-12">
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">API Documentation</h1>
+        <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+            Access our comprehensive AI agents directory programmatically through our REST API. 
+            Get real-time data about 50+ AI agents in JSON format.
+        </p>
+    </div>
+
+    <!-- Quick Start -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+        <h2 class="text-xl font-semibold text-blue-900 mb-3">Quick Start</h2>
+        <p class="text-blue-800 mb-4">Get all agents with a simple GET request:</p>
+        <div class="bg-blue-900 text-blue-100 p-4 rounded-md font-mono text-sm overflow-x-auto">
+            curl {{ request.url_root }}api/agents
+        </div>
+    </div>
+
+    <!-- API Endpoints -->
+    <div class="space-y-8">
+        <!-- Get All Agents -->
+        <div class="bg-white border border-gray-200 rounded-lg p-6">
+            <div class="flex items-center mb-4">
+                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-md text-sm font-medium mr-3">GET</span>
+                <h3 class="text-xl font-semibold text-gray-900">/api/agents</h3>
+            </div>
+            
+            <p class="text-gray-600 mb-6">Retrieve a complete list of all AI agents in the directory.</p>
+            
+            <!-- Request Example -->
+            <div class="mb-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-3">Request</h4>
+                <div class="bg-gray-900 text-gray-100 p-4 rounded-md overflow-x-auto">
+                    <pre><code>curl -X GET {{ request.url_root }}api/agents \
+  -H "Accept: application/json"</code></pre>
+                </div>
+            </div>
+
+            <!-- Response Example -->
+            <div class="mb-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-3">Response</h4>
+                <div class="bg-gray-900 text-gray-100 p-4 rounded-md overflow-x-auto">
+                    <pre><code>{
+  "success": true,
+  "data": [
+    {
+      "id": "chatgpt",
+      "name": "ChatGPT",
+      "short_description": "Advanced conversational AI by OpenAI based on GPT-4/GPT-4o",
+      "long_description": "ChatGPT is a state-of-the-art conversational AI...",
+      "creator": "OpenAI",
+      "url": "https://chat.openai.com",
+      "domains": ["Tech", "General AI"],
+      "use_cases": ["Conversation", "Writing", "Coding"],
+      "platform": ["Web", "Mobile", "API"],
+      "pricing": "Freemium",
+      "underlying_model": "GPT-4/GPT-4o",
+      "deployment": "Cloud",
+      "legitimacy": "Official",
+      "user_feedback": "Users praise ChatGPT for its natural conversation..."
+    }
+  ],
+  "total": 56,
+  "version": "1.0"
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- Response Fields -->
+            <div>
+                <h4 class="text-lg font-medium text-gray-900 mb-3">Response Fields</h4>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Field</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200 text-sm">
+                            <tr><td class="px-4 py-3 font-mono">success</td><td class="px-4 py-3">boolean</td><td class="px-4 py-3">Request success status</td></tr>
+                            <tr><td class="px-4 py-3 font-mono">data</td><td class="px-4 py-3">array</td><td class="px-4 py-3">Array of agent objects</td></tr>
+                            <tr><td class="px-4 py-3 font-mono">total</td><td class="px-4 py-3">integer</td><td class="px-4 py-3">Total number of agents</td></tr>
+                            <tr><td class="px-4 py-3 font-mono">id</td><td class="px-4 py-3">string</td><td class="px-4 py-3">Unique agent identifier (slug)</td></tr>
+                            <tr><td class="px-4 py-3 font-mono">name</td><td class="px-4 py-3">string</td><td class="px-4 py-3">Agent name</td></tr>
+                            <tr><td class="px-4 py-3 font-mono">short_description</td><td class="px-4 py-3">string</td><td class="px-4 py-3">Brief description of the agent</td></tr>
+                            <tr><td class="px-4 py-3 font-mono">creator</td><td class="px-4 py-3">string</td><td class="px-4 py-3">Company or person who created the agent</td></tr>
+                            <tr><td class="px-4 py-3 font-mono">url</td><td class="px-4 py-3">string</td><td class="px-4 py-3">Official website or access URL</td></tr>
+                            <tr><td class="px-4 py-3 font-mono">domains</td><td class="px-4 py-3">array</td><td class="px-4 py-3">Categories the agent belongs to</td></tr>
+                            <tr><td class="px-4 py-3 font-mono">use_cases</td><td class="px-4 py-3">array</td><td class="px-4 py-3">Primary use cases for the agent</td></tr>
+                            <tr><td class="px-4 py-3 font-mono">platform</td><td class="px-4 py-3">array</td><td class="px-4 py-3">Available platforms (Web, Mobile, API, etc.)</td></tr>
+                            <tr><td class="px-4 py-3 font-mono">pricing</td><td class="px-4 py-3">string</td><td class="px-4 py-3">Pricing model (Free, Freemium, Paid, etc.)</td></tr>
+                            <tr><td class="px-4 py-3 font-mono">underlying_model</td><td class="px-4 py-3">string</td><td class="px-4 py-3">AI model powering the agent</td></tr>
+                            <tr><td class="px-4 py-3 font-mono">user_feedback</td><td class="px-4 py-3">string</td><td class="px-4 py-3">Community feedback and reviews</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rate Limiting -->
+        <div class="bg-white border border-gray-200 rounded-lg p-6">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">Rate Limiting & Usage</h3>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="font-medium text-gray-900 mb-2">Current Limits</h4>
+                    <ul class="text-gray-600 space-y-1">
+                        <li>• No authentication required</li>
+                        <li>• No rate limiting currently enforced</li>
+                        <li>• Data updated in real-time</li>
+                        <li>• JSON response format only</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-medium text-gray-900 mb-2">Best Practices</h4>
+                    <ul class="text-gray-600 space-y-1">
+                        <li>• Cache responses for better performance</li>
+                        <li>• Use appropriate HTTP headers</li>
+                        <li>• Handle error responses gracefully</li>
+                        <li>• Consider pagination for large datasets</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Handling -->
+        <div class="bg-white border border-gray-200 rounded-lg p-6">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">Error Handling</h3>
+            <p class="text-gray-600 mb-4">The API returns standard HTTP status codes and error responses in JSON format.</p>
+            
+            <div class="bg-gray-900 text-gray-100 p-4 rounded-md overflow-x-auto mb-4">
+                <pre><code>{
+  "success": false,
+  "error": "Internal server error",
+  "total": 0
+}</code></pre>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="font-medium text-gray-900 mb-2">HTTP Status Codes</h4>
+                    <ul class="text-gray-600 space-y-1">
+                        <li>• <code>200</code> - Success</li>
+                        <li>• <code>404</code> - Endpoint not found</li>
+                        <li>• <code>500</code> - Internal server error</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-medium text-gray-900 mb-2">Error Fields</h4>
+                    <ul class="text-gray-600 space-y-1">
+                        <li>• <code>success</code> - Always false for errors</li>
+                        <li>• <code>error</code> - Human-readable error message</li>
+                        <li>• <code>total</code> - Always 0 for errors</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Code Examples -->
+        <div class="bg-white border border-gray-200 rounded-lg p-6">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">Code Examples</h3>
+            
+            <!-- JavaScript -->
+            <div class="mb-6">
+                <h4 class="font-medium text-gray-900 mb-2">JavaScript (fetch)</h4>
+                <div class="bg-gray-900 text-gray-100 p-4 rounded-md overflow-x-auto">
+                    <pre><code>fetch('{{ request.url_root }}api/agents')
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      console.log(`Found ${data.total} agents`);
+      data.data.forEach(agent => {
+        console.log(`${agent.name} by ${agent.creator}`);
+      });
+    }
+  })
+  .catch(error => console.error('Error:', error));</code></pre>
+                </div>
+            </div>
+
+            <!-- Python -->
+            <div class="mb-6">
+                <h4 class="font-medium text-gray-900 mb-2">Python (requests)</h4>
+                <div class="bg-gray-900 text-gray-100 p-4 rounded-md overflow-x-auto">
+                    <pre><code>import requests
+
+response = requests.get('{{ request.url_root }}api/agents')
+data = response.json()
+
+if data['success']:
+    print(f"Found {data['total']} agents")
+    for agent in data['data']:
+        print(f"{agent['name']} by {agent['creator']}")
+else:
+    print(f"Error: {data['error']}")</code></pre>
+                </div>
+            </div>
+
+            <!-- PHP -->
+            <div>
+                <h4 class="font-medium text-gray-900 mb-2">PHP</h4>
+                <div class="bg-gray-900 text-gray-100 p-4 rounded-md overflow-x-auto">
+                    <pre><code>$response = file_get_contents('{{ request.url_root }}api/agents');
+$data = json_decode($response, true);
+
+if ($data['success']) {
+    echo "Found " . $data['total'] . " agents\n";
+    foreach ($data['data'] as $agent) {
+        echo $agent['name'] . " by " . $agent['creator'] . "\n";
+    }
+} else {
+    echo "Error: " . $data['error'] . "\n";
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Support -->
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">Support & Feedback</h3>
+            <p class="text-gray-600 mb-4">
+                Need help with the API or have suggestions for improvements? 
+                We'd love to hear from you.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <a href="{{ url_for('index') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                    <i data-lucide="arrow-left" class="h-4 w-4 mr-2"></i>
+                    Back to Directory
+                </a>
+                <a href="https://github.com/vishwastam/ai-agents-directory" target="_blank" class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50">
+                    <i data-lucide="github" class="h-4 w-4 mr-2"></i>
+                    View on GitHub
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Initialize Lucide icons
+lucide.createIcons();
+</script>
+{% endblock %}

@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Test AI Agent",
+    "domains": "Testing",
+    "use_cases": "Testing functionality",
+    "short_desc": "A test AI agent for demonstration purposes",
+    "long_desc": "This is a detailed description of the test agent",
+    "creator": "Test Company",
+    "url": "https://example.com",
+    "platform": "Web",
+    "pricing": "Free",
+    "underlying_model": "Test Model",
+    "deployment": "",
+    "legitimacy": "User Submitted"
+  }
+]

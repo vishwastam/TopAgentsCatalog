@@ -1,0 +1,20 @@
+# AI Agents Directory - Python Dependencies
+# Install with: pip install -r dependencies.txt
+
+email-validator==2.2.0
+flask==3.0.3
+flask-dance==7.0.0
+flask-login==0.6.3
+flask-sqlalchemy==3.1.1
+fuzzywuzzy==0.18.0
+gunicorn==23.0.0
+oauthlib==3.2.2
+openai==1.51.2
+pandas==2.2.3
+psycopg2-binary==2.9.9
+pyjwt==2.9.0
+python-levenshtein==0.25.1
+trafilatura==1.12.2
+werkzeug==3.0.4
+beautifulsoup4
+requests

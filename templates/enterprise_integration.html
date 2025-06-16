@@ -1,0 +1,355 @@
+{% extends "base.html" %}
+
+{% block title %}Enterprise Integration - Top Agents{% endblock %}
+
+{% block meta_description %}Learn how Top Agents seamlessly integrates with your existing enterprise systems through API gateways, policy enforcement, and comprehensive audit trails for secure AI agent deployment.{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Hero Section -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div class="text-center">
+                <h1 class="text-4xl md:text-5xl font-bold mb-6">Enterprise Integration</h1>
+                <p class="text-xl md:text-2xl mb-8 opacity-90">Seamlessly integrate AI agents into your existing enterprise infrastructure</p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="#architecture" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                        View Architecture
+                    </a>
+                    <a href="#benefits" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors">
+                        Enterprise Benefits
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Integration Steps Overview -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">5-Step Integration Process</h2>
+            <p class="text-lg text-gray-600">Top Agents integrates seamlessly with your existing enterprise systems</p>
+        </div>
+
+        <!-- Step Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+            <!-- Step 1 -->
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+                <div class="flex items-center mb-4">
+                    <div class="bg-blue-100 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                        <span class="text-blue-600 font-bold">1</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900">Agent Access</h3>
+                </div>
+                <p class="text-gray-600 mb-4">Internal users discover and run approved AI agents through the Top Agents web dashboard or lightweight SDK integrated into internal apps.</p>
+                <div class="flex items-center text-sm text-blue-600">
+                    <i data-lucide="monitor" class="h-4 w-4 mr-2"></i>
+                    GUI & SDK Access
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+                <div class="flex items-center mb-4">
+                    <div class="bg-green-100 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                        <span class="text-green-600 font-bold">2</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900">Traffic Interception</h3>
+                </div>
+                <p class="text-gray-600 mb-4">All agent-related requests are routed through your existing API Gateway (Kong, Apigee) where a Top Agents plugin intercepts and monitors them.</p>
+                <div class="flex items-center text-sm text-green-600">
+                    <i data-lucide="shield" class="h-4 w-4 mr-2"></i>
+                    API Gateway Integration
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-yellow-500">
+                <div class="flex items-center mb-4">
+                    <div class="bg-yellow-100 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                        <span class="text-yellow-600 font-bold">3</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900">Policy Enforcement</h3>
+                </div>
+                <p class="text-gray-600 mb-4">Built-in Risk & Compliance Engine checks for policy violations, redacts sensitive data (PII), and approves or blocks calls.</p>
+                <div class="flex items-center text-sm text-yellow-600">
+                    <i data-lucide="lock" class="h-4 w-4 mr-2"></i>
+                    Risk & Compliance
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+                <div class="flex items-center mb-4">
+                    <div class="bg-purple-100 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                        <span class="text-purple-600 font-bold">4</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900">Agent Execution</h3>
+                </div>
+                <p class="text-gray-600 mb-4">Once cleared, sanitized requests are sent to external AI agents (OpenAI, Anthropic), with responses passing through the same inspection process.</p>
+                <div class="flex items-center text-sm text-purple-600">
+                    <i data-lucide="cpu" class="h-4 w-4 mr-2"></i>
+                    Secure Execution
+                </div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-red-500 md:col-span-2 lg:col-span-1">
+                <div class="flex items-center mb-4">
+                    <div class="bg-red-100 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                        <span class="text-red-600 font-bold">5</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900">Audit & Governance</h3>
+                </div>
+                <p class="text-gray-600 mb-4">All interactions are logged in real-time to enterprise SIEM, ITSM, and analytics systems for full audit trails and compliance.</p>
+                <div class="flex items-center text-sm text-red-600">
+                    <i data-lucide="activity" class="h-4 w-4 mr-2"></i>
+                    Complete Visibility
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Visual Architecture Diagram -->
+    <div id="architecture" class="bg-white py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-6">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Integration Architecture</h2>
+                <p class="text-gray-600">How Top Agents integrates with your enterprise systems</p>
+            </div>
+
+            <!-- Architecture Flow Diagram -->
+            <div class="bg-gray-50 rounded-xl p-4 overflow-x-auto">
+                <!-- Flow Container - Always Horizontal -->
+                <div class="flex items-center justify-between space-x-3 min-w-[800px]">
+                    
+                    <!-- User Interface -->
+                    <div class="flex flex-col items-center">
+                        <div class="bg-blue-100 p-3 rounded-lg text-center w-[140px]">
+                            <i data-lucide="users" class="h-5 w-5 text-blue-600 mx-auto mb-1"></i>
+                            <h3 class="font-medium text-gray-900 text-xs">Internal Users</h3>
+                            <p class="text-xs text-gray-600 leading-tight">Dashboard/SDK</p>
+                        </div>
+                    </div>
+
+                    <!-- Arrow -->
+                    <div class="flex-shrink-0">
+                        <i data-lucide="arrow-right" class="h-4 w-4 text-gray-400"></i>
+                    </div>
+
+                    <!-- API Gateway -->
+                    <div class="flex flex-col items-center">
+                        <div class="bg-green-100 p-3 rounded-lg text-center w-[140px]">
+                            <i data-lucide="shield" class="h-5 w-5 text-green-600 mx-auto mb-1"></i>
+                            <h3 class="font-medium text-gray-900 text-xs">API Gateway</h3>
+                            <p class="text-xs text-gray-600 leading-tight">Kong/Apigee</p>
+                        </div>
+                    </div>
+
+                    <!-- Arrow -->
+                    <div class="flex-shrink-0">
+                        <i data-lucide="arrow-right" class="h-4 w-4 text-gray-400"></i>
+                    </div>
+
+                    <!-- Risk Engine -->
+                    <div class="flex flex-col items-center">
+                        <div class="bg-yellow-100 p-3 rounded-lg text-center w-[140px]">
+                            <i data-lucide="lock" class="h-5 w-5 text-yellow-600 mx-auto mb-1"></i>
+                            <h3 class="font-medium text-gray-900 text-xs">Risk Engine</h3>
+                            <p class="text-xs text-gray-600 leading-tight">Policy Check</p>
+                        </div>
+                    </div>
+
+                    <!-- Arrow -->
+                    <div class="flex-shrink-0">
+                        <i data-lucide="arrow-right" class="h-4 w-4 text-gray-400"></i>
+                    </div>
+
+                    <!-- AI Agents -->
+                    <div class="flex flex-col items-center">
+                        <div class="bg-purple-100 p-3 rounded-lg text-center w-[140px]">
+                            <i data-lucide="cpu" class="h-5 w-5 text-purple-600 mx-auto mb-1"></i>
+                            <h3 class="font-medium text-gray-900 text-xs">AI Agents</h3>
+                            <p class="text-xs text-gray-600 leading-tight">OpenAI/Anthropic</p>
+                        </div>
+                    </div>
+
+                    <!-- Arrow -->
+                    <div class="flex-shrink-0">
+                        <i data-lucide="arrow-right" class="h-4 w-4 text-gray-400"></i>
+                    </div>
+
+                    <!-- Enterprise Systems -->
+                    <div class="flex flex-col items-center">
+                        <div class="bg-red-100 p-3 rounded-lg text-center w-[140px]">
+                            <i data-lucide="activity" class="h-5 w-5 text-red-600 mx-auto mb-1"></i>
+                            <h3 class="font-medium text-gray-900 text-xs">Audit & Log</h3>
+                            <p class="text-xs text-gray-600 leading-tight">SIEM/Analytics</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enterprise Benefits -->
+    <div id="benefits" class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Enterprise Benefits</h2>
+                <p class="text-lg text-gray-600">Why enterprises choose Top Agents for AI governance</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Security & Compliance -->
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <div class="bg-blue-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                        <i data-lucide="shield-check" class="h-6 w-6 text-blue-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Security & Compliance</h3>
+                    <ul class="space-y-2 text-gray-600">
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="h-4 w-4 text-green-500 mt-1 mr-2 flex-shrink-0"></i>
+                            Automatic PII detection and redaction
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="h-4 w-4 text-green-500 mt-1 mr-2 flex-shrink-0"></i>
+                            GDPR, HIPAA, SOC2 compliance
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="h-4 w-4 text-green-500 mt-1 mr-2 flex-shrink-0"></i>
+                            Real-time policy enforcement
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Integration -->
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <div class="bg-green-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                        <i data-lucide="puzzle" class="h-6 w-6 text-green-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Seamless Integration</h3>
+                    <ul class="space-y-2 text-gray-600">
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="h-4 w-4 text-green-500 mt-1 mr-2 flex-shrink-0"></i>
+                            Works with existing API gateways
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="h-4 w-4 text-green-500 mt-1 mr-2 flex-shrink-0"></i>
+                            No infrastructure changes required
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="h-4 w-4 text-green-500 mt-1 mr-2 flex-shrink-0"></i>
+                            Plugin-based deployment
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Visibility -->
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <div class="bg-purple-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                        <i data-lucide="eye" class="h-6 w-6 text-purple-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Complete Visibility</h3>
+                    <ul class="space-y-2 text-gray-600">
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="h-4 w-4 text-green-500 mt-1 mr-2 flex-shrink-0"></i>
+                            Real-time audit trails
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="h-4 w-4 text-green-500 mt-1 mr-2 flex-shrink-0"></i>
+                            Usage analytics and insights
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="h-4 w-4 text-green-500 mt-1 mr-2 flex-shrink-0"></i>
+                            SIEM and ITSM integration
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Cost Control -->
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <div class="bg-yellow-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                        <i data-lucide="dollar-sign" class="h-6 w-6 text-yellow-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Cost Control</h3>
+                    <ul class="space-y-2 text-gray-600">
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="h-4 w-4 text-green-500 mt-1 mr-2 flex-shrink-0"></i>
+                            Usage monitoring and alerts
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="h-4 w-4 text-green-500 mt-1 mr-2 flex-shrink-0"></i>
+                            Budget limits and controls
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="h-4 w-4 text-green-500 mt-1 mr-2 flex-shrink-0"></i>
+                            Cost allocation by department
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Governance -->
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <div class="bg-red-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                        <i data-lucide="settings" class="h-6 w-6 text-red-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">AI Governance</h3>
+                    <ul class="space-y-2 text-gray-600">
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="h-4 w-4 text-green-500 mt-1 mr-2 flex-shrink-0"></i>
+                            Centralized agent management
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="h-4 w-4 text-green-500 mt-1 mr-2 flex-shrink-0"></i>
+                            Approval workflows
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="h-4 w-4 text-green-500 mt-1 mr-2 flex-shrink-0"></i>
+                            Risk assessment and mitigation
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Developer Experience -->
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <div class="bg-indigo-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                        <i data-lucide="code" class="h-6 w-6 text-indigo-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Developer Experience</h3>
+                    <ul class="space-y-2 text-gray-600">
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="h-4 w-4 text-green-500 mt-1 mr-2 flex-shrink-0"></i>
+                            Simple SDK integration
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="h-4 w-4 text-green-500 mt-1 mr-2 flex-shrink-0"></i>
+                            Comprehensive documentation
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="h-4 w-4 text-green-500 mt-1 mr-2 flex-shrink-0"></i>
+                            Testing and staging environments
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl font-bold mb-4">Ready to Secure Your AI Infrastructure?</h2>
+            <p class="text-xl mb-8 opacity-90">Join leading enterprises using Top Agents for secure, compliant AI deployment</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{{ url_for('dashboard') }}" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                    Explore Dashboard
+                </a>
+                <button onclick="toggleDemoModal()" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors">
+                    Schedule Demo
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
