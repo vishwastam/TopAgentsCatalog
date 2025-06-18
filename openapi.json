@@ -7,7 +7,7 @@
     "contact": {
       "name": "Top Agents Support",
       "email": "support@top-agents.us",
-      "url": "https://top-agents.us:5000"
+      "url": "https://top-agents.us"
     },
     "license": {
       "name": "MIT",
@@ -16,7 +16,7 @@
   },
   "servers": [
     {
-      "url": "https://top-agents.us:5000",
+      "url": "https://top-agents.us",
       "description": "Production server"
     },
     {

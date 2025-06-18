@@ -43,7 +43,7 @@ class Recipe:
     def get_json_ld(self) -> Dict[str, Any]:
         """Generate JSON-LD structured data for SEO"""
         # Get base URL from environment or default
-        base_url = os.environ.get('BASE_URL', 'https://top-agents.us:5000')
+        base_url = os.environ.get('BASE_URL', 'https://top-agents.us')
         
         return {
             "@context": "https://schema.org",

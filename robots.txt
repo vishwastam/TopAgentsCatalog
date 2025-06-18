@@ -26,8 +26,8 @@ Allow: /.well-known/ai-plugin.json
 Allow: /openapi.json
 
 # Sitemaps
-Sitemap: https://top-agents.us:5000/sitemap.xml
-Sitemap: https://top-agents.us:5000/static/sitemap.xml
+Sitemap: https://top-agents.us/sitemap.xml
+Sitemap: https://top-agents.us/static/sitemap.xml
 
 # Crawl-delay for polite crawling
 Crawl-delay: 1

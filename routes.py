@@ -42,7 +42,7 @@ def index():
     top_recipes = recipe_loader.get_top_recipes(6)
     
     # Generate canonical URL (always point to clean homepage for filtered views)
-    base_url = os.environ.get('BASE_URL', 'https://top-agents.us:5000')
+    base_url = os.environ.get('BASE_URL', 'https://top-agents.us')
     canonical_url = base_url + '/'
     
     # Check if this is a search/filter request - redirect to /agents
@@ -326,7 +326,7 @@ def agents():
     filter_options = data_loader.get_filter_options()
     
     # Generate canonical URL
-    base_url = os.environ.get('BASE_URL', 'https://top-agents.us:5000')
+    base_url = os.environ.get('BASE_URL', 'https://top-agents.us')
     canonical_url = base_url + '/agents'
     
     return render_template('agents.html',
@@ -383,8 +383,8 @@ def sitemap():
     """Generate XML sitemap for search engines and LLM crawlers"""
     all_agents = data_loader.get_all_agents()
     
-    # Use environment variable for base URL or default to top-agents.us:5000
-    base_url = os.environ.get('BASE_URL', 'https://top-agents.us:5000')
+    # Use environment variable for base URL or default to top-agents.us
+    base_url = os.environ.get('BASE_URL', 'https://top-agents.us')
     
     # Build sitemap URLs
     urls = []
@@ -488,7 +488,7 @@ def api_agents_search():
     limit = int(request.args.get('limit', 20))
     
     # Get base URL for external links
-    base_url = os.environ.get('BASE_URL', 'https://top-agents.us:5000')
+    base_url = os.environ.get('BASE_URL', 'https://top-agents.us')
     
     # Get all agents
     all_agents = data_loader.get_all_agents()
@@ -550,7 +550,7 @@ def api_agent_detail(slug):
         rating_data = data_loader.rating_system.get_agent_ratings(agent.slug)
         
         # Get base URL for external links
-        base_url = os.environ.get('BASE_URL', 'https://top-agents.us:5000')
+        base_url = os.environ.get('BASE_URL', 'https://top-agents.us')
         
         result = {
             "slug": agent.slug,
@@ -1046,7 +1046,7 @@ def recipe_detail(slug):
     h1_title = f"{recipe.name} - AI Agent Recipe"
     
     # Generate canonical URL
-    base_url = os.environ.get('BASE_URL', 'https://top-agents.us:5000')
+    base_url = os.environ.get('BASE_URL', 'https://top-agents.us')
     canonical_url = f"{base_url}/recipes/{slug}"
     
     return render_template('recipe_detail.html',
