@@ -9,9 +9,9 @@
   },
   "api": {
     "type": "openapi",
-    "url": "https://localhost:5000/openapi.json"
+    "url": "https://top-agents.us:5000/openapi.json"
   },
-  "logo_url": "https://localhost:5000/static/favicon.ico",
-  "contact_email": "support@topagents.com",
-  "legal_info_url": "https://localhost:5000/legal"
+  "logo_url": "https://top-agents.us:5000/static/images/top-agents-logo.svg",
+  "contact_email": "support@top-agents.us",
+  "legal_info_url": "https://top-agents.us:5000/legal"
 }

@@ -1,0 +1,727 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Top Agents API",
+    "description": "Comprehensive API for discovering, searching, and managing AI agents. This API provides access to a curated directory of AI agents with detailed information, ratings, and recipes.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Top Agents Support",
+      "email": "support@top-agents.us",
+      "url": "https://top-agents.us:5000"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://top-agents.us:5000",
+      "description": "Production server"
+    },
+    {
+      "url": "http://localhost:5000",
+      "description": "Development server"
+    }
+  ],
+  "paths": {
+    "/api/agents": {
+      "get": {
+        "summary": "Get all agents",
+        "description": "Retrieve a complete list of all AI agents in the directory",
+        "operationId": "getAllAgents",
+        "tags": ["Agents"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Agent"
+                      }
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 150
+                    },
+                    "version": {
+                      "type": "string",
+                      "example": "1.0"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/agents/search": {
+      "get": {
+        "summary": "Search agents",
+        "description": "Search for AI agents using natural language queries and filters",
+        "operationId": "searchAgents",
+        "tags": ["Agents"],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Natural language search query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "content generation"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "description": "Filter by category/domain",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "Marketing"
+            }
+          },
+          {
+            "name": "pricing",
+            "in": "query",
+            "description": "Filter by pricing model",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["Free", "Freemium", "Paid"],
+              "example": "Free"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of results to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "maximum": 100,
+              "example": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful search response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "query": {
+                      "type": "string",
+                      "example": "content generation"
+                    },
+                    "total_results": {
+                      "type": "integer",
+                      "example": 15
+                    },
+                    "agents": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AgentSearchResult"
+                      }
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "search_type": {
+                          "type": "string",
+                          "enum": ["semantic", "filtered"],
+                          "example": "semantic"
+                        },
+                        "applied_filters": {
+                          "type": "object",
+                          "properties": {
+                            "category": {
+                              "type": "string"
+                            },
+                            "pricing": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/agents/{slug}": {
+      "get": {
+        "summary": "Get agent details",
+        "description": "Retrieve detailed information about a specific AI agent",
+        "operationId": "getAgentDetail",
+        "tags": ["Agents"],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "description": "Agent slug identifier",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "chatgpt"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Agent not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/categories": {
+      "get": {
+        "summary": "Get categories",
+        "description": "Retrieve all available categories, domains, use cases, and pricing models",
+        "operationId": "getCategories",
+        "tags": ["Categories"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "domains": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": ["Marketing", "Software Development", "Writing"]
+                    },
+                    "use_cases": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": ["Content Generation", "Code Review", "Email Writing"]
+                    },
+                    "creators": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": ["OpenAI", "Anthropic", "Google"]
+                    },
+                    "pricing_models": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": ["Free", "Freemium", "Paid"]
+                    },
+                    "total_agents": {
+                      "type": "integer",
+                      "example": 150
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "last_updated": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "api_version": {
+                          "type": "string",
+                          "example": "v1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/recipes": {
+      "get": {
+        "summary": "Get recipes",
+        "description": "Retrieve all AI agent recipes and implementation guides",
+        "operationId": "getRecipes",
+        "tags": ["Recipes"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total_recipes": {
+                      "type": "integer",
+                      "example": 25
+                    },
+                    "recipes": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Recipe"
+                      }
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "content_type": {
+                          "type": "string",
+                          "example": "ai_agent_recipes"
+                        },
+                        "api_version": {
+                          "type": "string",
+                          "example": "v1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/search": {
+      "get": {
+        "summary": "Legacy search endpoint",
+        "description": "Legacy search endpoint for backward compatibility",
+        "operationId": "legacySearch",
+        "tags": ["Legacy"],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Search query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "domain",
+            "in": "query",
+            "description": "Filter by domain",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "use_case",
+            "in": "query",
+            "description": "Filter by use case",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "platform",
+            "in": "query",
+            "description": "Filter by platform",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pricing",
+            "in": "query",
+            "description": "Filter by pricing",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "model",
+            "in": "query",
+            "description": "Filter by underlying model",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "creator",
+            "in": "query",
+            "description": "Filter by creator",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "agents": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AgentLegacy"
+                      }
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Agent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Agent slug identifier",
+            "example": "chatgpt"
+          },
+          "name": {
+            "type": "string",
+            "description": "Agent name",
+            "example": "ChatGPT"
+          },
+          "short_description": {
+            "type": "string",
+            "description": "Brief description of the agent",
+            "example": "AI-powered conversational agent"
+          },
+          "long_description": {
+            "type": "string",
+            "description": "Detailed description of the agent"
+          },
+          "creator": {
+            "type": "string",
+            "description": "Company or organization that created the agent",
+            "example": "OpenAI"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Official website URL",
+            "example": "https://chat.openai.com"
+          },
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Primary domains/categories",
+            "example": ["Writing", "Productivity"]
+          },
+          "use_cases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Specific use cases",
+            "example": ["Content Generation", "Email Writing"]
+          },
+          "platform": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Supported platforms",
+            "example": ["Web", "API"]
+          },
+          "pricing": {
+            "type": "string",
+            "description": "Pricing model",
+            "enum": ["Free", "Freemium", "Paid"],
+            "example": "Freemium"
+          },
+          "underlying_model": {
+            "type": "string",
+            "description": "Underlying AI model",
+            "example": "GPT-4"
+          },
+          "deployment": {
+            "type": "string",
+            "description": "Deployment model",
+            "example": "Cloud"
+          },
+          "legitimacy": {
+            "type": "string",
+            "description": "Legitimacy verification status"
+          },
+          "user_feedback": {
+            "type": "string",
+            "description": "User feedback and reviews"
+          }
+        },
+        "required": ["id", "name", "short_description", "creator"]
+      },
+      "AgentSearchResult": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "example": "chatgpt"
+          },
+          "name": {
+            "type": "string",
+            "example": "ChatGPT"
+          },
+          "creator": {
+            "type": "string",
+            "example": "OpenAI"
+          },
+          "description": {
+            "type": "string",
+            "example": "AI-powered conversational agent"
+          },
+          "long_description": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "pricing": {
+            "type": "string",
+            "enum": ["Free", "Freemium", "Paid"]
+          },
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "use_cases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "platform": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "underlying_model": {
+            "type": "string"
+          },
+          "detail_url": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
+      "AgentDetail": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AgentSearchResult"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "deployment": {
+                "type": "string"
+              },
+              "legitimacy": {
+                "type": "string"
+              },
+              "user_feedback": {
+                "type": "string"
+              },
+              "ratings": {
+                "type": "object",
+                "properties": {
+                  "average": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "count": {
+                    "type": "integer"
+                  },
+                  "breakdown": {
+                    "type": "object"
+                  },
+                  "recent_reviews": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  }
+                }
+              },
+              "structured_data": {
+                "type": "object",
+                "description": "JSON-LD structured data"
+              },
+              "api_url": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          }
+        ]
+      },
+      "AgentLegacy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "short_desc": {
+            "type": "string"
+          },
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "use_cases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "pricing": {
+            "type": "string"
+          },
+          "creator": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "Recipe": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Recipe name",
+            "example": "Content Generation Workflow"
+          },
+          "synopsis": {
+            "type": "string",
+            "description": "Brief description of the recipe"
+          },
+          "target_audience": {
+            "type": "string",
+            "description": "Intended audience for this recipe",
+            "example": "Marketing Teams"
+          },
+          "why_it_works": {
+            "type": "string",
+            "description": "Explanation of why this recipe is effective"
+          },
+          "source_links": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Related links and resources"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "error": {
+            "type": "string",
+            "example": "Agent not found"
+          },
+          "total": {
+            "type": "integer",
+            "example": 0
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Agents",
+      "description": "Operations related to AI agents"
+    },
+    {
+      "name": "Categories",
+      "description": "Operations related to categories and filters"
+    },
+    {
+      "name": "Recipes",
+      "description": "Operations related to AI agent recipes"
+    },
+    {
+      "name": "Legacy",
+      "description": "Legacy endpoints for backward compatibility"
+    }
+  ]
+} 

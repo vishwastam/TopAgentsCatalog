@@ -49,7 +49,110 @@
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
     
     <!-- JSON-LD Structured Data -->
-    {% block structured_data %}{% endblock %}
+    {% block structured_data %}
+    <!-- Organization Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": "https://top-agents.us:5000/#organization",
+      "name": "Top Agents",
+      "alternateName": "Top Agents AI Directory",
+      "url": "https://top-agents.us:5000",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://top-agents.us:5000/static/images/top-agents-logo.svg",
+        "width": 200,
+        "height": 60
+      },
+      "description": "Comprehensive directory of AI agents - discover, compare and find the perfect AI tools for your needs",
+      "foundingDate": "2024",
+      "sameAs": [
+        "https://twitter.com/topagents",
+        "https://linkedin.com/company/top-agents"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer service",
+        "email": "support@top-agents.us"
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "US"
+      }
+    }
+    </script>
+    
+    <!-- Website Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": "https://top-agents.us:5000/#website",
+      "url": "https://top-agents.us:5000",
+      "name": "Top Agents",
+      "description": "Comprehensive directory of AI agents - discover, compare and find the perfect AI tools for your needs",
+      "publisher": {
+        "@id": "https://top-agents.us:5000/#organization"
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://top-agents.us:5000/agents?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      },
+      "inLanguage": "en-US",
+      "isAccessibleForFree": true
+    }
+    </script>
+    
+    <!-- BreadcrumbList Schema (if on a page with breadcrumbs) -->
+    {% if request.endpoint in ['agent_detail', 'recipe_detail'] %}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Directory",
+          "item": "https://top-agents.us:5000"
+        }
+        {% if request.endpoint == 'agent_detail' %}
+        ,{
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Agents",
+          "item": "https://top-agents.us:5000/agents"
+        }
+        ,{
+          "@type": "ListItem",
+          "position": 3,
+          "name": "{{ agent.name if agent else 'Agent' }}",
+          "item": "{{ request.url }}"
+        }
+        {% elif request.endpoint == 'recipe_detail' %}
+        ,{
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Recipes",
+          "item": "https://top-agents.us:5000/recipes"
+        }
+        ,{
+          "@type": "ListItem",
+          "position": 3,
+          "name": "{{ recipe.title if recipe else 'Recipe' }}",
+          "item": "{{ request.url }}"
+        }
+        {% endif %}
+      ]
+    }
+    </script>
+    {% endif %}
+    {% endblock %}
     
     <script>
         tailwind.config = {

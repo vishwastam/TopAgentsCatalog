@@ -9,11 +9,11 @@
   },
   "api": {
     "type": "openapi",
-    "url": "https://topagents.com/openapi.json"
+    "url": "https://top-agents.us:5000/openapi.json"
   },
-  "logo_url": "https://topagents.com/static/images/top-agents-logo.svg",
-  "contact_email": "hello@topagents.com",
-  "legal_info_url": "https://topagents.com/legal",
+  "logo_url": "https://top-agents.us:5000/static/images/top-agents-logo.svg",
+  "contact_email": "support@top-agents.us",
+  "legal_info_url": "https://top-agents.us:5000/legal",
   "capabilities": [
     "search_agents",
     "get_agent_details", 

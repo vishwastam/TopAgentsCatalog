@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Dict, Any
 import re
+import os
 
 @dataclass
 class Agent:
@@ -92,6 +93,9 @@ class Agent:
     
     def get_json_ld(self) -> Dict[str, Any]:
         """Generate comprehensive JSON-LD structured data for SEO and semantic understanding"""
+        # Get base URL from environment or default
+        base_url = os.environ.get('BASE_URL', 'https://top-agents.us:5000')
+        
         # Base SoftwareApplication schema
         json_ld = {
             "@context": [
@@ -102,7 +106,7 @@ class Agent:
                 }
             ],
             "@type": ["SoftwareApplication", "WebApplication"],
-            "@id": f"https://topagents.com/agents/{self.slug}",
+            "@id": f"{base_url}/agents/{self.slug}",
             "name": self.name,
             "alternateName": f"{self.name} AI Agent",
             "description": self.short_desc,
@@ -129,7 +133,7 @@ class Agent:
             "publisher": {
                 "@type": "Organization",
                 "name": "Top Agents",
-                "url": "https://topagents.com"
+                "url": base_url
             },
             "offers": {
                 "@type": "Offer",
@@ -160,7 +164,7 @@ class Agent:
             "memoryRequirements": "Minimal",
             "processorRequirements": "Any",
             "storageRequirements": "Cloud-based",
-            "screenshot": f"https://topagents.com/static/images/agents/{self.slug}-preview.png",
+            "screenshot": f"{base_url}/static/images/agents/{self.slug}-preview.png",
             "aggregateRating": {
                 "@type": "AggregateRating",
                 "ratingValue": "4.5",
@@ -177,7 +181,7 @@ class Agent:
                 {
                     "@type": "ViewAction", 
                     "name": f"View {self.name} Details",
-                    "target": f"https://topagents.com/agents/{self.slug}"
+                    "target": f"{base_url}/agents/{self.slug}"
                 }
             ]
         }

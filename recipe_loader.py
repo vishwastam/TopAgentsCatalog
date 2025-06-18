@@ -42,7 +42,8 @@ class Recipe:
     
     def get_json_ld(self) -> Dict[str, Any]:
         """Generate JSON-LD structured data for SEO"""
-        from flask import url_for
+        # Get base URL from environment or default
+        base_url = os.environ.get('BASE_URL', 'https://top-agents.us:5000')
         
         return {
             "@context": "https://schema.org",
@@ -57,14 +58,14 @@ class Recipe:
             "publisher": {
                 "@type": "Organization",
                 "name": "Top Agents",
-                "url": "https://topagents.com"
+                "url": base_url
             },
             "datePublished": "2025-06-13",
             "dateModified": "2025-06-13",
-            "url": url_for('recipe_detail', slug=self.slug, _external=True),
+            "url": f"{base_url}/recipes/{self.slug}",
             "mainEntityOfPage": {
                 "@type": "WebPage",
-                "@id": url_for('recipe_detail', slug=self.slug, _external=True)
+                "@id": f"{base_url}/recipes/{self.slug}"
             },
             "about": {
                 "@type": "Thing",

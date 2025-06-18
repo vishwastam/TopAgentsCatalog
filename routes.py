@@ -7,6 +7,7 @@ from user_auth import user_auth
 from datetime import datetime
 import json
 import logging
+import os
 
 # Context processor to make current_user available in templates
 @app.context_processor
@@ -41,7 +42,8 @@ def index():
     top_recipes = recipe_loader.get_top_recipes(6)
     
     # Generate canonical URL (always point to clean homepage for filtered views)
-    canonical_url = url_for('index', _external=True)
+    base_url = os.environ.get('BASE_URL', 'https://top-agents.us:5000')
+    canonical_url = base_url + '/'
     
     # Check if this is a search/filter request - redirect to /agents
     if query or any(filters.values()):
@@ -324,15 +326,14 @@ def agents():
     filter_options = data_loader.get_filter_options()
     
     # Generate canonical URL
-    canonical_url = url_for('agents', _external=True)
+    base_url = os.environ.get('BASE_URL', 'https://top-agents.us:5000')
+    canonical_url = base_url + '/agents'
     
-    return render_template('agents.html', 
+    return render_template('agents.html',
                          agents=agents,
                          filter_options=filter_options,
-                         current_query=query,
-                         current_filters=filters,
-                         total_agents=len(data_loader.get_all_agents()),
-                         last_updated=data_loader.get_last_updated_time(),
+                         query=query,
+                         filters=filters,
                          canonical_url=canonical_url)
 
 @app.route('/agents/<slug>')
@@ -382,26 +383,29 @@ def sitemap():
     """Generate XML sitemap for search engines and LLM crawlers"""
     all_agents = data_loader.get_all_agents()
     
+    # Use environment variable for base URL or default to top-agents.us:5000
+    base_url = os.environ.get('BASE_URL', 'https://top-agents.us:5000')
+    
     # Build sitemap URLs
     urls = []
     
     # Add main pages
     urls.append({
-        'loc': url_for('index', _external=True),
+        'loc': f"{base_url}/",
         'lastmod': datetime.now().strftime('%Y-%m-%d'),
         'changefreq': 'daily',
         'priority': '1.0'
     })
     
     urls.append({
-        'loc': url_for('agents', _external=True),
+        'loc': f"{base_url}/agents",
         'lastmod': datetime.now().strftime('%Y-%m-%d'),
         'changefreq': 'daily',
         'priority': '0.9'
     })
     
     urls.append({
-        'loc': url_for('recipes', _external=True),
+        'loc': f"{base_url}/recipes",
         'lastmod': datetime.now().strftime('%Y-%m-%d'),
         'changefreq': 'weekly',
         'priority': '0.8'
@@ -412,7 +416,7 @@ def sitemap():
     recipes = recipe_loader.get_all_recipes()
     for recipe in recipes:
         urls.append({
-            'loc': url_for('recipe_detail', slug=recipe.slug, _external=True),
+            'loc': f"{base_url}/recipes/{recipe.slug}",
             'lastmod': datetime.now().strftime('%Y-%m-%d'),
             'changefreq': 'monthly',
             'priority': '0.7'
@@ -421,7 +425,7 @@ def sitemap():
     # Add all agent detail pages
     for agent in all_agents:
         urls.append({
-            'loc': url_for('agent_detail', slug=agent.slug, _external=True),
+            'loc': f"{base_url}/agents/{agent.slug}",
             'lastmod': datetime.now().strftime('%Y-%m-%d'),
             'changefreq': 'weekly',
             'priority': '0.9'
@@ -483,6 +487,9 @@ def api_agents_search():
     pricing = request.args.get('pricing', '')
     limit = int(request.args.get('limit', 20))
     
+    # Get base URL for external links
+    base_url = os.environ.get('BASE_URL', 'https://top-agents.us:5000')
+    
     # Get all agents
     all_agents = data_loader.get_all_agents()
     
@@ -519,7 +526,7 @@ def api_agents_search():
             "use_cases": agent.use_case_list,
             "platform": agent.platform_list if hasattr(agent, 'platform_list') else [],
             "underlying_model": getattr(agent, 'underlying_model', ''),
-            "detail_url": url_for('agent_detail', slug=agent.slug, _external=True)
+            "detail_url": f"{base_url}/agents/{agent.slug}"
         })
     
     return jsonify({
@@ -541,6 +548,9 @@ def api_agent_detail(slug):
     try:
         agent = data_loader.get_agent_by_slug(slug)
         rating_data = data_loader.rating_system.get_agent_ratings(agent.slug)
+        
+        # Get base URL for external links
+        base_url = os.environ.get('BASE_URL', 'https://top-agents.us:5000')
         
         result = {
             "slug": agent.slug,
@@ -564,8 +574,8 @@ def api_agent_detail(slug):
                 "recent_reviews": rating_data.get('recent_reviews', [])
             },
             "structured_data": agent.get_json_ld(),
-            "detail_url": url_for('agent_detail', slug=agent.slug, _external=True),
-            "api_url": url_for('api_agent_detail', slug=agent.slug, _external=True)
+            "detail_url": f"{base_url}/agents/{agent.slug}",
+            "api_url": f"{base_url}/api/agents/{agent.slug}"
         }
         
         return jsonify(result)
@@ -630,16 +640,29 @@ def api_recipes():
 @app.route('/openapi.json')
 def openapi_spec():
     """Serve OpenAPI specification for API documentation"""
-    with open('openapi.json', 'r') as f:
-        content = f.read()
-    
-    response = app.response_class(
-        response=content,
-        status=200,
-        mimetype='application/json'
-    )
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    return response
+    try:
+        with open('openapi.json', 'r') as f:
+            content = f.read()
+        
+        response = app.response_class(
+            response=content,
+            status=200,
+            mimetype='application/json'
+        )
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Cache-Control'] = 'public, max-age=3600'  # Cache for 1 hour
+        return response
+    except FileNotFoundError:
+        return jsonify({
+            "error": "OpenAPI specification not found",
+            "message": "The OpenAPI specification file is missing"
+        }), 404
+    except Exception as e:
+        logging.error(f"Error serving OpenAPI spec: {e}")
+        return jsonify({
+            "error": "Internal server error",
+            "message": "Failed to load OpenAPI specification"
+        }), 500
 
 @app.route('/api/agents')
 def api_agents():
@@ -1020,6 +1043,11 @@ def recipe_detail(slug):
     # Generate SEO metadata
     page_title = f"{recipe.name} - AI Agent Recipe | Top Agents"
     meta_description = f"{recipe.detailed_synopsis[:150]}... Learn how to implement this AI agent pattern for {recipe.target_audience.lower()}."
+    h1_title = f"{recipe.name} - AI Agent Recipe"
+    
+    # Generate canonical URL
+    base_url = os.environ.get('BASE_URL', 'https://top-agents.us:5000')
+    canonical_url = f"{base_url}/recipes/{slug}"
     
     return render_template('recipe_detail.html',
                          recipe=recipe,
@@ -1027,7 +1055,8 @@ def recipe_detail(slug):
                          json_ld=json.dumps(recipe.get_json_ld(), indent=2),
                          page_title=page_title,
                          meta_description=meta_description,
-                         canonical_url=url_for('recipe_detail', slug=slug, _external=True))
+                         h1_title=h1_title,
+                         canonical_url=canonical_url)
 
 @app.errorhandler(404)
 def not_found_error(error):
