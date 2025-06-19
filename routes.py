@@ -8,6 +8,7 @@ from datetime import datetime
 import json
 import logging
 import os
+from blog_loader import blog_loader
 
 # Context processor to make current_user available in templates
 @app.context_processor
@@ -411,6 +412,13 @@ def sitemap():
         'priority': '0.8'
     })
     
+    urls.append({
+        'loc': f"{base_url}/blog",
+        'lastmod': datetime.now().strftime('%Y-%m-%d'),
+        'changefreq': 'daily',
+        'priority': '0.8'
+    })
+    
     # Add recipe detail pages
     from recipe_loader import recipe_loader
     recipes = recipe_loader.get_all_recipes()
@@ -429,6 +437,16 @@ def sitemap():
             'lastmod': datetime.now().strftime('%Y-%m-%d'),
             'changefreq': 'weekly',
             'priority': '0.9'
+        })
+    
+    # Add blog posts
+    blog_posts = blog_loader.get_published_posts()
+    for post in blog_posts:
+        urls.append({
+            'loc': f"{base_url}/blog/{post.slug}",
+            'lastmod': post.publish_date.strftime('%Y-%m-%d'),
+            'changefreq': 'monthly',
+            'priority': '0.7'
         })
     
     # Generate XML sitemap
@@ -1068,3 +1086,171 @@ def internal_error(error):
     """Handle 500 errors"""
     logging.error(f"Internal server error: {error}")
     return render_template('500.html'), 500
+
+@app.route('/blog')
+def blog_list():
+    """Blog listing page with all published posts"""
+    # Get filter parameters
+    category = request.args.get('category')
+    tag = request.args.get('tag')
+    search_query = request.args.get('q', '').strip()
+    
+    # Get published posts
+    posts = blog_loader.get_published_posts()
+    
+    # Apply filters
+    if category:
+        posts = blog_loader.get_posts_by_category(category)
+    elif tag:
+        posts = blog_loader.get_posts_by_tag(tag)
+    
+    # Apply search if query provided
+    if search_query:
+        filtered_posts = []
+        for post in posts:
+            if (search_query.lower() in post.title.lower() or 
+                search_query.lower() in post.content.lower() or
+                search_query.lower() in post.excerpt.lower()):
+                filtered_posts.append(post)
+        posts = filtered_posts
+    
+    # Pagination
+    page = request.args.get('page', 1, type=int)
+    per_page = 9
+    start_idx = (page - 1) * per_page
+    end_idx = start_idx + per_page
+    paginated_posts = posts[start_idx:end_idx]
+    total_pages = (len(posts) + per_page - 1) // per_page
+    
+    # Get categories and tags for sidebar
+    categories = blog_loader.get_categories()
+    tags = blog_loader.get_tags()
+    
+    # Generate canonical URL
+    base_url = os.environ.get('BASE_URL', 'https://top-agents.us')
+    canonical_url = f"{base_url}/blog"
+    
+    return render_template('blog_list.html',
+                         posts=paginated_posts,
+                         categories=categories,
+                         tags=tags,
+                         current_category=category,
+                         current_tag=tag,
+                         search_query=search_query,
+                         page=page,
+                         total_pages=total_pages,
+                         total_posts=len(posts),
+                         canonical_url=canonical_url)
+
+@app.route('/blog/<slug>')
+def blog_detail(slug):
+    """Individual blog post page"""
+    post = blog_loader.get_post_by_slug(slug)
+    
+    if not post:
+        abort(404)
+    
+    # Check if post is published
+    if post.publish_date > datetime.now():
+        abort(404)
+    
+    # Get related posts (same category or tags)
+    all_posts = blog_loader.get_published_posts()
+    related_posts = []
+    
+    for p in all_posts:
+        if p.slug != slug:
+            # Check if same category or has common tags
+            if (p.category == post.category or 
+                any(tag in p.tags for tag in post.tags)):
+                related_posts.append(p)
+                if len(related_posts) >= 3:
+                    break
+    
+    # Generate SEO metadata
+    page_title = f"{post.title} | Top Agents Blog"
+    meta_description = post.meta_description
+    canonical_url = f"{os.environ.get('BASE_URL', 'https://top-agents.us')}/blog/{post.slug}"
+    
+    # Convert markdown to HTML
+    import markdown
+    html_content = markdown.markdown(post.content, extensions=['fenced_code', 'tables', 'codehilite'])
+    
+    return render_template('blog_detail.html',
+                         post=post,
+                         html_content=html_content,
+                         related_posts=related_posts,
+                         page_title=page_title,
+                         meta_description=meta_description,
+                         canonical_url=canonical_url,
+                         json_ld=json.dumps(post.get_json_ld(), indent=2))
+
+@app.route('/blog/category/<category>')
+def blog_category(category):
+    """Blog posts filtered by category"""
+    posts = blog_loader.get_posts_by_category(category)
+    
+    # Get categories and tags for sidebar
+    categories = blog_loader.get_categories()
+    tags = blog_loader.get_tags()
+    
+    # Generate canonical URL
+    base_url = os.environ.get('BASE_URL', 'https://top-agents.us')
+    canonical_url = f"{base_url}/blog/category/{category}"
+    
+    return render_template('blog_list.html',
+                         posts=posts,
+                         categories=categories,
+                         tags=tags,
+                         current_category=category,
+                         total_posts=len(posts),
+                         canonical_url=canonical_url)
+
+@app.route('/blog/tag/<tag>')
+def blog_tag(tag):
+    """Blog posts filtered by tag"""
+    posts = blog_loader.get_posts_by_tag(tag)
+    
+    # Get categories and tags for sidebar
+    categories = blog_loader.get_categories()
+    tags = blog_loader.get_tags()
+    
+    # Generate canonical URL
+    base_url = os.environ.get('BASE_URL', 'https://top-agents.us')
+    canonical_url = f"{base_url}/blog/tag/{tag}"
+    
+    return render_template('blog_list.html',
+                         posts=posts,
+                         categories=categories,
+                         tags=tags,
+                         current_tag=tag,
+                         total_posts=len(posts),
+                         canonical_url=canonical_url)
+
+@app.route('/api/blog/posts')
+def api_blog_posts():
+    """API endpoint for blog posts"""
+    posts = blog_loader.get_published_posts()
+    
+    results = []
+    for post in posts:
+        results.append({
+            "title": post.title,
+            "slug": post.slug,
+            "excerpt": post.excerpt,
+            "author": post.author,
+            "publish_date": post.publish_date.isoformat(),
+            "category": post.category,
+            "tags": post.tags,
+            "reading_time": post.reading_time,
+            "url": f"{os.environ.get('BASE_URL', 'https://top-agents.us')}/blog/{post.slug}"
+        })
+    
+    return jsonify({
+        "posts": results,
+        "total": len(results),
+        "metadata": {
+            "content_type": "blog_posts",
+            "api_version": "v1"
+        }
+    })

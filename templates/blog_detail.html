@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block description %}{{ meta_description }}{% endblock %}
+
+{% block canonical_url %}{{ canonical_url }}{% endblock %}
+
+{% block og_title %}{{ post.title }}{% endblock %}
+{% block og_description %}{{ post.meta_description }}{% endblock %}
+{% block og_image %}{{ post.featured_image if post.featured_image else url_for('static', filename='images/blog-default.jpg', _external=True) }}{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{{ json_ld|safe }}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="magazine-bg">
+    <!-- Magazine Hero Section -->
+    <div class="magazine-hero-detail">
+        {% if post.featured_image %}
+        <div class="magazine-hero-img-wrap">
+            <img src="{{ post.featured_image }}" alt="{{ post.title }}" class="magazine-hero-img">
+            <div class="magazine-hero-img-overlay"></div>
+            <div class="magazine-hero-content">
+                <div class="magazine-hero-breadcrumbs">
+                    <a href="{{ url_for('index') }}">Home</a> &raquo;
+                    <a href="{{ url_for('blog_list') }}">Blog</a> &raquo;
+                    <span>{{ post.title }}</span>
+                </div>
+                <span class="magazine-hero-category">{{ post.category }}</span>
+                <h1 class="magazine-hero-title">{{ post.title }}</h1>
+                <div class="magazine-hero-meta">
+                    <span class="magazine-hero-author">{{ post.author }}</span>
+                    <span class="magazine-hero-date">{{ post.publish_date.strftime('%B %d, %Y') }}</span>
+                    <span class="magazine-hero-reading"><i data-lucide="clock" class="h-4 w-4"></i> {{ post.reading_time }} min</span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- Premium Markdown Content -->
+        <article class="magazine-markdown animate-fadein">
+            {{ html_content|safe }}
+        </article>
+        <!-- Modern Share Bar -->
+        <div class="magazine-share-bar">
+            <span>Share:</span>
+            <button onclick="sharePost('twitter')" class="magazine-share-btn magazine-share-twitter"><i data-lucide="twitter"></i></button>
+            <button onclick="sharePost('linkedin')" class="magazine-share-btn magazine-share-linkedin"><i data-lucide="linkedin"></i></button>
+            <button onclick="sharePost('facebook')" class="magazine-share-btn magazine-share-facebook"><i data-lucide="facebook"></i></button>
+            <button onclick="sharePost('copy')" class="magazine-share-btn magazine-share-copy"><i data-lucide="copy"></i></button>
+        </div>
+        <!-- Author Box -->
+        <div class="magazine-author-box">
+            <div class="magazine-author-avatar">{{ post.author[0].upper() }}</div>
+            <div>
+                <div class="magazine-author-name">{{ post.author }}</div>
+                <div class="magazine-author-role">Top Agents Team</div>
+            </div>
+        </div>
+        <!-- Related Posts -->
+        {% if related_posts %}
+        <div class="magazine-related">
+            <h3 class="magazine-related-title"><i data-lucide="book-open" class="mr-2"></i>Related Articles</h3>
+            <div class="magazine-related-grid">
+                {% for related_post in related_posts %}
+                <article class="magazine-related-card">
+                    {% if related_post.featured_image %}
+                    <div class="magazine-related-img-wrap">
+                        <img src="{{ related_post.featured_image }}" alt="{{ related_post.title }}" class="magazine-related-img">
+                    </div>
+                    {% endif %}
+                    <div class="magazine-related-body">
+                        <span class="magazine-related-category">{{ related_post.category }}</span>
+                        <a href="{{ url_for('blog_detail', slug=related_post.slug) }}" class="magazine-related-title-link">{{ related_post.title }}</a>
+                        <span class="magazine-related-date">{{ related_post.publish_date.strftime('%b %d, %Y') }}</span>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        <!-- Newsletter Signup -->
+        <div class="magazine-detail-newsletter">
+            <div class="magazine-detail-newsletter-icon"><i data-lucide="mail"></i></div>
+            <h3 class="magazine-detail-newsletter-title">Stay Updated</h3>
+            <p class="magazine-detail-newsletter-desc">Get the latest AI agent insights delivered to your inbox.</p>
+            <form class="magazine-detail-newsletter-form">
+                <input type="email" placeholder="Enter your email" class="magazine-detail-newsletter-input">
+                <button type="submit" class="magazine-detail-newsletter-btn">Subscribe</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+function sharePost(platform = 'copy') {
+    const url = window.location.href;
+    const title = '{{ post.title }}';
+    const text = '{{ post.excerpt }}';
+    let shareUrl = '';
+    switch(platform) {
+        case 'twitter':
+            shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`;
+            break;
+        case 'linkedin':
+            shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+            break;
+        case 'facebook':
+            shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+            break;
+        case 'copy':
+        default:
+            navigator.clipboard.writeText(url).then(() => {
+                const notification = document.createElement('div');
+                notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+                notification.textContent = 'Link copied to clipboard!';
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 3000);
+            });
+            return;
+    }
+    if (shareUrl) {
+        window.open(shareUrl, '_blank', 'width=600,height=400');
+    }
+}
+</script>
+{% endblock %} 

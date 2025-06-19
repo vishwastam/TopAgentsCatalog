@@ -18,3 +18,5 @@ trafilatura==1.12.2
 werkzeug==3.0.4
 beautifulsoup4
 requests
+python-frontmatter==1.0.0
+markdown==3.5.2

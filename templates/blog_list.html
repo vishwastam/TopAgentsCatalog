@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Blog - AI Agents Insights & Guides | Top Agents{% endblock %}
+{% block description %}Discover insights, guides, and the latest trends in AI agents. Expert analysis, tutorials, and industry updates from the Top Agents team.{% endblock %}
+
+{% block canonical_url %}{{ canonical_url }}{% endblock %}
+
+{% block og_title %}Blog - AI Agents Insights & Guides | Top Agents{% endblock %}
+{% block og_description %}Discover insights, guides, and the latest trends in AI agents. Expert analysis, tutorials, and industry updates.{% endblock %}
+
+{% block content %}
+<div class="magazine-bg">
+    <!-- Magazine Hero Header -->
+    <div class="magazine-hero border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl shadow-xl mb-6">
+                <i data-lucide="file-text" class="h-10 w-10 text-white"></i>
+            </div>
+            <h1 class="magazine-title">Top Agents Blog</h1>
+            <p class="magazine-subtitle">Discover insights, guides, and the latest trends in AI agents. Expert analysis, tutorials, and industry updates.</p>
+            <div class="mt-10 max-w-2xl mx-auto">
+                <form method="GET" action="{{ url_for('blog_list') }}" class="relative">
+                    <input type="text" name="q" value="{{ search_query }}" placeholder="Search blog posts..." class="magazine-search">
+                    <button type="submit" class="magazine-search-btn">
+                        <i data-lucide="search" class="h-6 w-6"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-10">
+            <!-- Magazine Main Content -->
+            <div class="lg:col-span-3">
+                {% if posts %}
+                <div class="magazine-grid">
+                    {% for post in posts %}
+                    <article class="magazine-card animate-fadein">
+                        {% if post.featured_image %}
+                        <div class="magazine-card-img-wrap">
+                            <img src="{{ post.featured_image }}" alt="{{ post.title }}" class="magazine-card-img">
+                            <span class="magazine-card-category">{{ post.category }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="magazine-card-body">
+                            <h2 class="magazine-card-title">
+                                <a href="{{ url_for('blog_detail', slug=post.slug) }}">{{ post.title }}</a>
+                            </h2>
+                            <p class="magazine-card-excerpt">{{ post.excerpt }}</p>
+                            <div class="magazine-card-meta">
+                                <span class="magazine-card-author">{{ post.author }}</span>
+                                <span class="magazine-card-date">{{ post.publish_date.strftime('%b %d, %Y') }}</span>
+                                <span class="magazine-card-reading"><i data-lucide="clock" class="h-4 w-4"></i> {{ post.reading_time }} min</span>
+                            </div>
+                            <div class="magazine-card-tags">
+                                {% for tag in post.tags[:3] %}
+                                <a href="{{ url_for('blog_tag', tag=tag) }}" class="magazine-card-tag">#{{ tag }}</a>
+                                {% endfor %}
+                                {% if post.tags|length > 3 %}
+                                <span class="magazine-card-tag-more">+{{ post.tags|length - 3 }} more</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="magazine-no-posts">
+                    <i data-lucide="file-text" class="h-12 w-12 text-blue-600 mb-4"></i>
+                    <h3>No blog posts found</h3>
+                    <p>
+                        {% if search_query %}
+                            No posts match your search for "{{ search_query }}".
+                        {% elif current_category %}
+                            No posts found in the "{{ current_category }}" category.
+                        {% elif current_tag %}
+                            No posts found with the "{{ current_tag }}" tag.
+                        {% else %}
+                            No blog posts are available at the moment.
+                        {% endif %}
+                    </p>
+                    <a href="{{ url_for('blog_list') }}" class="magazine-btn">View All Posts</a>
+                </div>
+                {% endif %}
+                <!-- Magazine Pagination -->
+                {% if total_pages > 1 %}
+                <div class="magazine-pagination">
+                    {% if page > 1 %}
+                    <a href="{{ url_for('blog_list', page=page-1, category=current_category, tag=current_tag, q=search_query) }}" class="magazine-pagination-btn">&laquo; Prev</a>
+                    {% endif %}
+                    {% for p in range(1, total_pages + 1) %}
+                        {% if p == page %}
+                        <span class="magazine-pagination-btn magazine-pagination-active">{{ p }}</span>
+                        {% elif p <= 3 or p > total_pages - 3 or (p >= page - 1 and p <= page + 1) %}
+                        <a href="{{ url_for('blog_list', page=p, category=current_category, tag=current_tag, q=search_query) }}" class="magazine-pagination-btn">{{ p }}</a>
+                        {% elif p == 4 and page > 5 %}
+                        <span class="magazine-pagination-ellipsis">...</span>
+                        {% elif p == total_pages - 3 and page < total_pages - 4 %}
+                        <span class="magazine-pagination-ellipsis">...</span>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page < total_pages %}
+                    <a href="{{ url_for('blog_list', page=page+1, category=current_category, tag=current_tag, q=search_query) }}" class="magazine-pagination-btn">Next &raquo;</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            <!-- Magazine Sidebar -->
+            <aside class="magazine-sidebar">
+                <div class="magazine-sidebar-section">
+                    <h3 class="magazine-sidebar-title"><i data-lucide="folder" class="h-5 w-5 mr-2 text-blue-600"></i>Categories</h3>
+                    <div class="magazine-sidebar-categories">
+                        <a href="{{ url_for('blog_list') }}" class="magazine-sidebar-category{% if not current_category %} active{% endif %}">All Posts</a>
+                        {% for category in categories %}
+                        <a href="{{ url_for('blog_category', category=category) }}" class="magazine-sidebar-category{% if current_category == category %} active{% endif %}">{{ category }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="magazine-sidebar-section">
+                    <h3 class="magazine-sidebar-title"><i data-lucide="hash" class="h-5 w-5 mr-2 text-blue-600"></i>Popular Tags</h3>
+                    <div class="magazine-sidebar-tags">
+                        {% for tag in tags[:15] %}
+                        <a href="{{ url_for('blog_tag', tag=tag) }}" class="magazine-sidebar-tag{% if current_tag == tag %} active{% endif %}">#{{ tag }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="magazine-sidebar-section magazine-sidebar-newsletter">
+                    <div class="magazine-sidebar-newsletter-icon">
+                        <i data-lucide="mail" class="h-8 w-8 text-white"></i>
+                    </div>
+                    <h3 class="magazine-sidebar-title">Stay Updated</h3>
+                    <p class="magazine-sidebar-newsletter-desc">Get the latest AI agent insights delivered to your inbox.</p>
+                    <form class="magazine-sidebar-newsletter-form">
+                        <input type="email" placeholder="Enter your email" class="magazine-sidebar-newsletter-input">
+                        <button type="submit" class="magazine-sidebar-newsletter-btn">Subscribe</button>
+                    </form>
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>
+{% endblock %} 

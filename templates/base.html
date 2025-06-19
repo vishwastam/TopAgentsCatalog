@@ -25,7 +25,7 @@
     <meta name="twitter:image" content="{% block twitter_image %}{{ url_for('static', filename='images/top-agents-logo.svg', _external=True) }}{% endblock %}">
     
     <!-- Canonical URL -->
-    <link rel="canonical" href="{% block canonical_url %}{{ url_for(request.endpoint, _external=True, **request.view_args) }}{% endblock %}">
+    <link rel="canonical" href="{% block canonical_url %}{{ url_for(request.endpoint, _external=True, **(request.view_args or {})) }}{% endblock %}">
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/top-agents-logo.svg') }}">
@@ -191,6 +191,7 @@
                     <a href="{{ url_for('agents') }}" class="text-gray-700 hover:text-gray-900 font-medium">Agents</a>
                     <a href="{{ url_for('recipes') }}" class="text-gray-700 hover:text-gray-900 font-medium">Recipes</a>
                     <a href="{{ url_for('recipes_hub') }}" class="text-gray-700 hover:text-gray-900 font-medium">Stories</a>
+                    <a href="{{ url_for('blog_list') }}" class="text-gray-700 hover:text-gray-900 font-medium">Blog</a>
                     <a href="{{ url_for('enterprise_integration') }}" class="text-gray-700 hover:text-gray-900 font-medium">Enterprise</a>
                     <a href="{{ url_for('dashboard') }}" class="text-gray-700 hover:text-gray-900 font-medium">Dashboard</a>
                     <a href="{{ url_for('api_docs') }}" class="text-gray-700 hover:text-gray-900 font-medium">API</a>
@@ -235,6 +236,7 @@
                 <a href="{{ url_for('agents') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Agents</a>
                 <a href="{{ url_for('recipes') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Recipes</a>
                 <a href="{{ url_for('recipes_hub') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Stories</a>
+                <a href="{{ url_for('blog_list') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Blog</a>
                 <a href="{{ url_for('enterprise_integration') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Enterprise</a>
                 <a href="{{ url_for('dashboard') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Dashboard</a>
                 <a href="{{ url_for('api_docs') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">API</a>
