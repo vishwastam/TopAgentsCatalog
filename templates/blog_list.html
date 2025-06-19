@@ -113,7 +113,7 @@
                     <div class="magazine-sidebar-categories">
                         <a href="{{ url_for('blog_list') }}" class="magazine-sidebar-category{% if not current_category %} active{% endif %}">All Posts</a>
                         {% for category in categories %}
-                        <a href="{{ url_for('blog_category', category=category) }}" class="magazine-sidebar-category{% if current_category == category %} active{% endif %}">{{ category }}</a>
+                        <a href="{{ url_for('blog_category', category=category|urlencode) }}" class="magazine-sidebar-category{% if current_category == category %} active{% endif %}">{{ category }}</a>
                         {% endfor %}
                     </div>
                 </div>
@@ -121,7 +121,7 @@
                     <h3 class="magazine-sidebar-title"><i data-lucide="hash" class="h-5 w-5 mr-2 text-blue-600"></i>Popular Tags</h3>
                     <div class="magazine-sidebar-tags">
                         {% for tag in tags[:15] %}
-                        <a href="{{ url_for('blog_tag', tag=tag) }}" class="magazine-sidebar-tag{% if current_tag == tag %} active{% endif %}">#{{ tag }}</a>
+                        <a href="{{ url_for('blog_tag', tag=tag|urlencode) }}" class="magazine-sidebar-tag{% if current_tag == tag %} active{% endif %}">#{{ tag }}</a>
                         {% endfor %}
                     </div>
                 </div>

@@ -1185,45 +1185,55 @@ def blog_detail(slug):
                          canonical_url=canonical_url,
                          json_ld=json.dumps(post.get_json_ld(), indent=2))
 
-@app.route('/blog/category/<category>')
+@app.route('/blog/category/<category>', endpoint='blog_category')
 def blog_category(category):
-    """Blog posts filtered by category"""
     posts = blog_loader.get_posts_by_category(category)
-    
+    # Pagination logic
+    page = request.args.get('page', 1, type=int)
+    per_page = 9
+    start_idx = (page - 1) * per_page
+    end_idx = start_idx + per_page
+    paginated_posts = posts[start_idx:end_idx]
+    total_pages = (len(posts) + per_page - 1) // per_page
     # Get categories and tags for sidebar
     categories = blog_loader.get_categories()
     tags = blog_loader.get_tags()
-    
     # Generate canonical URL
     base_url = os.environ.get('BASE_URL', 'https://top-agents.us')
     canonical_url = f"{base_url}/blog/category/{category}"
-    
     return render_template('blog_list.html',
-                         posts=posts,
+                         posts=paginated_posts,
                          categories=categories,
                          tags=tags,
                          current_category=category,
+                         page=page,
+                         total_pages=total_pages,
                          total_posts=len(posts),
                          canonical_url=canonical_url)
 
-@app.route('/blog/tag/<tag>')
+@app.route('/blog/tag/<tag>', endpoint='blog_tag')
 def blog_tag(tag):
-    """Blog posts filtered by tag"""
     posts = blog_loader.get_posts_by_tag(tag)
-    
+    # Pagination logic
+    page = request.args.get('page', 1, type=int)
+    per_page = 9
+    start_idx = (page - 1) * per_page
+    end_idx = start_idx + per_page
+    paginated_posts = posts[start_idx:end_idx]
+    total_pages = (len(posts) + per_page - 1) // per_page
     # Get categories and tags for sidebar
     categories = blog_loader.get_categories()
     tags = blog_loader.get_tags()
-    
     # Generate canonical URL
     base_url = os.environ.get('BASE_URL', 'https://top-agents.us')
     canonical_url = f"{base_url}/blog/tag/{tag}"
-    
     return render_template('blog_list.html',
-                         posts=posts,
+                         posts=paginated_posts,
                          categories=categories,
                          tags=tags,
                          current_tag=tag,
+                         page=page,
+                         total_pages=total_pages,
                          total_posts=len(posts),
                          canonical_url=canonical_url)
 
