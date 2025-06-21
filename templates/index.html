@@ -22,7 +22,7 @@
         "@type": "SoftwareApplication",
         "name": "{{ agent.name }}",
         "description": "{{ agent.short_desc }}",
-        "url": "{{ url_for('agent_detail', slug=agent.slug, _external=True) }}"
+        "url": "{{ url_for('main.agent_detail', slug=agent.slug, _external=True) }}"
       }
     }{% if not loop.last %},{% endif %}
     {% endfor %}
@@ -40,7 +40,7 @@
             A comprehensive directory of publicly available AI agents. Find the perfect AI tool for your needs, from conversational assistants to creative generators.
         </p>
         <div class="max-w-4xl mx-auto px-4">
-            <form method="GET" action="{{ url_for('index') }}" class="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <form method="GET" action="{{ url_for('main.index') }}" class="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <div class="relative flex-1">
                     <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5"></i>
                     <input 
@@ -108,7 +108,7 @@
         
         <!-- Add Agent Form -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <form method="POST" action="{{ url_for('add_agent') }}" class="space-y-6">
+            <form method="POST" action="{{ url_for('main.add_agent') }}" class="space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Required Fields -->
                     <div>
@@ -233,7 +233,7 @@
 <!-- Filters Section -->
 <section id="filters-section" class="bg-white border-t border-gray-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-        <form method="GET" action="{{ url_for('index') }}" class="space-y-4">
+        <form method="GET" action="{{ url_for('main.index') }}" class="space-y-4">
             {% if current_query %}
                 <input type="hidden" name="q" value="{{ current_query }}">
             {% endif %}
@@ -264,7 +264,7 @@
                     </select>
                     
                     {% if current_query or current_filters %}
-                        <a href="{{ url_for('index') }}" class="text-blue-600 hover:text-blue-700 text-sm underline whitespace-nowrap self-start sm:self-center">
+                        <a href="{{ url_for('main.index') }}" class="text-blue-600 hover:text-blue-700 text-sm underline whitespace-nowrap self-start sm:self-center">
                             Clear Filters
                         </a>
                     {% endif %}
@@ -280,14 +280,14 @@
             {% if current_query %}
                 <span class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 rounded-md text-sm">
                     Search: "{{ current_query }}"
-                    <a href="{{ url_for('index', **current_filters) }}" class="text-blue-600 hover:text-blue-800">×</a>
+                    <a href="{{ url_for('main.index', **current_filters) }}" class="text-blue-600 hover:text-blue-800">×</a>
                 </span>
             {% endif %}
             
             {% for key, value in current_filters.items() %}
                 <span class="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-800 rounded-md text-sm">
                     {{ key.replace('_', ' ').title() }}: {{ value }}
-                    <a href="{{ url_for('index', q=current_query, **dict(current_filters, **{key: None})) }}" class="text-gray-600 hover:text-gray-800">×</a>
+                    <a href="{{ url_for('main.index', q=current_query, **dict(current_filters, **{key: None})) }}" class="text-gray-600 hover:text-gray-800">×</a>
                 </span>
             {% endfor %}
         </div>
@@ -308,7 +308,7 @@
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             {% for recipe in top_recipes %}
-            <a href="{{ url_for('recipe_detail', slug=recipe.slug) }}" class="block bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200 hover:border-indigo-200 group">
+            <a href="{{ url_for('main.recipe_detail', slug=recipe.slug) }}" class="block bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200 hover:border-indigo-200 group">
                 <div class="p-5">
                     <div class="mb-4">
                         <h3 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-indigo-600 transition-colors">
@@ -353,7 +353,7 @@
         </div>
         
         <div class="text-center">
-            <a href="{{ url_for('recipes') }}" 
+            <a href="{{ url_for('main.recipes') }}" 
                class="inline-flex items-center bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -393,7 +393,7 @@
     
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-12">
         {% for agent in featured_agents %}
-        <a href="{{ url_for('agent_detail', slug=agent.slug) }}" class="block">
+        <a href="{{ url_for('main.agent_detail', slug=agent.slug) }}" class="block">
             <div class="bg-white rounded-lg border-2 border-blue-100 hover:shadow-lg transition-shadow cursor-pointer h-full">
                 <div class="p-4 sm:p-6">
                     <div class="flex items-start justify-between mb-4">
@@ -487,7 +487,7 @@
         
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {% for agent in agents[6:] %}
-            <a href="{{ url_for('agent_detail', slug=agent.slug) }}" class="block">
+            <a href="{{ url_for('main.agent_detail', slug=agent.slug) }}" class="block">
                 <div class="bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer h-full">
                     <div class="p-4 sm:p-6">
                         <div class="flex items-start justify-between mb-4">
@@ -575,7 +575,7 @@
     <h3 class="text-xl font-semibold text-gray-900 mb-2">No agents found</h3>
     <p class="text-gray-600 mb-4">
         {% if current_query or current_filters %}
-            Try adjusting your search criteria or <a href="{{ url_for('index') }}" class="text-blue-600 hover:text-blue-800">browse all agents</a>.
+            Try adjusting your search criteria or <a href="{{ url_for('main.index') }}" class="text-blue-600 hover:text-blue-800">browse all agents</a>.
         {% else %}
             No agents are currently available in the directory.
         {% endif %}

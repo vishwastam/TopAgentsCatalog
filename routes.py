@@ -1,5 +1,4 @@
-from flask import render_template, request, jsonify, abort, redirect, url_for, flash, session
-from app import app
+from flask import render_template, request, jsonify, abort, redirect, url_for, flash, session, Blueprint, make_response
 from data_loader import data_loader
 from display_ratings import display_ratings
 from recipe_loader import recipe_loader
@@ -9,15 +8,163 @@ import json
 import logging
 import os
 from blog_loader import blog_loader
+from models import db, GoogleWorkspaceIDPIntegration
+import google.auth
+from google.oauth2 import service_account
+import requests as pyrequests
+from rating_system import RatingSystem
+from intelligent_search import intelligent_search
 
-# Context processor to make current_user available in templates
-@app.context_processor
+# Create blueprints
+discovery_bp = Blueprint('discovery', __name__)
+main_bp = Blueprint('main', __name__)
+
+# Create instances
+rating_system = RatingSystem()
+
+# Discovery blueprint routes
+@discovery_bp.route('/discovery/idp', methods=['POST'])
+def register_google_workspace_idp():
+    """Register a Google Workspace IDP integration and validate credentials."""
+    data = request.get_json()
+    display_name = data.get('display_name')
+    service_account_json = data.get('service_account_json')
+    api_url = data.get('api_url')
+
+    # Validate required fields
+    if not display_name or not service_account_json:
+        return jsonify({"status": "error", "message": "Missing required fields."}), 400
+    try:
+        info = json.loads(service_account_json)
+        creds = service_account.Credentials.from_service_account_info(info, scopes=["https://www.googleapis.com/auth/admin.directory.user.readonly"])
+        token = creds.token
+        status = 'active'
+        last_test_status = 'success'
+        error_message = None
+    except json.JSONDecodeError:
+        status = 'error'
+        last_test_status = 'failure'
+        error_message = 'Invalid credentials: could not parse service account JSON.'
+        creds = None
+    except Exception as e:
+        status = 'error'
+        last_test_status = 'failure'
+        error_message = f'Invalid credentials: {str(e)}'
+        creds = None
+    integration = GoogleWorkspaceIDPIntegration(
+        display_name=display_name,
+        type='google_workspace',
+        service_account_json=service_account_json,
+        api_url=api_url,
+        status=status,
+        last_tested_at=datetime.utcnow(),
+        last_test_status=last_test_status,
+        error_message=error_message,
+    )
+    db.session.add(integration)
+    db.session.commit()
+    if status == 'active':
+        return jsonify({"status": "success", "idp_id": integration.id}), 200
+    else:
+        return jsonify({"status": "error", "message": error_message}), 400
+
+@discovery_bp.route('/discovery/apps', methods=['GET'])
+def fetch_app_catalog():
+    """Fetch catalog of registered applications from Google Workspace IDP."""
+    idp_id = request.args.get('idp_id')
+    
+    if not idp_id:
+        return jsonify({"status": "error", "message": "Missing idp_id parameter."}), 400
+    
+    # Get the IDP integration
+    integration = GoogleWorkspaceIDPIntegration.query.get(idp_id)
+    if not integration:
+        return jsonify({"status": "error", "message": "IDP not found."}), 404
+    
+    if integration.status != 'active':
+        return jsonify({"status": "error", "message": "IDP not active."}), 400
+    
+    try:
+        # Parse service account credentials
+        service_account_info = json.loads(integration.service_account_json)
+        creds = service_account.Credentials.from_service_account_info(
+            service_account_info,
+            scopes=["https://www.googleapis.com/auth/admin.directory.user.readonly"]
+        )
+        
+        # Get access token
+        if not creds.token or creds.expired:
+            creds.refresh(pyrequests.Request())
+        
+        # Call Google Admin SDK Directory API
+        headers = {
+            'Authorization': f'Bearer {creds.token}',
+            'Content-Type': 'application/json'
+        }
+        
+        # Google Admin SDK Directory API endpoint for applications
+        api_url = "https://admin.googleapis.com/admin/directory/v1/customer/my_customer/applications"
+        
+        response = pyrequests.get(api_url, headers=headers, timeout=30)
+        
+        if response.status_code == 429:
+            return jsonify({"status": "error", "message": "Service temporarily unavailable due to rate limiting."}), 503
+        elif response.status_code != 200:
+            return jsonify({"status": "error", "message": f"External service error: {response.status_code}"}), 502
+        
+        # Parse response
+        try:
+            data = response.json()
+        except json.JSONDecodeError:
+            return jsonify({"status": "error", "message": "Data processing error: invalid JSON response."}), 500
+        
+        # Extract and normalize applications
+        # Handle both 'applications' and 'items' keys for flexibility
+        if 'applications' in data:
+            applications = data['applications']
+        elif 'items' in data:
+            applications = data['items']
+        else:
+            return jsonify({"status": "error", "message": "Data processing error: missing applications/items in response."}), 500
+        normalized_apps = []
+        
+        for app in applications:
+            # Validate required fields
+            if not app.get('id') or not app.get('name'):
+                continue  # Skip apps without required fields
+            
+            normalized_app = {
+                'id': app.get('id'),
+                'name': app.get('name'),
+                'description': app.get('description', ''),
+                'status': app.get('status', 'UNKNOWN'),
+                'type': app.get('type', ''),
+                'created_at': app.get('creationTime', ''),
+                'updated_at': app.get('lastModifiedTime', '')
+            }
+            normalized_apps.append(normalized_app)
+        
+        return jsonify({
+            "status": "success",
+            "apps": normalized_apps,
+            "total_count": len(normalized_apps),
+            "idp_id": idp_id
+        }), 200
+        
+    except Exception as e:
+        if 'timeout' in str(e).lower():
+            return jsonify({"status": "error", "message": "Request timeout."}), 408
+        else:
+            return jsonify({"status": "error", "message": f"Error fetching applications: {str(e)}"}), 500
+
+# Main blueprint routes
+@main_bp.context_processor
 def inject_user():
     session_token = session.get('session_token')
     current_user = user_auth.get_user_from_session(session_token) if session_token else None
     return {'current_user': current_user}
 
-@app.route('/')
+@main_bp.route('/')
 def index():
     """Main listing page with all agents and filters"""
     # Get filter parameters from URL
@@ -48,7 +195,7 @@ def index():
     
     # Check if this is a search/filter request - redirect to /agents
     if query or any(filters.values()):
-        return redirect(url_for('agents') + '?' + request.query_string.decode())
+        return redirect(url_for('main.agents') + '?' + request.query_string.decode())
     
     # Homepage - show featured agents and recipes only
     featured_agents = agents[:9]  # First 9 agents as featured
@@ -59,7 +206,7 @@ def index():
                          total_agents=len(data_loader.get_all_agents()),
                          canonical_url=canonical_url)
 
-@app.route('/demo-request', methods=['POST'])
+@main_bp.route('/demo-request', methods=['POST'])
 def demo_request():
     """Handle demo request form submissions"""
     import json
@@ -108,7 +255,7 @@ def demo_request():
             'message': 'There was an error submitting your request. Please try again.'
         }), 500
 
-@app.route('/dashboard')
+@main_bp.route('/dashboard')
 def dashboard():
     """Administrative dashboard for team leaders and IT administrators"""
     all_agents = data_loader.get_all_agents()
@@ -175,7 +322,7 @@ def dashboard():
                          team_performance=team_performance,
                          recent_activities=recent_activities)
 
-@app.route('/recipes-hub')
+@main_bp.route('/recipes-hub')
 def recipes_hub():
     """Team Recipes & Stories Hub for regular employees"""
     all_recipes = recipe_loader.get_all_recipes()
@@ -302,7 +449,7 @@ def recipes_hub():
                          trending_recipes=trending_recipes,
                          similar_stacks=similar_stacks)
 
-@app.route('/agents')
+@main_bp.route('/agents')
 def agents():
     """Full agents listing page with search and filters"""
     # Get filter parameters from URL
@@ -337,49 +484,52 @@ def agents():
                          filters=filters,
                          canonical_url=canonical_url)
 
-@app.route('/agents/<slug>')
+@main_bp.route('/agents/<slug>')
 def agent_detail(slug):
     """Individual agent detail page"""
-    agent = data_loader.get_agent_by_slug(slug)
-    
-    if not agent:
+    try:
+        agent = data_loader.get_agent_by_slug(slug)
+        
+        if not agent:
+            abort(404)
+        
+        # Get related agents (same primary domain or use case)
+        all_agents = data_loader.get_all_agents()
+        related_agents = [
+            a for a in all_agents 
+            if a.slug != slug and (
+                a.primary_domain == agent.primary_domain or 
+                a.primary_use_case == agent.primary_use_case
+            )
+        ][:6]  # Limit to 6 related agents
+        
+        # Get rating data for this agent
+        rating_data = data_loader.rating_system.get_agent_ratings(agent.slug)
+        
+        # Generate unique SEO metadata
+        page_title = f"{agent.name} by {agent.creator} - AI Agent | Top Agents"
+        meta_description = f"{agent.short_desc} | {agent.pricing_clean} AI agent for {agent.primary_use_case}. Created by {agent.creator}."
+        h1_title = f"{agent.name} - {agent.primary_use_case} AI Agent"
+        
+        return render_template('agent_detail.html', 
+                             agent=agent,
+                             related_agents=related_agents,
+                             rating_data=rating_data,
+                             json_ld=json.dumps(agent.get_json_ld(), indent=2),
+                             rating_success=request.args.get('rating_success'),
+                             rating_error=request.args.get('error'),
+                             page_title=page_title,
+                             meta_description=meta_description,
+                             h1_title=h1_title)
+    except ValueError:
         abort(404)
-    
-    # Get related agents (same primary domain or use case)
-    all_agents = data_loader.get_all_agents()
-    related_agents = [
-        a for a in all_agents 
-        if a.slug != slug and (
-            a.primary_domain == agent.primary_domain or 
-            a.primary_use_case == agent.primary_use_case
-        )
-    ][:6]  # Limit to 6 related agents
-    
-    # Get rating data for this agent
-    rating_data = data_loader.rating_system.get_agent_ratings(agent.slug)
-    
-    # Generate unique SEO metadata
-    page_title = f"{agent.name} by {agent.creator} - AI Agent | Top Agents"
-    meta_description = f"{agent.short_desc} | {agent.pricing_clean} AI agent for {agent.primary_use_case}. Created by {agent.creator}."
-    h1_title = f"{agent.name} - {agent.primary_use_case} AI Agent"
-    
-    return render_template('agent_detail.html', 
-                         agent=agent,
-                         related_agents=related_agents,
-                         rating_data=rating_data,
-                         json_ld=json.dumps(agent.get_json_ld(), indent=2),
-                         rating_success=request.args.get('rating_success'),
-                         rating_error=request.args.get('error'),
-                         page_title=page_title,
-                         meta_description=meta_description,
-                         h1_title=h1_title)
 
-@app.route('/agent/<slug>')
+@main_bp.route('/agent/<slug>')
 def agent_detail_redirect(slug):
     """Redirect old /agent/<slug> URLs to new /agents/<slug> format"""
-    return redirect(url_for('agent_detail', slug=slug), code=301)
+    return redirect(url_for('main.agent_detail', slug=slug), code=301)
 
-@app.route('/sitemap.xml')
+@main_bp.route('/sitemap.xml')
 def sitemap():
     """Generate XML sitemap for search engines and LLM crawlers"""
     all_agents = data_loader.get_all_agents()
@@ -463,41 +613,32 @@ def sitemap():
     
     sitemap_xml += '</urlset>'
     
-    response = app.response_class(
-        response=sitemap_xml,
-        status=200,
-        mimetype='application/xml'
-    )
+    response = make_response(sitemap_xml, 200)
+    response.mimetype = 'application/xml'
     return response
 
-@app.route('/robots.txt')
+@main_bp.route('/robots.txt')
 def robots_txt():
     """Serve robots.txt file for search engines"""
     with open('robots.txt', 'r') as f:
         content = f.read()
     
-    response = app.response_class(
-        response=content,
-        status=200,
-        mimetype='text/plain'
-    )
+    response = make_response(content, 200)
+    response.mimetype = 'text/plain'
     return response
 
-@app.route('/.well-known/ai-plugin.json')
+@main_bp.route('/.well-known/ai-plugin.json')
 def ai_plugin_manifest():
     """Serve AI plugin manifest for LLM integration"""
     with open('.well-known/ai-plugin.json', 'r') as f:
         content = f.read()
     
-    response = app.response_class(
-        response=content,
-        status=200,
-        mimetype='application/json'
-    )
+    response = make_response(content, 200)
+    response.mimetype = 'application/json'
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
 
-@app.route('/api/agents/search')
+@main_bp.route('/api/agents/search')
 def api_agents_search():
     """API endpoint for searching agents with natural language queries"""
     query = request.args.get('q', '')
@@ -516,9 +657,7 @@ def api_agents_search():
     
     if query:
         # Use intelligent search for natural language queries
-        from intelligent_search import IntelligentSearch
-        searcher = IntelligentSearch()
-        filtered_agents = searcher.search(filtered_agents, query)
+        filtered_agents = intelligent_search.search(filtered_agents, query)
     
     if category:
         filtered_agents = [a for a in filtered_agents if category.lower() in a.primary_domain.lower()]
@@ -560,7 +699,7 @@ def api_agents_search():
         }
     })
 
-@app.route('/api/agents/<slug>')
+@main_bp.route('/api/agents/<slug>')
 def api_agent_detail(slug):
     """API endpoint for getting detailed agent information"""
     try:
@@ -601,7 +740,7 @@ def api_agent_detail(slug):
     except ValueError:
         return jsonify({"error": "Agent not found"}), 404
 
-@app.route('/api/categories')
+@main_bp.route('/api/categories')
 def api_categories():
     """API endpoint for getting all categories and domains"""
     all_agents = data_loader.get_all_agents()
@@ -630,7 +769,7 @@ def api_categories():
         }
     })
 
-@app.route('/api/recipes')
+@main_bp.route('/api/recipes')
 def api_recipes():
     """API endpoint for getting AI agent recipes"""
     from recipe_loader import recipe_loader
@@ -655,18 +794,15 @@ def api_recipes():
         }
     })
 
-@app.route('/openapi.json')
+@main_bp.route('/openapi.json')
 def openapi_spec():
     """Serve OpenAPI specification for API documentation"""
     try:
         with open('openapi.json', 'r') as f:
             content = f.read()
         
-        response = app.response_class(
-            response=content,
-            status=200,
-            mimetype='application/json'
-        )
+        response = make_response(content, 200)
+        response.mimetype = 'application/json'
         response.headers['Access-Control-Allow-Origin'] = '*'
         response.headers['Cache-Control'] = 'public, max-age=3600'  # Cache for 1 hour
         return response
@@ -682,7 +818,7 @@ def openapi_spec():
             "message": "Failed to load OpenAPI specification"
         }), 500
 
-@app.route('/api/agents')
+@main_bp.route('/api/agents')
 def api_agents():
     """REST API endpoint to return all agents in JSON format"""
     try:
@@ -723,7 +859,7 @@ def api_agents():
             'total': 0
         }), 500
 
-@app.route('/api/search')
+@main_bp.route('/api/search')
 def api_search():
     """API endpoint for AJAX search (if needed for future enhancements)"""
     query = request.args.get('q', '').strip()
@@ -760,7 +896,7 @@ def api_search():
         'total': len(results)
     })
 
-@app.route('/add-agent', methods=['POST'])
+@main_bp.route('/add-agent', methods=['POST'])
 def add_agent():
     """Handle submission of new agent form"""
     try:
@@ -783,37 +919,37 @@ def add_agent():
         missing_fields = [field for field in required_fields if not agent_data[field]]
         
         if missing_fields:
-            return redirect(url_for('index', error='missing_fields'))
+            return redirect(url_for('main.index', error='missing_fields'))
         
         # Add the agent
         success = data_loader.add_user_agent(agent_data)
         
         if success:
-            return redirect(url_for('index', success='submitted'))
+            return redirect(url_for('main.index', success='submitted'))
         else:
-            return redirect(url_for('index', error='save_failed'))
+            return redirect(url_for('main.index', error='save_failed'))
             
     except Exception as e:
         logging.error(f"Error in add_agent route: {e}")
-        return redirect(url_for('index', error='general'))
+        return redirect(url_for('main.index', error='general'))
 
-@app.route('/recipes')
+@main_bp.route('/recipes')
 def recipes():
     """Agent recipes listing page"""
     recipes = recipe_loader.get_all_recipes()
     return render_template('recipes.html', recipes=recipes)
 
-@app.route('/api')
+@main_bp.route('/api')
 def api_docs():
     """API documentation page"""
     return render_template('api_docs.html')
 
-@app.route('/enterprise-integration')
+@main_bp.route('/enterprise-integration')
 def enterprise_integration():
     """Enterprise integration architecture page"""
     return render_template('enterprise_integration.html')
 
-@app.route('/login', methods=['GET', 'POST'])
+@main_bp.route('/login', methods=['GET', 'POST'])
 def login():
     """User login page"""
     if request.method == 'POST':
@@ -831,15 +967,15 @@ def login():
             session['session_token'] = session_token
             session.permanent = True
             
-            # Redirect to dashboard or intended page
+            # Redirect to dashboard or next page
             next_page = request.args.get('next')
-            return redirect(next_page or url_for('dashboard'))
+            return redirect(next_page or url_for('main.dashboard'))
         else:
             return render_template('login_new.html', error=result['error'])
     
     return render_template('login_new.html')
 
-@app.route('/signup', methods=['GET', 'POST'])
+@main_bp.route('/signup', methods=['GET', 'POST'])
 def signup():
     """User registration page"""
     if request.method == 'POST':
@@ -876,27 +1012,27 @@ def signup():
             session['session_token'] = session_token
             session.permanent = True
             
-            return redirect(url_for('signup_success'))
+            return redirect(url_for('main.signup_success'))
         else:
             return render_template('signup_new.html', error=result['error'])
     
     return render_template('signup_new.html')
 
-@app.route('/signup/success')
+@main_bp.route('/signup/success')
 def signup_success():
     """Post-signup success page"""
     # Check if user is logged in (should be after signup)
     session_token = session.get('session_token')
     if not session_token:
-        return redirect(url_for('signup'))
+        return redirect(url_for('main.signup'))
     
     user = user_auth.get_user_from_session(session_token)
     if not user:
-        return redirect(url_for('signup'))
+        return redirect(url_for('main.signup'))
     
     return render_template('signup_success.html', user=user)
 
-@app.route('/logout')
+@main_bp.route('/logout')
 def logout():
     """User logout"""
     session_token = session.get('session_token')
@@ -904,9 +1040,9 @@ def logout():
         user_auth.logout_session(session_token)
     
     session.clear()
-    return redirect(url_for('index'))
+    return redirect(url_for('main.index'))
 
-@app.route('/auth/google', methods=['POST'])
+@main_bp.route('/auth/google', methods=['POST'])
 def google_auth():
     """Handle Google OAuth authentication"""
     try:
@@ -955,7 +1091,7 @@ def google_auth():
             
             return jsonify({
                 'success': True,
-                'redirect': url_for('dashboard')
+                'redirect': url_for('main.dashboard')
             })
         else:
             return jsonify({'success': False, 'error': result['error']})
@@ -964,7 +1100,7 @@ def google_auth():
         logging.error(f"Google auth error: {e}")
         return jsonify({'success': False, 'error': 'Authentication failed'})
 
-@app.route('/auth/google-demo', methods=['POST'])
+@main_bp.route('/auth/google-demo', methods=['POST'])
 def google_auth_demo():
     """Demo Google OAuth authentication without requiring actual Google credentials"""
     try:
@@ -996,7 +1132,7 @@ def google_auth_demo():
             
             # Check if this was a new user creation (signup) or existing user (signin)
             is_new_user = result.get('is_new_user', False)
-            redirect_url = url_for('signup_success') if (action == 'signup' or is_new_user) else url_for('dashboard')
+            redirect_url = url_for('main.signup_success') if (action == 'signup' or is_new_user) else url_for('main.dashboard')
             
             return jsonify({
                 'success': True,
@@ -1009,7 +1145,7 @@ def google_auth_demo():
         logging.error(f"Demo Google auth error: {e}")
         return jsonify({'success': False, 'error': 'Authentication failed'})
 
-@app.route('/rate-agent', methods=['POST'])
+@main_bp.route('/rate-agent', methods=['POST'])
 def rate_agent():
     """Handle agent rating submission"""
     try:
@@ -1020,13 +1156,13 @@ def rate_agent():
         
         # Validate data
         if not agent_slug or not rating or not (1 <= rating <= 5):
-            return redirect(url_for('agent_detail', slug=agent_slug, error='invalid_rating'))
+            return redirect(url_for('main.agent_detail', slug=agent_slug, error='invalid_rating'))
         
         # Check if agent exists
         try:
             agent = data_loader.get_agent_by_slug(agent_slug)
         except ValueError:
-            return redirect(url_for('index', error='agent_not_found'))
+            return redirect(url_for('main.index', error='agent_not_found'))
         
         # Add rating
         success = data_loader.rating_system.add_rating(
@@ -1037,15 +1173,15 @@ def rate_agent():
         )
         
         if success:
-            return redirect(url_for('agent_detail', slug=agent_slug, rating_success='1'))
+            return redirect(url_for('main.agent_detail', slug=agent_slug, rating_success='1'))
         else:
-            return redirect(url_for('agent_detail', slug=agent_slug, error='rating_failed'))
+            return redirect(url_for('main.agent_detail', slug=agent_slug, error='rating_failed'))
             
     except Exception as e:
         logging.error(f"Error in rate_agent route: {e}")
-        return redirect(url_for('index', error='general'))
+        return redirect(url_for('main.index', error='general'))
 
-@app.route('/recipes/<slug>')
+@main_bp.route('/recipes/<slug>')
 def recipe_detail(slug):
     """Individual recipe detail page"""
     from recipe_loader import recipe_loader
@@ -1076,18 +1212,18 @@ def recipe_detail(slug):
                          h1_title=h1_title,
                          canonical_url=canonical_url)
 
-@app.errorhandler(404)
+@main_bp.errorhandler(404)
 def not_found_error(error):
     """Handle 404 errors"""
     return render_template('404.html'), 404
 
-@app.errorhandler(500)
+@main_bp.errorhandler(500)
 def internal_error(error):
     """Handle 500 errors"""
     logging.error(f"Internal server error: {error}")
     return render_template('500.html'), 500
 
-@app.route('/blog')
+@main_bp.route('/blog')
 def blog_list():
     """Blog listing page with all published posts"""
     # Get filter parameters
@@ -1142,7 +1278,7 @@ def blog_list():
                          total_posts=len(posts),
                          canonical_url=canonical_url)
 
-@app.route('/blog/<slug>')
+@main_bp.route('/blog/<slug>')
 def blog_detail(slug):
     """Individual blog post page"""
     post = blog_loader.get_post_by_slug(slug)
@@ -1185,7 +1321,7 @@ def blog_detail(slug):
                          canonical_url=canonical_url,
                          json_ld=json.dumps(post.get_json_ld(), indent=2))
 
-@app.route('/blog/category/<category>', endpoint='blog_category')
+@main_bp.route('/blog/category/<category>', endpoint='blog_category')
 def blog_category(category):
     posts = blog_loader.get_posts_by_category(category)
     # Pagination logic
@@ -1211,7 +1347,7 @@ def blog_category(category):
                          total_posts=len(posts),
                          canonical_url=canonical_url)
 
-@app.route('/blog/tag/<tag>', endpoint='blog_tag')
+@main_bp.route('/blog/tag/<tag>', endpoint='blog_tag')
 def blog_tag(tag):
     posts = blog_loader.get_posts_by_tag(tag)
     # Pagination logic
@@ -1237,7 +1373,7 @@ def blog_tag(tag):
                          total_posts=len(posts),
                          canonical_url=canonical_url)
 
-@app.route('/api/blog/posts')
+@main_bp.route('/api/blog/posts')
 def api_blog_posts():
     """API endpoint for blog posts"""
     posts = blog_loader.get_published_posts()

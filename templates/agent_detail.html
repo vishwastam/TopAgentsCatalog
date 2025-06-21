@@ -3,7 +3,7 @@
 {% block title %}{{ page_title }}{% endblock %}
 {% block description %}{{ meta_description }}{% endblock %}
 
-{% block canonical_url %}{{ url_for('agent_detail', slug=agent.slug, _external=True) }}{% endblock %}
+{% block canonical_url %}{{ url_for('main.agent_detail', slug=agent.slug, _external=True) }}{% endblock %}
 
 {% block og_title %}{{ agent.name }} by {{ agent.creator }} - AI Agent{% endblock %}
 {% block og_description %}{{ agent.short_desc }} | Platform: {{ agent.platform }} | Pricing: {{ agent.pricing }}{% endblock %}
@@ -19,7 +19,7 @@
 <div class="bg-white border-b border-gray-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div class="flex items-center space-x-2 text-sm">
-            <a href="{{ url_for('index') }}" class="text-blue-600 hover:text-blue-800">Directory</a>
+            <a href="{{ url_for('main.index') }}" class="text-blue-600 hover:text-blue-800">Directory</a>
             <span class="text-gray-400">/</span>
             <span class="text-blue-600">{{ agent.primary_domain }}</span>
             <span class="text-gray-400">/</span>
@@ -395,7 +395,7 @@
                     </div>
                     {% endif %}
 
-                    <form method="POST" action="{{ url_for('rate_agent') }}" class="space-y-4">
+                    <form method="POST" action="{{ url_for('main.rate_agent') }}" class="space-y-4">
                         <input type="hidden" name="agent_slug" value="{{ agent.slug }}">
                         
                         <div>
@@ -465,7 +465,7 @@
     <h3 class="text-xl sm:text-2xl font-bold text-gray-900 mb-6">Related Agents</h3>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {% for related_agent in related_agents %}
-        <a href="{{ url_for('agent_detail', slug=related_agent.slug) }}" class="block">
+        <a href="{{ url_for('main.agent_detail', slug=related_agent.slug) }}" class="block">
             <div class="bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer h-full">
                 <div class="p-4 sm:p-6">
                     <h4 class="text-base sm:text-lg font-semibold text-gray-900 mb-2 break-words">{{ related_agent.name }}</h4>
@@ -493,7 +493,7 @@
 <!-- Back to Directory -->
 <section class="bg-gray-900 text-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
-        <a href="{{ url_for('index') }}" class="inline-flex items-center gap-2 border border-gray-600 text-white px-6 py-3 rounded-md hover:bg-gray-800">
+        <a href="{{ url_for('main.index') }}" class="inline-flex items-center gap-2 border border-gray-600 text-white px-6 py-3 rounded-md hover:bg-gray-800">
             <i data-lucide="arrow-left" class="h-4 w-4"></i>
             Back to Directory
         </a>

@@ -26,7 +26,7 @@
     <!-- Search and Filter Section -->
     <section class="bg-white py-8 border-b border-gray-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <form method="GET" action="{{ url_for('agents') }}" class="space-y-6">
+            <form method="GET" action="{{ url_for('main.agents') }}" class="space-y-6">
                 <!-- Search Bar -->
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -106,14 +106,14 @@
                 {% if current_query %}
                     <span class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 rounded-md text-sm">
                         Search: "{{ current_query }}"
-                        <a href="{{ url_for('agents', **current_filters) }}" class="text-blue-600 hover:text-blue-800">×</a>
+                        <a href="{{ url_for('main.agents', **current_filters) }}" class="text-blue-600 hover:text-blue-800">×</a>
                     </span>
                 {% endif %}
                 
                 {% for key, value in current_filters.items() %}
                     <span class="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-800 rounded-md text-sm">
                         {{ key.replace('_', ' ').title() }}: {{ value }}
-                        <a href="{{ url_for('agents', q=current_query, **dict(current_filters, **{key: None})) }}" class="text-gray-600 hover:text-gray-800">×</a>
+                        <a href="{{ url_for('main.agents', q=current_query, **dict(current_filters, **{key: None})) }}" class="text-gray-600 hover:text-gray-800">×</a>
                     </span>
                 {% endfor %}
             </div>
@@ -143,7 +143,7 @@
                 <!-- Agents Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {% for agent in agents %}
-                    <a href="{{ url_for('agent_detail', slug=agent.slug) }}" 
+                    <a href="{{ url_for('main.agent_detail', slug=agent.slug) }}" 
                        class="block bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-200 hover:border-indigo-200 group">
                         <div class="p-6">
                             <!-- Agent Header -->
@@ -206,7 +206,7 @@
                     <i data-lucide="search-x" class="h-16 w-16 text-gray-400 mx-auto mb-4"></i>
                     <h3 class="text-lg font-medium text-gray-900 mb-2">No agents found</h3>
                     <p class="text-gray-500 mb-4">Try adjusting your search criteria or filters.</p>
-                    <a href="{{ url_for('agents') }}" 
+                    <a href="{{ url_for('main.agents') }}" 
                        class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
                         <i data-lucide="refresh-cw" class="h-4 w-4 mr-2"></i>
                         Clear all filters

@@ -177,7 +177,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center space-x-3">
-                    <a href="{{ url_for('index') }}" class="flex items-center space-x-2 sm:space-x-3">
+                    <a href="{{ url_for('main.index') }}" class="flex items-center space-x-2 sm:space-x-3">
                         <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
                             <i data-lucide="brain" class="h-5 w-5 sm:h-6 sm:w-6 text-white"></i>
                         </div>
@@ -187,14 +187,14 @@
                 
                 <!-- Desktop Navigation -->
                 <nav class="hidden md:flex items-center space-x-6">
-                    <a href="{{ url_for('index') }}" class="text-gray-700 hover:text-gray-900 font-medium">Home</a>
-                    <a href="{{ url_for('agents') }}" class="text-gray-700 hover:text-gray-900 font-medium">Agents</a>
-                    <a href="{{ url_for('recipes') }}" class="text-gray-700 hover:text-gray-900 font-medium">Recipes</a>
-                    <a href="{{ url_for('recipes_hub') }}" class="text-gray-700 hover:text-gray-900 font-medium">Stories</a>
-                    <a href="{{ url_for('blog_list') }}" class="text-gray-700 hover:text-gray-900 font-medium">Blog</a>
-                    <a href="{{ url_for('enterprise_integration') }}" class="text-gray-700 hover:text-gray-900 font-medium">Enterprise</a>
-                    <a href="{{ url_for('dashboard') }}" class="text-gray-700 hover:text-gray-900 font-medium">Dashboard</a>
-                    <a href="{{ url_for('api_docs') }}" class="text-gray-700 hover:text-gray-900 font-medium">API</a>
+                    <a href="{{ url_for('main.index') }}" class="text-gray-700 hover:text-gray-900 font-medium">Home</a>
+                    <a href="{{ url_for('main.agents') }}" class="text-gray-700 hover:text-gray-900 font-medium">Agents</a>
+                    <a href="{{ url_for('main.recipes') }}" class="text-gray-700 hover:text-gray-900 font-medium">Recipes</a>
+                    <a href="{{ url_for('main.recipes_hub') }}" class="text-gray-700 hover:text-gray-900 font-medium">Stories</a>
+                    <a href="{{ url_for('main.blog_list') }}" class="text-gray-700 hover:text-gray-900 font-medium">Blog</a>
+                    <a href="{{ url_for('main.enterprise_integration') }}" class="text-gray-700 hover:text-gray-900 font-medium">Enterprise</a>
+                    <a href="{{ url_for('main.dashboard') }}" class="text-gray-700 hover:text-gray-900 font-medium">Dashboard</a>
+                    <a href="{{ url_for('main.api_docs') }}" class="text-gray-700 hover:text-gray-900 font-medium">API</a>
                     
                     {% if current_user %}
                     <div class="flex items-center space-x-3">
@@ -208,12 +208,12 @@
                             {% endif %}
                             <span class="text-gray-700 text-sm">{{ current_user.first_name or current_user.email.split('@')[0] }}</span>
                         </div>
-                        <a href="{{ url_for('logout') }}" class="text-gray-600 hover:text-gray-900 text-sm">Sign out</a>
+                        <a href="{{ url_for('main.logout') }}" class="text-gray-600 hover:text-gray-900 text-sm">Sign out</a>
                     </div>
                     {% else %}
                     <div class="flex items-center space-x-3">
-                        <a href="{{ url_for('login') }}" class="text-gray-700 hover:text-gray-900 font-medium">Sign in</a>
-                        <a href="{{ url_for('signup') }}" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
+                        <a href="{{ url_for('main.login') }}" class="text-gray-700 hover:text-gray-900 font-medium">Sign in</a>
+                        <a href="{{ url_for('main.signup') }}" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
                             Sign up
                         </a>
                     </div>
@@ -232,14 +232,14 @@
         <!-- Mobile Menu -->
         <div id="mobileMenu" class="hidden md:hidden border-t border-gray-200 bg-white">
             <div class="px-4 py-3 space-y-3">
-                <a href="{{ url_for('index') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Home</a>
-                <a href="{{ url_for('agents') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Agents</a>
-                <a href="{{ url_for('recipes') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Recipes</a>
-                <a href="{{ url_for('recipes_hub') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Stories</a>
-                <a href="{{ url_for('blog_list') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Blog</a>
-                <a href="{{ url_for('enterprise_integration') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Enterprise</a>
-                <a href="{{ url_for('dashboard') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Dashboard</a>
-                <a href="{{ url_for('api_docs') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">API</a>
+                <a href="{{ url_for('main.index') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Home</a>
+                <a href="{{ url_for('main.agents') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Agents</a>
+                <a href="{{ url_for('main.recipes') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Recipes</a>
+                <a href="{{ url_for('main.recipes_hub') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Stories</a>
+                <a href="{{ url_for('main.blog_list') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Blog</a>
+                <a href="{{ url_for('main.enterprise_integration') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Enterprise</a>
+                <a href="{{ url_for('main.dashboard') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Dashboard</a>
+                <a href="{{ url_for('main.api_docs') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">API</a>
                 
                 {% if current_user %}
                 <div class="border-t border-gray-200 pt-3 mt-3">
@@ -253,12 +253,12 @@
                         {% endif %}
                         <span class="text-gray-700 text-sm">{{ current_user.first_name or current_user.email.split('@')[0] }}</span>
                     </div>
-                    <a href="{{ url_for('logout') }}" class="block text-gray-600 hover:text-gray-900 py-2">Sign out</a>
+                    <a href="{{ url_for('main.logout') }}" class="block text-gray-600 hover:text-gray-900 py-2">Sign out</a>
                 </div>
                 {% else %}
                 <div class="border-t border-gray-200 pt-3 mt-3 space-y-2">
-                    <a href="{{ url_for('login') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Sign in</a>
-                    <a href="{{ url_for('signup') }}" class="block bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 text-center">
+                    <a href="{{ url_for('main.login') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Sign in</a>
+                    <a href="{{ url_for('main.signup') }}" class="block bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 text-center">
                         Sign up
                     </a>
                 </div>

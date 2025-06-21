@@ -34,7 +34,7 @@
                         <i data-lucide="play-circle" class="h-5 w-5 mr-2"></i>
                         Request Demo
                     </button>
-                    <a href="{{ url_for('dashboard') }}" class="inline-flex items-center px-8 py-4 bg-white text-blue-600 border-2 border-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+                    <a href="{{ url_for('main.dashboard') }}" class="inline-flex items-center px-8 py-4 bg-white text-blue-600 border-2 border-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
                         <i data-lucide="external-link" class="h-5 w-5 mr-2"></i>
                         See Live Preview
                     </a>
@@ -766,31 +766,15 @@
                 Get your team organized around AI that actually works.
             </p>
             
-            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <button onclick="openDemoForm()" class="inline-flex items-center px-8 py-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                     <i data-lucide="calendar" class="h-5 w-5 mr-2"></i>
                     Request a Demo
                 </button>
-                <a href="{{ url_for('dashboard') }}" class="inline-flex items-center px-8 py-4 bg-white text-blue-600 border-2 border-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+                <a href="{{ url_for('main.dashboard') }}" class="inline-flex items-center px-8 py-4 bg-white text-blue-600 border-2 border-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
                     <i data-lucide="eye" class="h-5 w-5 mr-2"></i>
                     Try It Live
                 </a>
-            </div>
-            
-            <!-- Demo Form (Hidden by default) -->
-            <div id="demoForm" class="hidden bg-white rounded-2xl shadow-xl p-8 max-w-md mx-auto">
-                <h3 class="text-2xl font-bold text-gray-900 mb-6">Request Your Demo</h3>
-                <form id="demoFormElement" class="space-y-4" onsubmit="submitDemoRequest(event)">
-                    <input type="text" id="companyName" placeholder="Company Name" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <input type="email" id="workEmail" placeholder="Work Email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <input type="text" id="teamSize" placeholder="Team Size" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <textarea id="aiUsage" placeholder="Tell us about your AI usage..." rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
-                    <button type="submit" id="submitBtn" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
-                        Schedule Demo
-                    </button>
-                </form>
-                <div id="demoMessage" class="hidden mt-4 p-3 rounded-lg"></div>
-                <button onclick="closeDemoForm()" class="mt-4 text-gray-500 hover:text-gray-700">Cancel</button>
             </div>
         </div>
     </section>
@@ -802,88 +786,7 @@ function scrollToDemo() {
 }
 
 function openDemoForm() {
-    document.getElementById('demoForm').classList.remove('hidden');
+    alert('Demo request form would open here');
 }
-
-function closeDemoForm() {
-    document.getElementById('demoForm').classList.add('hidden');
-    // Reset form and hide message
-    document.getElementById('demoFormElement').reset();
-    document.getElementById('demoMessage').classList.add('hidden');
-}
-
-async function submitDemoRequest(event) {
-    event.preventDefault();
-    
-    const submitBtn = document.getElementById('submitBtn');
-    const messageDiv = document.getElementById('demoMessage');
-    
-    // Show loading state
-    submitBtn.textContent = 'Submitting...';
-    submitBtn.disabled = true;
-    messageDiv.classList.add('hidden');
-    
-    // Collect form data
-    const formData = {
-        company_name: document.getElementById('companyName').value,
-        email: document.getElementById('workEmail').value,
-        team_size: document.getElementById('teamSize').value,
-        ai_usage: document.getElementById('aiUsage').value
-    };
-    
-    try {
-        const response = await fetch('/demo-request', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData)
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            messageDiv.className = 'mt-4 p-3 rounded-lg bg-green-100 text-green-800';
-            messageDiv.textContent = result.message;
-            document.getElementById('demoFormElement').reset();
-        } else {
-            messageDiv.className = 'mt-4 p-3 rounded-lg bg-red-100 text-red-800';
-            messageDiv.textContent = result.message;
-        }
-        
-        messageDiv.classList.remove('hidden');
-        
-    } catch (error) {
-        messageDiv.className = 'mt-4 p-3 rounded-lg bg-red-100 text-red-800';
-        messageDiv.textContent = 'Network error. Please try again.';
-        messageDiv.classList.remove('hidden');
-    }
-    
-    // Reset button
-    submitBtn.textContent = 'Schedule Demo';
-    submitBtn.disabled = false;
-}
-
-// Agent logo error handling
-document.addEventListener('DOMContentLoaded', function() {
-    const logos = document.querySelectorAll('img[alt$=" logo"]');
-    logos.forEach(logo => {
-        logo.addEventListener('error', function() {
-            console.log(`Failed to load logo for ${this.alt.replace(' logo', '')}, keeping default icon`);
-        });
-    });
-});
-</script>
-
-<script>
-// Agent logo error handling
-document.addEventListener('DOMContentLoaded', function() {
-    const logos = document.querySelectorAll('img[alt$=" logo"]');
-    logos.forEach(logo => {
-        logo.addEventListener('error', function() {
-            console.log(`Failed to load logo for ${this.alt.replace(' logo', '')}, keeping default icon`);
-        });
-    });
-});
 </script>
 {% endblock %}

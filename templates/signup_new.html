@@ -14,7 +14,7 @@
             <h2 class="text-3xl font-bold text-gray-900">Create your account</h2>
             <p class="mt-2 text-sm text-gray-600">
                 Already have an account?
-                <a href="{{ url_for('login') }}" class="font-medium text-blue-600 hover:text-blue-500">
+                <a href="{{ url_for('main.login') }}" class="font-medium text-blue-600 hover:text-blue-500">
                     Sign in
                 </a>
             </p>
@@ -47,7 +47,7 @@
             </div>
 
             <!-- Email/Password Form -->
-            <form class="mt-6" method="POST" action="{{ url_for('signup') }}">
+            <form class="mt-6" method="POST" action="{{ url_for('main.signup') }}">
                 {% if error %}
                 <div class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
                     {{ error }}

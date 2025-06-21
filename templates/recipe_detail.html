@@ -20,9 +20,9 @@
     <div class="bg-white border-b border-gray-200">
         <div class="container mx-auto px-6 py-4">
             <nav class="text-sm text-gray-600">
-                <a href="{{ url_for('index') }}" class="hover:text-gray-900">Home</a>
+                <a href="{{ url_for('main.index') }}" class="hover:text-gray-900">Home</a>
                 <span class="mx-2">/</span>
-                <a href="{{ url_for('recipes') }}" class="hover:text-gray-900">Recipes</a>
+                <a href="{{ url_for('main.recipes') }}" class="hover:text-gray-900">Recipes</a>
                 <span class="mx-2">/</span>
                 <span class="text-gray-900">{{ recipe.name }}</span>
             </nav>
@@ -160,14 +160,14 @@
                         </div>
                         
                         <h3 class="text-lg font-semibold text-gray-900 mb-3">
-                            <a href="{{ url_for('recipe_detail', slug=related_recipe.slug) }}" class="hover:text-indigo-600">
+                            <a href="{{ url_for('main.recipe_detail', slug=related_recipe.slug) }}" class="hover:text-indigo-600">
                                 {{ related_recipe.name }}
                             </a>
                         </h3>
                         
                         <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ related_recipe.synopsis }}</p>
                         
-                        <a href="{{ url_for('recipe_detail', slug=related_recipe.slug) }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                        <a href="{{ url_for('main.recipe_detail', slug=related_recipe.slug) }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
                             Read Recipe →
                         </a>
                     </div>
@@ -175,7 +175,7 @@
                 </div>
 
                 <div class="text-center mt-12">
-                    <a href="{{ url_for('recipes') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                    <a href="{{ url_for('main.recipes') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
                         <i data-lucide="book-open" class="h-4 w-4"></i>
                         View All Recipes
                     </a>

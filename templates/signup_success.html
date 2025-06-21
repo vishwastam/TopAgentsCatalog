@@ -40,13 +40,13 @@
                 </p>
                 
                 <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                    <a href="{{ url_for('recipes_hub') }}" 
+                    <a href="{{ url_for('main.recipes_hub') }}" 
                        class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
                         <i data-lucide="book-open" class="h-5 w-5 mr-2"></i>
                         Explore Team Stories
                     </a>
                     
-                    <a href="{{ url_for('dashboard') }}" 
+                    <a href="{{ url_for('main.dashboard') }}" 
                        class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
                         <i data-lucide="layout-dashboard" class="h-5 w-5 mr-2"></i>
                         Go to Dashboard
@@ -102,7 +102,7 @@ function startCountdown() {
         
         if (timeLeft <= 0) {
             clearInterval(countdownInterval);
-            window.location.href = "{{ url_for('recipes_hub') }}";
+            window.location.href = "{{ url_for('main.recipes_hub') }}";
         }
     }, 1000);
 }

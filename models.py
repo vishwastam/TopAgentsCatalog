@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from typing import List, Dict, Any
 import re
 import os
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 @dataclass
 class Agent:
@@ -196,3 +198,19 @@ class Agent:
             json_ld["deploymentMode"] = self.deployment
         
         return json_ld
+
+db = SQLAlchemy()
+
+class GoogleWorkspaceIDPIntegration(db.Model):
+    __tablename__ = 'idp_integrations'
+    id = db.Column(db.Integer, primary_key=True)
+    display_name = db.Column(db.String(128), nullable=False)
+    type = db.Column(db.String(32), default='google_workspace', nullable=False)
+    service_account_json = db.Column(db.Text, nullable=False)  # Store as JSON string or reference to secret
+    api_url = db.Column(db.String(256), nullable=True)
+    status = db.Column(db.String(32), default='pending', nullable=False)
+    last_tested_at = db.Column(db.DateTime, nullable=True)
+    last_test_status = db.Column(db.String(32), nullable=True)
+    error_message = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

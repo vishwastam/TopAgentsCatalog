@@ -25,8 +25,8 @@
             <div class="magazine-hero-img-overlay"></div>
             <div class="magazine-hero-content">
                 <div class="magazine-hero-breadcrumbs">
-                    <a href="{{ url_for('index') }}">Home</a> &raquo;
-                    <a href="{{ url_for('blog_list') }}">Blog</a> &raquo;
+                    <a href="{{ url_for('main.index') }}">Home</a> &raquo;
+                    <a href="{{ url_for('main.blog_list') }}">Blog</a> &raquo;
                     <span>{{ post.title }}</span>
                 </div>
                 <span class="magazine-hero-category">{{ post.category }}</span>
@@ -75,7 +75,7 @@
                     {% endif %}
                     <div class="magazine-related-body">
                         <span class="magazine-related-category">{{ related_post.category }}</span>
-                        <a href="{{ url_for('blog_detail', slug=related_post.slug) }}" class="magazine-related-title-link">{{ related_post.title }}</a>
+                        <a href="{{ url_for('main.blog_detail', slug=related_post.slug) }}" class="magazine-related-title-link">{{ related_post.title }}</a>
                         <span class="magazine-related-date">{{ related_post.publish_date.strftime('%b %d, %Y') }}</span>
                     </div>
                 </article>

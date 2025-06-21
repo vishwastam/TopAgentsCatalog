@@ -2,7 +2,7 @@
 
 {% block title %}AI Agent Recipes - Top Agents{% endblock %}
 
-{% block canonical_url %}{{ url_for('recipes', _external=True) }}{% endblock %}
+{% block canonical_url %}{{ url_for('main.recipes', _external=True) }}{% endblock %}
 
 {% block og_title %}AI Agent Recipes - Real-World Implementation Examples{% endblock %}
 {% block og_description %}Discover 21 proven AI agent workflows and implementations. From AutoGPT market research to Otter.ai transcription - see how AI agents solve real problems.{% endblock %}
@@ -38,7 +38,7 @@
                     <div class="flex items-start justify-between mb-4">
                         <div class="flex-1">
                             <h3 class="text-xl font-semibold text-gray-900 mb-2">
-                                <a href="{{ url_for('recipe_detail', slug=recipe.slug) }}" class="hover:text-indigo-600 transition-colors">
+                                <a href="{{ url_for('main.recipe_detail', slug=recipe.slug) }}" class="hover:text-indigo-600 transition-colors">
                                     {{ recipe.name }}
                                 </a>
                             </h3>
@@ -59,7 +59,7 @@
 
                     <!-- Read Full Recipe Button -->
                     <div class="mb-4">
-                        <a href="{{ url_for('recipe_detail', slug=recipe.slug) }}" 
+                        <a href="{{ url_for('main.recipe_detail', slug=recipe.slug) }}" 
                            class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium">
                             <i data-lucide="book-open" class="h-4 w-4"></i>
                             Read Full Recipe
@@ -92,15 +92,15 @@
                             </button>
                             <div id="recipe-{{ loop.index }}-share" class="hidden absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg border border-gray-200 z-10">
                                 <div class="py-1">
-                                    <button onclick="shareRecipe('{{ recipe.name }}', '{{ recipe.synopsis }}', '{{ url_for('recipes', _external=True) }}').twitter()" class="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-gray-100 flex items-center gap-2">
+                                    <button onclick="shareRecipe('{{ recipe.name }}', '{{ recipe.synopsis }}', '{{ url_for('main.recipes', _external=True) }}').twitter()" class="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-gray-100 flex items-center gap-2">
                                         <i data-lucide="twitter" class="h-3 w-3"></i>
                                         Twitter
                                     </button>
-                                    <button onclick="shareRecipe('{{ recipe.name }}', '{{ recipe.synopsis }}', '{{ url_for('recipes', _external=True) }}').linkedin()" class="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-gray-100 flex items-center gap-2">
+                                    <button onclick="shareRecipe('{{ recipe.name }}', '{{ recipe.synopsis }}', '{{ url_for('main.recipes', _external=True) }}').linkedin()" class="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-gray-100 flex items-center gap-2">
                                         <i data-lucide="linkedin" class="h-3 w-3"></i>
                                         LinkedIn
                                     </button>
-                                    <button onclick="shareRecipe('{{ recipe.name }}', '{{ recipe.synopsis }}', '{{ url_for('recipes', _external=True) }}').copy()" class="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-gray-100 flex items-center gap-2">
+                                    <button onclick="shareRecipe('{{ recipe.name }}', '{{ recipe.synopsis }}', '{{ url_for('main.recipes', _external=True) }}').copy()" class="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-gray-100 flex items-center gap-2">
                                         <i data-lucide="copy" class="h-3 w-3"></i>
                                         Copy
                                     </button>
@@ -123,11 +123,11 @@
                     Explore our comprehensive directory of 143+ AI agents and tools to find the perfect solution for your needs.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="{{ url_for('index') }}" 
+                    <a href="{{ url_for('main.index') }}" 
                        class="bg-white text-blue-600 hover:bg-gray-50 px-8 py-3 rounded-lg font-semibold transition-colors">
                         Browse All Agents
                     </a>
-                    <a href="{{ url_for('add_agent') }}" 
+                    <a href="{{ url_for('main.add_agent') }}" 
                        class="bg-blue-500 hover:bg-blue-400 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
                         Submit Your Agent
                     </a>
