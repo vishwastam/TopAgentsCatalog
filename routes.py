@@ -8,7 +8,7 @@ import json
 import logging
 import os
 from blog_loader import blog_loader
-from models import db, GoogleWorkspaceIDPIntegration
+from models import db, GoogleWorkspaceIDPIntegration, IDPIntegration
 import google.auth
 from google.oauth2 import service_account
 import requests as pyrequests
@@ -24,138 +24,290 @@ rating_system = RatingSystem()
 
 # Discovery blueprint routes
 @discovery_bp.route('/discovery/idp', methods=['POST'])
-def register_google_workspace_idp():
-    """Register a Google Workspace IDP integration and validate credentials."""
+def register_idp():
+    """Register an IDP integration and validate credentials for multiple providers."""
     data = request.get_json()
+    
+    if not data:
+        return jsonify({"status": "error", "message": "Invalid JSON data."}), 400
+    
     display_name = data.get('display_name')
-    service_account_json = data.get('service_account_json')
-    api_url = data.get('api_url')
-
+    idp_type = data.get('type')
+    
     # Validate required fields
-    if not display_name or not service_account_json:
-        return jsonify({"status": "error", "message": "Missing required fields."}), 400
-    try:
-        info = json.loads(service_account_json)
-        creds = service_account.Credentials.from_service_account_info(info, scopes=["https://www.googleapis.com/auth/admin.directory.user.readonly"])
-        token = creds.token
-        status = 'active'
-        last_test_status = 'success'
-        error_message = None
-    except json.JSONDecodeError:
-        status = 'error'
-        last_test_status = 'failure'
-        error_message = 'Invalid credentials: could not parse service account JSON.'
-        creds = None
-    except Exception as e:
-        status = 'error'
-        last_test_status = 'failure'
-        error_message = f'Invalid credentials: {str(e)}'
-        creds = None
-    integration = GoogleWorkspaceIDPIntegration(
+    if not display_name or not idp_type:
+        return jsonify({"status": "error", "message": "Missing required fields: display_name and type."}), 400
+    
+    # Validate provider type
+    supported_types = ['google_workspace', 'azure_ad', 'okta']
+    if idp_type not in supported_types:
+        return jsonify({"status": "error", "message": f"Unsupported provider type. Supported types: {', '.join(supported_types)}"}), 400
+    
+    # Extract provider-specific configuration
+    config = {}
+    api_url = data.get('api_url')
+    
+    if idp_type == 'google_workspace':
+        service_account_json = data.get('service_account_json')
+        if not service_account_json:
+            return jsonify({"status": "error", "message": "Missing required field: service_account_json"}), 400
+        config['service_account_json'] = service_account_json
+        api_url = api_url or 'https://admin.googleapis.com'
+        
+    elif idp_type == 'azure_ad':
+        tenant_id = data.get('tenant_id')
+        client_id = data.get('client_id')
+        client_secret = data.get('client_secret')
+        if not all([tenant_id, client_id, client_secret]):
+            return jsonify({"status": "error", "message": "Missing required fields: tenant_id, client_id, client_secret"}), 400
+        config.update({
+            'tenant_id': tenant_id,
+            'client_id': client_id,
+            'client_secret': client_secret
+        })
+        api_url = api_url or 'https://graph.microsoft.com/v1.0'
+        
+    elif idp_type == 'okta':
+        domain = data.get('domain')
+        api_token = data.get('api_token')
+        
+        if not all([domain, api_token]):
+            return jsonify({"status": "error", "message": "Missing required fields: domain, api_token"}), 400
+        
+        # Validate domain format
+        import re
+        if not re.match(r'^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.okta\.com$', domain):
+            return jsonify({"status": "error", "message": "Invalid domain format. Must be a valid Okta domain (e.g., company.okta.com)"}), 400
+        
+        config.update({
+            'domain': domain,
+            'api_token': api_token
+        })
+        api_url = api_url or f'https://{domain}/api/v1'
+    
+    # Create IDP integration
+    integration = IDPIntegration(
         display_name=display_name,
-        type='google_workspace',
-        service_account_json=service_account_json,
-        api_url=api_url,
-        status=status,
-        last_tested_at=datetime.utcnow(),
-        last_test_status=last_test_status,
-        error_message=error_message,
+        type=idp_type,
+        config=config,
+        api_url=api_url
     )
-    db.session.add(integration)
-    db.session.commit()
-    if status == 'active':
-        return jsonify({"status": "success", "idp_id": integration.id}), 200
-    else:
-        return jsonify({"status": "error", "message": error_message}), 400
+    
+    # Validate configuration
+    is_valid, validation_message = integration.validate_config()
+    if not is_valid:
+        return jsonify({"status": "error", "message": validation_message}), 400
+    
+    # Test connection
+    try:
+        success, message = integration.test_connection()
+        if success:
+            integration.status = 'active'
+            integration.last_test_status = 'success'
+            integration.error_message = None
+            db.session.add(integration)
+            db.session.commit()
+            return jsonify({"status": "success", "idp_id": integration.id}), 200
+        else:
+            integration.status = 'error'
+            integration.last_test_status = 'failed'
+            integration.error_message = message
+            db.session.add(integration)
+            db.session.commit()
+            err = str(message).lower()
+            response = {"status": "error", "message": message}
+            if integration.id:
+                response["idp_id"] = integration.id
+            if 'timeout' in err:
+                return jsonify(response), 408
+            if 'rate limit' in err or 'rate limiting' in err or '429' in err:
+                return jsonify(response), 503
+            return jsonify(response), 400
+    except Exception as e:
+        integration.status = 'error'
+        integration.last_test_status = 'failed'
+        integration.error_message = str(e)
+        db.session.add(integration)
+        db.session.commit()
+        err = str(e).lower()
+        response = {"status": "error", "message": str(e)}
+        if integration.id:
+            response["idp_id"] = integration.id
+        if 'timeout' in err:
+            return jsonify(response), 408
+        if 'rate limit' in err or 'rate limiting' in err or '429' in err:
+            return jsonify(response), 503
+        return jsonify(response), 400
 
 @discovery_bp.route('/discovery/apps', methods=['GET'])
 def fetch_app_catalog():
-    """Fetch catalog of registered applications from Google Workspace IDP."""
+    """Fetch catalog of registered applications from any IDP provider."""
     idp_id = request.args.get('idp_id')
-    
     if not idp_id:
         return jsonify({"status": "error", "message": "Missing idp_id parameter."}), 400
-    
-    # Get the IDP integration
-    integration = GoogleWorkspaceIDPIntegration.query.get(idp_id)
+    integration = IDPIntegration.query.get(idp_id)
     if not integration:
         return jsonify({"status": "error", "message": "IDP not found."}), 404
-    
     if integration.status != 'active':
         return jsonify({"status": "error", "message": "IDP not active."}), 400
-    
     try:
-        # Parse service account credentials
-        service_account_info = json.loads(integration.service_account_json)
-        creds = service_account.Credentials.from_service_account_info(
-            service_account_info,
-            scopes=["https://www.googleapis.com/auth/admin.directory.user.readonly"]
-        )
-        
-        # Get access token
-        if not creds.token or creds.expired:
-            creds.refresh(pyrequests.Request())
-        
-        # Call Google Admin SDK Directory API
-        headers = {
-            'Authorization': f'Bearer {creds.token}',
-            'Content-Type': 'application/json'
-        }
-        
-        # Google Admin SDK Directory API endpoint for applications
-        api_url = "https://admin.googleapis.com/admin/directory/v1/customer/my_customer/applications"
-        
-        response = pyrequests.get(api_url, headers=headers, timeout=30)
-        
-        if response.status_code == 429:
-            return jsonify({"status": "error", "message": "Service temporarily unavailable due to rate limiting."}), 503
-        elif response.status_code != 200:
-            return jsonify({"status": "error", "message": f"External service error: {response.status_code}"}), 502
-        
-        # Parse response
-        try:
-            data = response.json()
-        except json.JSONDecodeError:
-            return jsonify({"status": "error", "message": "Data processing error: invalid JSON response."}), 500
-        
-        # Extract and normalize applications
-        # Handle both 'applications' and 'items' keys for flexibility
-        if 'applications' in data:
-            applications = data['applications']
-        elif 'items' in data:
-            applications = data['items']
+        if integration.type == 'google_workspace':
+            return _fetch_google_workspace_apps(integration)
+        elif integration.type == 'azure_ad':
+            return _fetch_azure_ad_apps(integration)
+        elif integration.type == 'okta':
+            return _fetch_okta_apps(integration)
         else:
-            return jsonify({"status": "error", "message": "Data processing error: missing applications/items in response."}), 500
-        normalized_apps = []
-        
-        for app in applications:
-            # Validate required fields
-            if not app.get('id') or not app.get('name'):
-                continue  # Skip apps without required fields
-            
-            normalized_app = {
-                'id': app.get('id'),
-                'name': app.get('name'),
-                'description': app.get('description', ''),
-                'status': app.get('status', 'UNKNOWN'),
-                'type': app.get('type', ''),
-                'created_at': app.get('creationTime', ''),
-                'updated_at': app.get('lastModifiedTime', '')
-            }
-            normalized_apps.append(normalized_app)
-        
-        return jsonify({
-            "status": "success",
-            "apps": normalized_apps,
-            "total_count": len(normalized_apps),
-            "idp_id": idp_id
-        }), 200
-        
+            return jsonify({"status": "error", "message": f"Unsupported provider type: {integration.type}"}), 400
     except Exception as e:
         if 'timeout' in str(e).lower():
             return jsonify({"status": "error", "message": "Request timeout."}), 408
         else:
             return jsonify({"status": "error", "message": f"Error fetching applications: {str(e)}"}), 500
+
+def _fetch_google_workspace_apps(integration):
+    """Fetch applications from Google Workspace"""
+    config = integration.get_config()
+    service_account_info = json.loads(config['service_account_json'])
+    creds = service_account.Credentials.from_service_account_info(
+        service_account_info,
+        scopes=["https://www.googleapis.com/auth/admin.directory.user.readonly"]
+    )
+    
+    # Get access token
+    if not creds.token or creds.expired:
+        creds.refresh(pyrequests.Request())
+    
+    # Call Google Admin SDK Directory API
+    headers = {
+        'Authorization': f'Bearer {creds.token}',
+        'Content-Type': 'application/json'
+    }
+    
+    api_url = f"{integration.api_url}/admin/directory/v1/customer/my_customer/applications"
+    response = pyrequests.get(api_url, headers=headers, timeout=30)
+    
+    if response.status_code == 429:
+        return jsonify({"status": "error", "message": "Service temporarily unavailable due to rate limiting."}), 503
+    elif response.status_code == 403:
+        return jsonify({"status": "error", "message": "Service temporarily unavailable due to quota exceeded."}), 503
+    elif response.status_code != 200:
+        return jsonify({"status": "error", "message": f"External service error: {response.status_code}"}), 502
+    
+    data = response.json()
+    applications = data.get('applications', data.get('items', []))
+    
+    normalized_apps = []
+    for app in applications:
+        if not app.get('id') or not app.get('name'):
+            continue
+        
+        normalized_app = {
+            'id': app.get('id'),
+            'name': app.get('name'),
+            'description': app.get('description', ''),
+            'status': app.get('status', 'UNKNOWN'),
+            'type': app.get('type', ''),
+            'created_at': app.get('creationTime', ''),
+            'updated_at': app.get('lastModifiedTime', '')
+        }
+        normalized_apps.append(normalized_app)
+    
+    return jsonify({
+        "status": "success",
+        "apps": normalized_apps,
+        "total_count": len(normalized_apps),
+        "idp_id": integration.id
+    }), 200
+
+def _fetch_azure_ad_apps(integration):
+    """Fetch applications from Azure AD"""
+    config = integration.get_config()
+    token_url = f"https://login.microsoftonline.com/{config['tenant_id']}/oauth2/v2.0/token"
+    token_data = {
+        'grant_type': 'client_credentials',
+        'client_id': config['client_id'],
+        'client_secret': config['client_secret'],
+        'scope': 'https://graph.microsoft.com/.default'
+    }
+    token_response = pyrequests.post(token_url, data=token_data, timeout=30)
+    if token_response.status_code == 401:
+        return jsonify({'status': 'error', 'message': 'Invalid credentials'}), 401
+    elif token_response.status_code == 429:
+        return jsonify({'status': 'error', 'message': 'Rate limit exceeded'}), 503
+    elif token_response.status_code != 200:
+        return jsonify({'status': 'error', 'message': f'Authentication failed: {token_response.status_code}'}), 401
+    token_info = token_response.json()
+    access_token = token_info.get('access_token')
+    graph_url = f"{integration.api_url}/applications"
+    headers = {
+        'Authorization': f'Bearer {access_token}',
+        'Content-Type': 'application/json'
+    }
+    response = pyrequests.get(graph_url, headers=headers, timeout=30)
+    if response.status_code == 429:
+        return jsonify({'status': 'error', 'message': 'Service temporarily unavailable due to rate limiting.'}), 503
+    elif response.status_code == 401:
+        return jsonify({'status': 'error', 'message': 'Invalid credentials.'}), 400
+    elif response.status_code != 200:
+        return jsonify({'status': 'error', 'message': f'External service error: {response.status_code}'}), 502
+    data = response.json()
+    applications = data.get('value', [])
+    normalized_apps = []
+    for app in applications:
+        if not app.get('id') or not app.get('displayName'):
+            continue
+        normalized_app = {
+            'id': app.get('id'),
+            'name': app.get('displayName'),
+            'description': app.get('description', ''),
+            'status': 'ACTIVE' if app.get('signInAudience') else 'INACTIVE',
+            'type': app.get('appId', ''),
+            'created_at': app.get('createdDateTime', ''),
+            'updated_at': app.get('createdDateTime', '')
+        }
+        normalized_apps.append(normalized_app)
+    return jsonify({
+        'status': 'success',
+        'apps': normalized_apps,
+        'total_count': len(normalized_apps),
+        'idp_id': integration.id
+    }), 200
+
+def _fetch_okta_apps(integration):
+    """Fetch applications from Okta"""
+    config = integration.get_config()
+    api_url = config.get('api_url', 'https://dev-000000.okta.com')
+    token = config.get('api_token')
+    headers = {'Authorization': f'SSWS {token}'}
+    resp = pyrequests.get(f"{api_url}/api/v1/apps", headers=headers, timeout=10)
+    if resp.status_code == 401:
+        return jsonify({'status': 'error', 'message': 'Invalid credentials'}), 401
+    if resp.status_code == 429:
+        return jsonify({'status': 'error', 'message': 'Rate limit exceeded'}), 503
+    if resp.status_code != 200:
+        return jsonify({'status': 'error', 'message': f'Okta API returned status {resp.status_code}'}), 502
+    apps = resp.json()
+    normalized = []
+    for app in apps:
+        # Use 'name' for Salesforce/Slack, otherwise use 'label'
+        if app.get('name') in ['Salesforce', 'Slack']:
+            normalized_name = app.get('name')
+        else:
+            normalized_name = app.get('label')
+        normalized.append({
+            'id': app.get('id'),
+            'name': normalized_name,
+            'status': app.get('status'),
+            'created_at': app.get('created'),
+            'updated_at': app.get('lastUpdated')
+        })
+    return jsonify({
+        'status': 'success',
+        'apps': normalized,
+        'total_count': len(normalized),
+        'idp_id': integration.id
+    }), 200
 
 # Main blueprint routes
 @main_bp.context_processor
@@ -1375,28 +1527,31 @@ def blog_tag(tag):
 
 @main_bp.route('/api/blog/posts')
 def api_blog_posts():
-    """API endpoint for blog posts"""
-    posts = blog_loader.get_published_posts()
+    """API endpoint to get blog posts with optional filtering"""
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    category = request.args.get('category')
+    tag = request.args.get('tag')
     
-    results = []
-    for post in posts:
-        results.append({
-            "title": post.title,
-            "slug": post.slug,
-            "excerpt": post.excerpt,
-            "author": post.author,
-            "publish_date": post.publish_date.isoformat(),
-            "category": post.category,
-            "tags": post.tags,
-            "reading_time": post.reading_time,
-            "url": f"{os.environ.get('BASE_URL', 'https://top-agents.us')}/blog/{post.slug}"
-        })
+    # Validate parameters
+    if page < 1:
+        return jsonify({"error": "Page must be greater than 0"}), 400
+    if per_page < 1 or per_page > 100:
+        return jsonify({"error": "Per page must be between 1 and 100"}), 400
     
-    return jsonify({
-        "posts": results,
-        "total": len(results),
-        "metadata": {
-            "content_type": "blog_posts",
-            "api_version": "v1"
-        }
-    })
+    try:
+        posts = blog_loader.get_blog_posts(page=page, per_page=per_page, category=category, tag=tag)
+        return jsonify(posts)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Discovery UI Routes
+@main_bp.route('/discovery/idp-connection')
+def idp_connection():
+    """IDP Connection setup page (US1)"""
+    return render_template('idp_connection.html')
+
+@main_bp.route('/discovery/app-catalog')
+def app_catalog():
+    """Application catalog page (US2)"""
+    return render_template('app_catalog.html')

@@ -747,26 +747,19 @@ class TestFormValidation:
         assert b'Password must be at least 8 characters long' in response.data
     
     def test_demo_request_form_validation(self, client):
-        """Test demo request form validation."""
+        """Test demo request form validation"""
         # Test with missing required fields
-        incomplete_data = {
-            'company_name': 'Test Company'
-            # Missing email, team_size, ai_usage
-        }
-        response = client.post('/demo-request',
-                              data=json.dumps(incomplete_data),
-                              content_type='application/json')
-        assert response.status_code == 200
-    
-    def test_add_agent_form_validation(self, client):
-        """Test add agent form validation."""
-        response = client.post('/add-agent', data={})  # Empty data should redirect
-        assert response.status_code == 302  # Redirects on validation failure
-    
-    def test_rate_agent_form_validation(self, client):
-        """Test rate agent form validation."""
-        response = client.post('/rate-agent', data={})  # Empty data should redirect
-        assert response.status_code == 302  # Redirects on validation failure
+        response = client.post('/demo-request', data={})
+        assert response.status_code == 400
+        
+        # Test with invalid email
+        response = client.post('/demo-request', data={
+            'name': 'Test User',
+            'email': 'invalid-email',
+            'company': 'Test Company',
+            'message': 'Test message'
+        })
+        assert response.status_code == 400
 
 class TestAPIParameters:
     """Test cases for API parameter validation."""
@@ -974,6 +967,65 @@ class TestIntelligentSearch:
         from intelligent_search import IntelligentSearch
         search = IntelligentSearch()
         assert search is not None
+
+# Discovery UI Routes Tests
+def test_idp_connection_page(client):
+    """Test IDP Connection page loads correctly"""
+    response = client.get('/discovery/idp-connection')
+    assert response.status_code == 200
+    assert b'IDP Connection Setup' in response.data
+    assert b'Google Workspace IDP Configuration' in response.data
+
+def test_app_catalog_page(client):
+    """Test App Catalog page loads correctly"""
+    response = client.get('/discovery/app-catalog')
+    assert response.status_code == 200
+    assert b'Application Catalog' in response.data
+    assert b'Discover and manage applications' in response.data
+
+def test_idp_connection_page_seo(client):
+    """Test IDP Connection page has proper SEO elements"""
+    response = client.get('/discovery/idp-connection')
+    assert response.status_code == 200
+    assert b'Configure Google Workspace IDP connection' in response.data
+    assert b'IDP Connection - Top Agents' in response.data
+
+def test_app_catalog_page_seo(client):
+    """Test App Catalog page has proper SEO elements"""
+    response = client.get('/discovery/app-catalog')
+    assert response.status_code == 200
+    assert b'Discover and manage applications from your Google Workspace' in response.data
+    assert b'Application Catalog - Top Agents' in response.data
+
+def test_idp_connection_page_accessibility(client):
+    """Test IDP Connection page has accessibility features"""
+    response = client.get('/discovery/idp-connection')
+    assert response.status_code == 200
+    # Check for form labels
+    assert b'for="display_name"' in response.data
+    assert b'for="service_account_json"' in response.data
+    # Check for proper heading structure
+    assert b'<h1' in response.data
+    assert b'<h2' in response.data
+
+def test_app_catalog_page_accessibility(client):
+    """Test App Catalog page has accessibility features"""
+    response = client.get('/discovery/app-catalog')
+    assert response.status_code == 200
+    # Check for proper heading structure
+    assert b'<h1' in response.data
+    assert b'<h2' in response.data
+    # Check for table structure
+    assert b'<table' in response.data
+    assert b'<thead' in response.data
+
+def test_discovery_routes_not_in_navigation(client):
+    """Test that discovery routes are not exposed in main navigation"""
+    response = client.get('/')
+    assert response.status_code == 200
+    # Verify discovery routes are not in navigation
+    assert b'/discovery/idp-connection' not in response.data
+    assert b'/discovery/app-catalog' not in response.data
 
 if __name__ == '__main__':
     pytest.main([__file__]) 

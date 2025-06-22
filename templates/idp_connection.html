@@ -1,0 +1,388 @@
+{% extends "base.html" %}
+
+{% block title %}IDP Connection - Top Agents{% endblock %}
+
+{% block description %}Configure Google Workspace IDP connection for seamless enterprise application discovery and integration with Top Agents.{% endblock %}
+
+{% block og_description %}Configure Google Workspace IDP connection for seamless enterprise application discovery and integration with Top Agents.{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Hero Section -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div class="text-center">
+                <h1 class="text-4xl md:text-5xl font-bold mb-6">IDP Connection Setup</h1>
+                <p class="text-xl md:text-2xl mb-8 opacity-90">Configure Google Workspace integration for application discovery</p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="#setup-form" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                        Configure IDP
+                    </a>
+                    <a href="#status" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors">
+                        View Status
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Setup Form Section -->
+    <div id="setup-form" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="bg-white rounded-xl shadow-lg p-8">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Google Workspace IDP Configuration</h2>
+                <p class="text-lg text-gray-600">Connect your Google Workspace to enable application discovery and user management</p>
+            </div>
+
+            <!-- Configuration Steps -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-500">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-blue-100 w-8 h-8 rounded-full flex items-center justify-center mr-3">
+                            <span class="text-blue-600 font-bold text-sm">1</span>
+                        </div>
+                        <h3 class="font-semibold text-gray-900">Service Account</h3>
+                    </div>
+                    <p class="text-sm text-gray-600">Create a Google Cloud service account with Admin SDK API access</p>
+                </div>
+
+                <div class="bg-green-50 p-6 rounded-lg border-l-4 border-green-500">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-green-100 w-8 h-8 rounded-full flex items-center justify-center mr-3">
+                            <span class="text-green-600 font-bold text-sm">2</span>
+                        </div>
+                        <h3 class="font-semibold text-gray-900">Download JSON</h3>
+                    </div>
+                    <p class="text-sm text-gray-600">Download the service account JSON key file from Google Cloud Console</p>
+                </div>
+
+                <div class="bg-purple-50 p-6 rounded-lg border-l-4 border-purple-500">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-purple-100 w-8 h-8 rounded-full flex items-center justify-center mr-3">
+                            <span class="text-purple-600 font-bold text-sm">3</span>
+                        </div>
+                        <h3 class="font-semibold text-gray-900">Configure</h3>
+                    </div>
+                    <p class="text-sm text-gray-600">Upload the JSON file and configure the connection settings below</p>
+                </div>
+            </div>
+
+            <!-- IDP Configuration Form -->
+            <form id="idp-form" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="display_name" class="block text-sm font-medium text-gray-700 mb-2">
+                            Display Name
+                        </label>
+                        <input type="text" id="display_name" name="display_name" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                               placeholder="My Google Workspace">
+                    </div>
+
+                    <div>
+                        <label for="api_url" class="block text-sm font-medium text-gray-700 mb-2">
+                            API URL
+                        </label>
+                        <input type="url" id="api_url" name="api_url" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                               value="https://admin.googleapis.com"
+                               placeholder="https://admin.googleapis.com">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="service_account_json" class="block text-sm font-medium text-gray-700 mb-2">
+                        Service Account JSON
+                    </label>
+                    <textarea id="service_account_json" name="service_account_json" required rows="8"
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+                              placeholder='{"type": "service_account", "project_id": "your-project", ...}'></textarea>
+                    <p class="mt-2 text-sm text-gray-500">Paste the entire service account JSON key content</p>
+                </div>
+
+                <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                    <div class="flex items-center space-x-4">
+                        <button type="button" id="test-connection" 
+                                class="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+                            <i data-lucide="test-tube" class="h-4 w-4 inline mr-2"></i>
+                            Test Connection
+                        </button>
+                        <button type="button" id="validate-json" 
+                                class="bg-blue-100 text-blue-700 px-6 py-3 rounded-lg font-medium hover:bg-blue-200 transition-colors">
+                            <i data-lucide="check-circle" class="h-4 w-4 inline mr-2"></i>
+                            Validate JSON
+                        </button>
+                    </div>
+                    <button type="submit" 
+                            class="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                        <i data-lucide="save" class="h-4 w-4 inline mr-2"></i>
+                        Save Configuration
+                    </button>
+                </div>
+            </form>
+
+            <!-- Status Messages -->
+            <div id="status-messages" class="mt-6 space-y-3"></div>
+        </div>
+    </div>
+
+    <!-- Connection Status Section -->
+    <div id="status" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="bg-white rounded-xl shadow-lg p-8">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Connection Status</h2>
+                <p class="text-lg text-gray-600">Monitor your IDP connection health and configuration</p>
+            </div>
+
+            <!-- Status Cards -->
+            <div id="status-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Connection Status -->
+                <div class="bg-gray-50 p-6 rounded-lg border">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-gray-900">Connection Status</h3>
+                        <div id="connection-indicator" class="w-3 h-3 bg-gray-300 rounded-full"></div>
+                    </div>
+                    <p id="connection-status" class="text-sm text-gray-600">Not configured</p>
+                </div>
+
+                <!-- Last Sync -->
+                <div class="bg-gray-50 p-6 rounded-lg border">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-gray-900">Last Sync</h3>
+                        <i data-lucide="clock" class="h-4 w-4 text-gray-400"></i>
+                    </div>
+                    <p id="last-sync" class="text-sm text-gray-600">Never</p>
+                </div>
+
+                <!-- Apps Discovered -->
+                <div class="bg-gray-50 p-6 rounded-lg border">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-gray-900">Apps Discovered</h3>
+                        <i data-lucide="apps" class="h-4 w-4 text-gray-400"></i>
+                    </div>
+                    <p id="apps-count" class="text-sm text-gray-600">0</p>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                <button id="refresh-status" 
+                        class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                    <i data-lucide="refresh-cw" class="h-4 w-4 inline mr-2"></i>
+                    Refresh Status
+                </button>
+                <button id="view-apps" 
+                        class="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors">
+                    <i data-lucide="external-link" class="h-4 w-4 inline mr-2"></i>
+                    View Discovered Apps
+                </button>
+                <button id="delete-connection" 
+                        class="bg-red-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-red-700 transition-colors">
+                    <i data-lucide="trash-2" class="h-4 w-4 inline mr-2"></i>
+                    Delete Connection
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Section -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="bg-white rounded-xl shadow-lg p-8">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Need Help?</h2>
+                <p class="text-lg text-gray-600">Follow these steps to set up your Google Workspace integration</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Google Cloud Setup</h3>
+                    <ol class="space-y-3 text-sm text-gray-600">
+                        <li class="flex items-start">
+                            <span class="bg-blue-100 text-blue-600 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-0.5">1</span>
+                            Go to Google Cloud Console and create a new project
+                        </li>
+                        <li class="flex items-start">
+                            <span class="bg-blue-100 text-blue-600 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-0.5">2</span>
+                            Enable the Admin SDK API for your project
+                        </li>
+                        <li class="flex items-start">
+                            <span class="bg-blue-100 text-blue-600 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-0.5">3</span>
+                            Create a service account with Domain-wide delegation
+                        </li>
+                        <li class="flex items-start">
+                            <span class="bg-blue-100 text-blue-600 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-0.5">4</span>
+                            Download the JSON key file for the service account
+                        </li>
+                    </ol>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Security Notes</h3>
+                    <ul class="space-y-3 text-sm text-gray-600">
+                        <li class="flex items-start">
+                            <i data-lucide="shield" class="h-4 w-4 text-green-600 mr-3 mt-0.5"></i>
+                            Service account credentials are encrypted and stored securely
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="lock" class="h-4 w-4 text-green-600 mr-3 mt-0.5"></i>
+                            Only read access to application data is required
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="eye" class="h-4 w-4 text-green-600 mr-3 mt-0.5"></i>
+                            No user passwords or sensitive data are accessed
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="activity" class="h-4 w-4 text-green-600 mr-3 mt-0.5"></i>
+                            All API calls are logged for audit purposes
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('idp-form');
+    const statusMessages = document.getElementById('status-messages');
+    const testConnectionBtn = document.getElementById('test-connection');
+    const validateJsonBtn = document.getElementById('validate-json');
+    const refreshStatusBtn = document.getElementById('refresh-status');
+    const viewAppsBtn = document.getElementById('view-apps');
+    const deleteConnectionBtn = document.getElementById('delete-connection');
+
+    // Form submission
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(form);
+        const data = {
+            display_name: formData.get('display_name'),
+            service_account_json: formData.get('service_account_json'),
+            api_url: formData.get('api_url')
+        };
+
+        try {
+            const response = await fetch('/discovery/idp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            
+            if (response.ok) {
+                showMessage('success', `IDP connection created successfully! ID: ${result.idp_id}`);
+                loadStatus();
+            } else {
+                showMessage('error', result.message || 'Failed to create IDP connection');
+            }
+        } catch (error) {
+            showMessage('error', 'Network error occurred');
+        }
+    });
+
+    // Test connection
+    testConnectionBtn.addEventListener('click', async function() {
+        const jsonData = document.getElementById('service_account_json').value;
+        if (!jsonData) {
+            showMessage('error', 'Please enter service account JSON first');
+            return;
+        }
+
+        try {
+            const response = await fetch('/discovery/idp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    display_name: 'Test Connection',
+                    service_account_json: jsonData,
+                    api_url: 'https://admin.googleapis.com'
+                })
+            });
+
+            const result = await response.json();
+            
+            if (response.ok) {
+                showMessage('success', 'Connection test successful!');
+            } else {
+                showMessage('error', result.message || 'Connection test failed');
+            }
+        } catch (error) {
+            showMessage('error', 'Network error during connection test');
+        }
+    });
+
+    // Validate JSON
+    validateJsonBtn.addEventListener('click', function() {
+        const jsonData = document.getElementById('service_account_json').value;
+        if (!jsonData) {
+            showMessage('error', 'Please enter JSON data to validate');
+            return;
+        }
+
+        try {
+            const parsed = JSON.parse(jsonData);
+            if (parsed.type === 'service_account' && parsed.project_id) {
+                showMessage('success', 'JSON format is valid');
+            } else {
+                showMessage('error', 'Invalid service account JSON format');
+            }
+        } catch (error) {
+            showMessage('error', 'Invalid JSON format');
+        }
+    });
+
+    // Refresh status
+    refreshStatusBtn.addEventListener('click', loadStatus);
+
+    // View apps
+    viewAppsBtn.addEventListener('click', function() {
+        window.location.href = '/discovery/apps';
+    });
+
+    // Delete connection
+    deleteConnectionBtn.addEventListener('click', async function() {
+        if (!confirm('Are you sure you want to delete this connection?')) {
+            return;
+        }
+
+        // This would need to be implemented based on your backend
+        showMessage('info', 'Delete functionality not implemented yet');
+    });
+
+    // Load initial status
+    loadStatus();
+
+    function showMessage(type, message) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `p-4 rounded-lg ${
+            type === 'success' ? 'bg-green-100 text-green-700 border border-green-200' :
+            type === 'error' ? 'bg-red-100 text-red-700 border border-red-200' :
+            'bg-blue-100 text-blue-700 border border-blue-200'
+        }`;
+        messageDiv.textContent = message;
+        
+        statusMessages.appendChild(messageDiv);
+        
+        setTimeout(() => {
+            messageDiv.remove();
+        }, 5000);
+    }
+
+    async function loadStatus() {
+        // This would load the actual status from your backend
+        // For now, showing placeholder data
+        document.getElementById('connection-status').textContent = 'Not configured';
+        document.getElementById('last-sync').textContent = 'Never';
+        document.getElementById('apps-count').textContent = '0';
+        document.getElementById('connection-indicator').className = 'w-3 h-3 bg-gray-300 rounded-full';
+    }
+});
+</script>
+{% endblock %}
