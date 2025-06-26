@@ -2,18 +2,22 @@ from flask import render_template, request, jsonify, abort, redirect, url_for, f
 from data_loader import data_loader
 from display_ratings import display_ratings
 from recipe_loader import recipe_loader
-from user_auth import user_auth
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 import logging
 import os
 from blog_loader import blog_loader
-from models import db, GoogleWorkspaceIDPIntegration, IDPIntegration
+from models import db, GoogleWorkspaceIDPIntegration, IDPIntegration, User, Organization, ToolCatalog, UsageLog
 import google.auth
 from google.oauth2 import service_account
 import requests as pyrequests
 from rating_system import RatingSystem
 from intelligent_search import intelligent_search
+from sqlalchemy import func, extract
+from functools import wraps
+import uuid
+from werkzeug.security import generate_password_hash
+import re
 
 # Create blueprints
 discovery_bp = Blueprint('discovery', __name__)
@@ -27,33 +31,26 @@ rating_system = RatingSystem()
 def register_idp():
     """Register an IDP integration and validate credentials for multiple providers."""
     data = request.get_json()
-    
     if not data:
         return jsonify({"status": "error", "message": "Invalid JSON data."}), 400
-    
     display_name = data.get('display_name')
     idp_type = data.get('type')
-    
     # Validate required fields
     if not display_name or not idp_type:
         return jsonify({"status": "error", "message": "Missing required fields: display_name and type."}), 400
-    
     # Validate provider type
     supported_types = ['google_workspace', 'azure_ad', 'okta']
     if idp_type not in supported_types:
         return jsonify({"status": "error", "message": f"Unsupported provider type. Supported types: {', '.join(supported_types)}"}), 400
-    
     # Extract provider-specific configuration
     config = {}
     api_url = data.get('api_url')
-    
     if idp_type == 'google_workspace':
         service_account_json = data.get('service_account_json')
         if not service_account_json:
             return jsonify({"status": "error", "message": "Missing required field: service_account_json"}), 400
         config['service_account_json'] = service_account_json
         api_url = api_url or 'https://admin.googleapis.com'
-        
     elif idp_type == 'azure_ad':
         tenant_id = data.get('tenant_id')
         client_id = data.get('client_id')
@@ -66,25 +63,19 @@ def register_idp():
             'client_secret': client_secret
         })
         api_url = api_url or 'https://graph.microsoft.com/v1.0'
-        
     elif idp_type == 'okta':
         domain = data.get('domain')
         api_token = data.get('api_token')
-        
         if not all([domain, api_token]):
             return jsonify({"status": "error", "message": "Missing required fields: domain, api_token"}), 400
-        
-        # Validate domain format
         import re
         if not re.match(r'^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.okta\.com$', domain):
             return jsonify({"status": "error", "message": "Invalid domain format. Must be a valid Okta domain (e.g., company.okta.com)"}), 400
-        
         config.update({
             'domain': domain,
             'api_token': api_token
         })
         api_url = api_url or f'https://{domain}/api/v1'
-    
     # Create IDP integration
     integration = IDPIntegration(
         display_name=display_name,
@@ -92,12 +83,10 @@ def register_idp():
         config=config,
         api_url=api_url
     )
-    
     # Validate configuration
     is_valid, validation_message = integration.validate_config()
     if not is_valid:
         return jsonify({"status": "error", "message": validation_message}), 400
-    
     # Test connection
     try:
         success, message = integration.test_connection()
@@ -173,35 +162,41 @@ def _fetch_google_workspace_apps(integration):
         service_account_info,
         scopes=["https://www.googleapis.com/auth/admin.directory.user.readonly"]
     )
-    
     # Get access token
     if not creds.token or creds.expired:
         creds.refresh(pyrequests.Request())
-    
     # Call Google Admin SDK Directory API
     headers = {
         'Authorization': f'Bearer {creds.token}',
         'Content-Type': 'application/json'
     }
-    
     api_url = f"{integration.api_url}/admin/directory/v1/customer/my_customer/applications"
     response = pyrequests.get(api_url, headers=headers, timeout=30)
-    
     if response.status_code == 429:
         return jsonify({"status": "error", "message": "Service temporarily unavailable due to rate limiting."}), 503
     elif response.status_code == 403:
         return jsonify({"status": "error", "message": "Service temporarily unavailable due to quota exceeded."}), 503
     elif response.status_code != 200:
         return jsonify({"status": "error", "message": f"External service error: {response.status_code}"}), 502
-    
     data = response.json()
+    # Ensure 'applications' or 'items' is present and is a list
+    if (('applications' not in data and 'items' not in data) or
+        (('applications' in data and not isinstance(data['applications'], list)) or
+         ('items' in data and not isinstance(data['items'], list)))):
+        return jsonify({
+            "status": "error",
+            "message": "Data processing error: Unexpected response structure from Google API."
+        }), 500
     applications = data.get('applications', data.get('items', []))
-    
+    if not isinstance(applications, list):
+        return jsonify({
+            "status": "error",
+            "message": "Data processing error: Unexpected response structure from Google API."
+        }), 500
     normalized_apps = []
     for app in applications:
         if not app.get('id') or not app.get('name'):
             continue
-        
         normalized_app = {
             'id': app.get('id'),
             'name': app.get('name'),
@@ -212,7 +207,6 @@ def _fetch_google_workspace_apps(integration):
             'updated_at': app.get('lastModifiedTime', '')
         }
         normalized_apps.append(normalized_app)
-    
     return jsonify({
         "status": "success",
         "apps": normalized_apps,
@@ -312,8 +306,11 @@ def _fetch_okta_apps(integration):
 # Main blueprint routes
 @main_bp.context_processor
 def inject_user():
-    session_token = session.get('session_token')
-    current_user = user_auth.get_user_from_session(session_token) if session_token else None
+    user_id = session.get('user_id')
+    current_user = None
+    if user_id:
+        from models import User
+        current_user = User.query.filter_by(id=user_id).first()
     return {'current_user': current_user}
 
 @main_bp.route('/')
@@ -407,64 +404,51 @@ def demo_request():
             'message': 'There was an error submitting your request. Please try again.'
         }), 500
 
+def get_current_user():
+    user_id = session.get('user_id')
+    user = None
+    if user_id:
+        from models import User
+        user = User.query.filter_by(id=user_id).first()
+    return user
+
+def require_enterprise_admin(view_func):
+    @wraps(view_func)
+    def wrapper(*args, **kwargs):
+        user = get_current_user()
+
+        if not user:
+            flash('You must be logged in to view this page.', 'warning')
+            return redirect(url_for('main.login', next=request.url))
+
+        if not user.is_enterprise() or not user.is_admin():
+            flash('You do not have permission to access this page.', 'danger')
+            return render_template('403.html'), 403
+            
+        return view_func(user, *args, **kwargs)
+    return wrapper
+
 @main_bp.route('/dashboard')
-def dashboard():
-    """Administrative dashboard for team leaders and IT administrators"""
-    all_agents = data_loader.get_all_agents()
-    all_recipes = recipe_loader.get_all_recipes()
-    
-    # Core metrics
+@require_enterprise_admin
+def dashboard(user):
+    """Enterprise dashboard for admins only, scoped to their organization."""
+    org_id = user.organization_id
+    if not org_id:
+        flash('No organization found for your account.', 'danger')
+        return redirect(url_for('main_bp.login'))
+
+    # Example: Only show agents, recipes, and metrics for this org
+    # (Replace with real queries as needed)
+    all_agents = []  # TODO: Filter agents by org if needed
+    all_recipes = []  # TODO: Filter recipes by org if needed
     total_agents = len(all_agents)
-    active_teams = 5
-    total_usage_this_month = 24567
-    success_rate = 94
-    
-    # Trending agents (top performers)
+    active_teams = User.query.filter_by(organization_id=org_id).distinct(User.team).count()
+    total_usage_this_month = UsageLog.query.filter_by(organization_id=org_id).count()
+    success_rate = 94  # Placeholder
     trending_agents = all_agents[:5]
-    
-    # Team performance data with proper structure
-    team_performance = [
-        {'name': 'Marketing', 'agents_used': 12, 'color': 'pink', 'icon': 'megaphone'},
-        {'name': 'Engineering', 'agents_used': 18, 'color': 'blue', 'icon': 'code'},
-        {'name': 'Product', 'agents_used': 8, 'color': 'purple', 'icon': 'package'},
-        {'name': 'Support', 'agents_used': 14, 'color': 'orange', 'icon': 'headphones'},
-        {'name': 'Growth', 'agents_used': 9, 'color': 'green', 'icon': 'trending-up'}
-    ]
-    
-    # Recent activity feed
-    recent_activities = [
-        {
-            'message': 'Marketing team deployed new content generation agent',
-            'time': '2 hours ago',
-            'color': 'blue',
-            'icon': 'bot'
-        },
-        {
-            'message': 'Sarah completed customer support automation recipe',
-            'time': '4 hours ago',
-            'color': 'green',
-            'icon': 'check-circle'
-        },
-        {
-            'message': 'Engineering team added code review assistant',
-            'time': '6 hours ago',
-            'color': 'purple',
-            'icon': 'code'
-        },
-        {
-            'message': 'New agent rated 5 stars by Product team',
-            'time': '8 hours ago',
-            'color': 'yellow',
-            'icon': 'star'
-        },
-        {
-            'message': 'Sales team requested demo of lead generation agent',
-            'time': '1 day ago',
-            'color': 'orange',
-            'icon': 'users'
-        }
-    ]
-    
+    team_performance = []  # TODO: Aggregate by team for this org
+    recent_activities = []  # TODO: Show recent activity for this org
+
     return render_template('dashboard.html',
                          total_agents=total_agents,
                          active_teams=active_teams,
@@ -1107,24 +1091,25 @@ def login():
     if request.method == 'POST':
         email = request.form.get('email', '').strip()
         password = request.form.get('password', '').strip()
-        
-        if not email or not password:
-            return render_template('login_new.html', error="Please fill in all fields")
-        
-        result = user_auth.authenticate_user(email, password)
-        
-        if result['success']:
-            # Create session
-            session_token = user_auth.create_session(result['user']['id'])
-            session['session_token'] = session_token
-            session.permanent = True
-            
-            # Redirect to dashboard or next page
-            next_page = request.args.get('next')
-            return redirect(next_page or url_for('main.dashboard'))
-        else:
-            return render_template('login_new.html', error=result['error'])
-    
+        # Basic email format validation
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            session.clear()
+            return render_template('login_new.html', error='Invalid email or password')
+        from models import User
+        user = User.query.filter_by(email=email).first()
+        if not user or not user.check_password(password):
+            session.clear()
+            return render_template('login_new.html', error='Invalid email or password')
+        if user.status != 'active':
+            session.clear()
+            return render_template('login_new.html', error='Account is not active')
+        # Set session
+        session.clear()
+        session['user_id'] = user.id
+        session['is_superadmin'] = user.is_superadmin()
+        # Redirect to dashboard or requested URL
+        next_url = request.args.get('next') or url_for('main.dashboard')
+        return redirect(next_url)
     return render_template('login_new.html')
 
 @main_bp.route('/signup', methods=['GET', 'POST'])
@@ -1136,165 +1121,112 @@ def signup():
         confirm_password = request.form.get('confirm_password', '').strip()
         first_name = request.form.get('first_name', '').strip()
         last_name = request.form.get('last_name', '').strip()
-        
         # Validation
-        if not email or not password:
-            return render_template('signup_new.html', error="Email and password are required")
-        
-        if len(password) < 8:
-            return render_template('signup_new.html', error="Password must be at least 8 characters long")
-        
+        if not all([email, password, confirm_password, first_name, last_name]):
+            return render_template('signup_new.html', error='All fields are required')
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            return render_template('signup_new.html', error='Invalid email address')
         if password != confirm_password:
-            return render_template('signup_new.html', error="Passwords do not match")
-        
-        if not request.form.get('agree_terms'):
-            return render_template('signup_new.html', error="You must agree to the Terms of Service")
-        
-        # Create user
-        result = user_auth.create_user(
+            return render_template('signup_new.html', error='Passwords must match')
+        if User.query.filter_by(email=email).first():
+            return render_template('signup_new.html', error='Email address already exists')
+        # Create new user
+        new_user = User(
+            id=str(uuid.uuid4()),
             email=email,
-            password=password,
+            password_hash=generate_password_hash(password),
             first_name=first_name,
-            last_name=last_name
+            last_name=last_name,
+            full_name=f"{first_name} {last_name}",
+            role='user',  # default role
+            primary_role='community',
+            roles=['community'],
+            status='active' # default status
         )
-        
-        if result['success']:
-            # Create session
-            session_token = user_auth.create_session(result['user']['id'])
-            session['session_token'] = session_token
-            session.permanent = True
-            
-            return redirect(url_for('main.signup_success'))
-        else:
-            return render_template('signup_new.html', error=result['error'])
-    
+        db.session.add(new_user)
+        db.session.commit()
+        # Log the user in by creating a session
+        session['user_id'] = new_user.id
+        session['is_superadmin'] = new_user.is_superadmin()
+        return redirect(url_for('main.signup_success'))
     return render_template('signup_new.html')
 
 @main_bp.route('/signup/success')
 def signup_success():
     """Post-signup success page"""
-    # Check if user is logged in (should be after signup)
-    session_token = session.get('session_token')
-    if not session_token:
-        return redirect(url_for('main.signup'))
-    
-    user = user_auth.get_user_from_session(session_token)
+    user_id = session.get('user_id')
+    user = None
+    if user_id:
+        from models import User
+        user = User.query.filter_by(id=user_id).first()
     if not user:
         return redirect(url_for('main.signup'))
-    
     return render_template('signup_success.html', user=user)
-
-@main_bp.route('/logout')
-def logout():
-    """User logout"""
-    session_token = session.get('session_token')
-    if session_token:
-        user_auth.logout_session(session_token)
-    
-    session.clear()
-    return redirect(url_for('main.index'))
 
 @main_bp.route('/auth/google', methods=['POST'])
 def google_auth():
     """Handle Google OAuth authentication"""
     try:
         import jwt
-        
+        from models import User, db
+        import uuid
         # Get the credential from the request
         data = request.get_json()
         credential = data.get('credential')
         action = data.get('action', 'signin')
-        
         if not credential:
             return jsonify({'success': False, 'error': 'No credential provided'})
-        
         # For demo purposes, we'll simulate the Google token verification
-        # In production, you would verify the JWT token with Google's public keys
         try:
-            # Decode without verification for demo (DO NOT use in production)
             decoded_token = jwt.decode(credential, options={"verify_signature": False})
-            
             google_id = decoded_token.get('sub')
             email = decoded_token.get('email')
             first_name = decoded_token.get('given_name', '')
             last_name = decoded_token.get('family_name', '')
             profile_image = decoded_token.get('picture', '')
-            
             if not google_id or not email:
                 return jsonify({'success': False, 'error': 'Invalid Google token'})
-            
         except Exception as e:
             return jsonify({'success': False, 'error': 'Invalid token format'})
-        
-        # Authenticate or create user with Google
-        result = user_auth.authenticate_google_user(
-            google_id=google_id,
-            email=email,
-            first_name=first_name,
-            last_name=last_name,
-            profile_image=profile_image
-        )
-        
-        if result['success']:
-            # Create session
-            session_token = user_auth.create_session(result['user']['id'])
-            session['session_token'] = session_token
-            session.permanent = True
-            
-            return jsonify({
-                'success': True,
-                'redirect': url_for('main.dashboard')
-            })
+        # Find or create user
+        user = User.query.filter((User.sso_id == google_id) | (User.email == email)).first()
+        is_new_user = False
+        if user:
+            user.first_name = first_name or user.first_name
+            user.last_name = last_name or user.last_name
+            user.profile_image = profile_image or user.profile_image
+            user.sso_provider = 'google'
+            user.sso_id = google_id
+            user.last_login = datetime.utcnow()
         else:
-            return jsonify({'success': False, 'error': result['error']})
-            
+            user = User(
+                id=str(uuid.uuid4()),
+                email=email,
+                first_name=first_name,
+                last_name=last_name,
+                profile_image=profile_image,
+                sso_provider='google',
+                sso_id=google_id,
+                status='active',
+                roles=['community'],
+                created_at=datetime.utcnow(),
+                updated_at=datetime.utcnow(),
+                last_login=datetime.utcnow()
+            )
+            db.session.add(user)
+            is_new_user = True
+        db.session.commit()
+        session.clear()
+        session['user_id'] = user.id
+        session['is_superadmin'] = user.is_superadmin()
+        session.permanent = True
+        redirect_url = url_for('main.signup_success') if (action == 'signup' or is_new_user) else url_for('main.dashboard')
+        return jsonify({
+            'success': True,
+            'redirect': redirect_url
+        })
     except Exception as e:
         logging.error(f"Google auth error: {e}")
-        return jsonify({'success': False, 'error': 'Authentication failed'})
-
-@main_bp.route('/auth/google-demo', methods=['POST'])
-def google_auth_demo():
-    """Demo Google OAuth authentication without requiring actual Google credentials"""
-    try:
-        data = request.get_json()
-        google_id = data.get('google_id')
-        email = data.get('email')
-        first_name = data.get('first_name', '')
-        last_name = data.get('last_name', '')
-        profile_image = data.get('profile_image', '')
-        action = data.get('action', 'signin')
-        
-        if not google_id or not email:
-            return jsonify({'success': False, 'error': 'Missing required data'})
-        
-        # Authenticate or create user with Google
-        result = user_auth.authenticate_google_user(
-            google_id=google_id,
-            email=email,
-            first_name=first_name,
-            last_name=last_name,
-            profile_image=profile_image
-        )
-        
-        if result['success']:
-            # Create session
-            session_token = user_auth.create_session(result['user']['id'])
-            session['session_token'] = session_token
-            session.permanent = True
-            
-            # Check if this was a new user creation (signup) or existing user (signin)
-            is_new_user = result.get('is_new_user', False)
-            redirect_url = url_for('main.signup_success') if (action == 'signup' or is_new_user) else url_for('main.dashboard')
-            
-            return jsonify({
-                'success': True,
-                'redirect': redirect_url
-            })
-        else:
-            return jsonify({'success': False, 'error': result['error']})
-            
-    except Exception as e:
-        logging.error(f"Demo Google auth error: {e}")
         return jsonify({'success': False, 'error': 'Authentication failed'})
 
 @main_bp.route('/rate-agent', methods=['POST'])
@@ -1527,23 +1459,23 @@ def blog_tag(tag):
 
 @main_bp.route('/api/blog/posts')
 def api_blog_posts():
-    """API endpoint to get blog posts with optional filtering"""
-    page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 10, type=int)
-    category = request.args.get('category')
-    tag = request.args.get('tag')
-    
-    # Validate parameters
-    if page < 1:
-        return jsonify({"error": "Page must be greater than 0"}), 400
-    if per_page < 1 or per_page > 100:
-        return jsonify({"error": "Per page must be between 1 and 100"}), 400
-    
+    """API endpoint for blog posts with pagination"""
     try:
-        posts = blog_loader.get_blog_posts(page=page, per_page=per_page, category=category, tag=tag)
-        return jsonify(posts)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        page = int(request.args.get('page', 1))
+        per_page = int(request.args.get('per_page', 10))
+        if page < 1 or per_page < 1:
+            raise ValueError()
+    except (ValueError, TypeError):
+        return jsonify({'error': 'Invalid page or per_page parameter. Must be positive integers.'}), 400
+
+    paginated_posts = blog_loader.get_paginated_posts(page, per_page)
+    return jsonify({
+        'posts': [post.serialize() for post in paginated_posts.items],
+        'total': paginated_posts.total,
+        'page': paginated_posts.page,
+        'pages': paginated_posts.pages,
+        'per_page': paginated_posts.per_page
+    })
 
 # Discovery UI Routes
 @main_bp.route('/discovery/idp-connection')
@@ -1555,3 +1487,126 @@ def idp_connection():
 def app_catalog():
     """Application catalog page (US2)"""
     return render_template('app_catalog.html')
+
+@main_bp.route('/admin/usage-analytics')
+@require_enterprise_admin
+def usage_analytics(user):
+    """Analytics dashboard for enterprise admins: tool usage by employees in their org only."""
+    org_id = user.organization_id
+    if not org_id:
+        flash('No organization found for your account.', 'danger')
+        return redirect(url_for('main_bp.login'))
+
+    # --- Filters ---
+    period = request.args.get('period', 'monthly')  # daily, weekly, monthly
+    today = datetime.utcnow().date()
+    if period == 'daily':
+        start_date = today
+        end_date = today
+    elif period == 'weekly':
+        start_date = today - timedelta(days=today.weekday())  # Monday
+        end_date = start_date + timedelta(days=6)
+    else:  # monthly
+        start_date = today.replace(day=1)
+        end_date = (start_date + timedelta(days=32)).replace(day=1) - timedelta(days=1)
+
+    # Allow custom date range
+    start_date_str = request.args.get('start_date')
+    end_date_str = request.args.get('end_date')
+    if start_date_str:
+        start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+    if end_date_str:
+        end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+
+    # --- Aggregation: Usage by tool, department, team (scoped to org) ---
+    usage_query = (
+        db.session.query(
+            ToolCatalog.name.label('tool_name'),
+            User.department,
+            User.team,
+            func.count(UsageLog.id).label('usage_count')
+        )
+        .join(UsageLog, UsageLog.tool_id == ToolCatalog.id)
+        .join(User, UsageLog.user_id == User.id)
+        .filter(UsageLog.organization_id == org_id)
+        .filter(UsageLog.timestamp >= datetime.combine(start_date, datetime.min.time()))
+        .filter(UsageLog.timestamp <= datetime.combine(end_date, datetime.max.time()))
+        .group_by(ToolCatalog.name, User.department, User.team)
+        .order_by(ToolCatalog.name, User.department, User.team)
+    )
+    usage_data = usage_query.all()
+
+    # Structure data for template: {tool: {department: {team: count}}}
+    analytics = {}
+    for row in usage_data:
+        tool = row.tool_name or 'Unknown Tool'
+        dept = row.department or 'Unknown Department'
+        team = row.team or 'Unknown Team'
+        analytics.setdefault(tool, {}).setdefault(dept, {}).setdefault(team, 0)
+        analytics[tool][dept][team] += row.usage_count
+
+    return render_template(
+        'usage_analytics.html',
+        analytics=analytics,
+        period=period,
+        start_date=start_date,
+        end_date=end_date
+    )
+
+def require_superadmin(view_func):
+    @wraps(view_func)
+    def wrapper(*args, **kwargs):
+        user = get_current_user()
+        if not user or not user.is_superadmin():
+            flash('You must be a superadmin to access this page.', 'danger')
+            return render_template('403.html'), 403
+        return view_func(user, *args, **kwargs)
+    return wrapper
+
+@main_bp.route('/superadmin')
+@require_superadmin
+def superadmin_dashboard(user):
+    """Super-admin dashboard to manage all users and organizations."""
+    all_users = User.query.order_by(User.created_at.desc()).all()
+    all_orgs = Organization.query.order_by(Organization.name).all()
+    return render_template('superadmin.html', users=all_users, orgs=all_orgs)
+
+@main_bp.route('/auth/google-demo', methods=['POST'])
+def google_auth_demo():
+    """Demo Google OAuth authentication for testing purposes only."""
+    from models import User, db
+    import uuid
+    data = request.get_json()
+    google_id = data.get('google_id')
+    email = data.get('email')
+    first_name = data.get('first_name', '')
+    last_name = data.get('last_name', '')
+    if not google_id or not email:
+        return jsonify({'success': False, 'error': 'Missing google_id or email'}), 200
+    user = User.query.filter((User.sso_id == google_id) | (User.email == email)).first()
+    if not user:
+        user = User(
+            id=str(uuid.uuid4()),
+            email=email,
+            first_name=first_name,
+            last_name=last_name,
+            sso_provider='google',
+            sso_id=google_id,
+            status='active',
+            roles=['community'],
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow(),
+            last_login=datetime.utcnow()
+        )
+        db.session.add(user)
+        db.session.commit()
+    session.clear()
+    session['user_id'] = user.id
+    session['is_superadmin'] = user.is_superadmin()
+    session.permanent = True
+    return jsonify({'success': True, 'user_id': user.id}), 200
+
+@main_bp.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('main.login'))

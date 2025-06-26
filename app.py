@@ -29,6 +29,10 @@ def create_app(test_config=None):
     from models import db
     db.init_app(app)
     
+    # Initialize Flask-Migrate
+    from flask_migrate import Migrate
+    migrate = Migrate(app, db)
+    
     # Register blueprints
     from routes import discovery_bp, main_bp
     app.register_blueprint(discovery_bp)

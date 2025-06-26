@@ -81,6 +81,25 @@ class BlogPost:
             "timeRequired": f"PT{self.reading_time}M"
         }
 
+    def serialize(self):
+        return {
+            'title': self.title,
+            'slug': getattr(self, 'slug', None),
+            'author': getattr(self, 'author', None),
+            'date': getattr(self, 'date', None),
+            'summary': getattr(self, 'summary', None),
+            'content': getattr(self, 'content', None)
+        }
+
+
+class PaginatedPosts:
+    def __init__(self, items, total, page, per_page):
+        self.items = items
+        self.total = total
+        self.page = page
+        self.per_page = per_page
+        self.pages = (total + per_page - 1) // per_page
+
 
 class BlogLoader:
     """Class to handle loading and processing blog posts from markdown files"""
@@ -213,6 +232,13 @@ class BlogLoader:
         for post in self.posts:
             tags.update(post.tags)
         return sorted(list(tags))
+    
+    def get_paginated_posts(self, page, per_page):
+        start = (page - 1) * per_page
+        end = start + per_page
+        items = self.posts[start:end]
+        total = len(self.posts)
+        return PaginatedPosts(items, total, page, per_page)
 
 
 # Global instance for use in routes

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}AI Tool Usage Analytics{% endblock %}
+
+{% block meta_description %}View which AI tools are being accessed by employees, with filters and breakdowns by department and team.{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">AI Tool Usage Analytics</h1>
+                <p class="text-gray-600">See which AI tools are being accessed by employees. Filter by period and breakdown by department/team.</p>
+            </div>
+            <a href="/dashboard" class="text-blue-600 hover:text-blue-700 text-sm font-medium">&larr; Back to Dashboard</a>
+        </div>
+
+        <!-- Filter Controls -->
+        <form method="get" class="flex flex-wrap items-center gap-4 mb-8">
+            <label class="font-medium text-gray-700">Period:
+                <select name="period" class="ml-2 border rounded px-2 py-1">
+                    <option value="daily" {% if period == 'daily' %}selected{% endif %}>Daily</option>
+                    <option value="weekly" {% if period == 'weekly' %}selected{% endif %}>Weekly</option>
+                    <option value="monthly" {% if period == 'monthly' %}selected{% endif %}>Monthly</option>
+                </select>
+            </label>
+            <label class="font-medium text-gray-700">Start Date:
+                <input type="date" name="start_date" value="{{ start_date }}" class="ml-2 border rounded px-2 py-1">
+            </label>
+            <label class="font-medium text-gray-700">End Date:
+                <input type="date" name="end_date" value="{{ end_date }}" class="ml-2 border rounded px-2 py-1">
+            </label>
+            <button type="submit" class="ml-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Apply</button>
+        </form>
+
+        <!-- Analytics Table -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Usage by Tool</h2>
+            {% if analytics %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Tool</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Department</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Team</th>
+                            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Usage Count</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-100">
+                        {% for tool, dept_data in analytics.items() %}
+                            {% for dept, team_data in dept_data.items() %}
+                                {% for team, count in team_data.items() %}
+                                <tr>
+                                    <td class="px-4 py-2 font-medium text-gray-900">{{ tool }}</td>
+                                    <td class="px-4 py-2 text-gray-700">{{ dept }}</td>
+                                    <td class="px-4 py-2 text-gray-700">{{ team }}</td>
+                                    <td class="px-4 py-2 text-right text-gray-900">{{ count }}</td>
+                                </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+                <p class="text-gray-500">No usage data found for the selected period.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

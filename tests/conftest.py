@@ -238,25 +238,16 @@ def mock_blog_tags():
 def mock_external_services():
     """Mock external services to avoid real API calls during testing."""
     with patch('routes.pyrequests.get') as mock_get, \
-         patch('routes.service_account.Credentials.from_service_account_info') as mock_creds, \
-         patch('routes.user_auth.authenticate_user') as mock_auth, \
-         patch('routes.user_auth.create_user') as mock_create_user, \
-         patch('routes.user_auth.authenticate_google_user') as mock_google_auth:
+         patch('routes.service_account.Credentials.from_service_account_info') as mock_creds:
         
         # Mock successful responses
         mock_get.return_value.status_code = 200
         mock_get.return_value.json.return_value = {'applications': []}
         mock_creds.return_value = MagicMock(token='test_token', expired=False)
-        mock_auth.return_value = {'success': False, 'error': 'Invalid credentials'}
-        mock_create_user.return_value = {'success': False, 'error': 'Registration failed'}
-        mock_google_auth.return_value = {'success': False, 'error': 'Google auth failed'}
         
         yield {
             'mock_get': mock_get,
-            'mock_creds': mock_creds,
-            'mock_auth': mock_auth,
-            'mock_create_user': mock_create_user,
-            'mock_google_auth': mock_google_auth
+            'mock_creds': mock_creds
         }
 
 @pytest.fixture

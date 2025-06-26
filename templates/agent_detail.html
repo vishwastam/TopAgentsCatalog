@@ -7,6 +7,8 @@
 
 {% block og_title %}{{ agent.name }} by {{ agent.creator }} - AI Agent{% endblock %}
 {% block og_description %}{{ agent.short_desc }} | Platform: {{ agent.platform }} | Pricing: {{ agent.pricing }}{% endblock %}
+{% block og_image %}{{ url_for('static', filename='images/agents/' + (agent.slug if agent and agent.slug else 'top-agents-logo.png'), _external=True) }}{% endblock %}
+{% block twitter_image %}{{ url_for('static', filename='images/agents/' + (agent.slug if agent and agent.slug else 'top-agents-logo.png'), _external=True) }}{% endblock %}
 
 {% block structured_data %}
 <script type="application/ld+json">

@@ -7,6 +7,8 @@
 {% block og_title %}{{ recipe.name }} - AI Agent Recipe{% endblock %}
 {% block og_description %}{{ meta_description }}{% endblock %}
 {% block og_type %}article{% endblock %}
+{% block og_image %}{{ url_for('static', filename='images/recipes/' + (recipe.slug if recipe and recipe.slug else 'top-agents-logo.png'), _external=True) }}{% endblock %}
+{% block twitter_image %}{{ url_for('static', filename='images/recipes/' + (recipe.slug if recipe and recipe.slug else 'top-agents-logo.png'), _external=True) }}{% endblock %}
 
 {% block structured_data %}
 <script type="application/ld+json">

@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import json
 import logging
+from werkzeug.security import check_password_hash
 
 @dataclass
 class Agent:
@@ -652,3 +653,125 @@ class GoogleWorkspaceIDPIntegration(db.Model):
     error_message = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class Organization(db.Model):
+    __tablename__ = 'organizations'
+    id = db.Column(db.String(36), primary_key=True)  # UUID
+    name = db.Column(db.String(255), unique=True, nullable=False)
+    domain = db.Column(db.String(255))  # e.g., 'acme.com'
+    sso_provider = db.Column(db.String(50))
+    sso_config = db.Column(db.JSON)     # SSO/IDP config details
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    users = db.relationship('User', back_populates='organization')
+
+class User(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.String(36), primary_key=True)  # UUID
+    email = db.Column(db.String(255), unique=True, nullable=False)
+    full_name = db.Column(db.String(255))
+    first_name = db.Column(db.String(100))
+    last_name = db.Column(db.String(100))
+    password_hash = db.Column(db.String(255))  # nullable for SSO-only users
+    sso_provider = db.Column(db.String(50))    # 'okta', 'azure_ad', 'google', 'none'
+    sso_id = db.Column(db.String(255))         # ID from SSO provider, nullable
+    organization_id = db.Column(db.String(36), db.ForeignKey('organizations.id'), nullable=True)
+    department = db.Column(db.String(100))
+    team = db.Column(db.String(100))
+    role = db.Column(db.String(50), default='community')  # e.g., 'admin', 'employee', 'manager', etc.
+    # Role fields
+    primary_role = db.Column(db.String(50), default='community')  # e.g., 'admin', 'employee', 'manager', 'security', 'finance', 'community'
+    roles = db.Column(db.JSON, default=lambda: ['community'])  # List of roles for RBAC
+    status = db.Column(db.String(20), default='active')  # 'active', 'invited', 'disabled'
+    profile_image = db.Column(db.String(255))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    last_login = db.Column(db.DateTime)
+    preferences = db.Column(db.JSON)           # For notification, UI, etc.
+
+    # Relationships
+    organization = db.relationship('Organization', back_populates='users')
+    # usage_logs = db.relationship('UsageLog', back_populates='user')
+    # compliance_events = db.relationship('ComplianceEvent', back_populates='user')
+
+    def is_enterprise(self):
+        # Support both transient (relationship set) and persisted (organization_id set) objects
+        has_org = self.organization_id is not None or self.organization is not None
+        return has_org and self.primary_role != 'community'
+
+    def is_community(self):
+        return self.primary_role == 'community'
+
+    def is_admin(self):
+        return 'admin' in (self.roles or [])
+
+    def has_role(self, role):
+        return role in (self.roles or [])
+
+    def is_superadmin(self):
+        return self.roles and 'superadmin' in self.roles
+
+    def check_password(self, password):
+        if not self.password_hash:
+            return False
+        return check_password_hash(self.password_hash, password)
+
+class UsageLog(db.Model):
+    __tablename__ = 'usage_logs'
+    id = db.Column(db.String(36), primary_key=True)  # UUID
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=True)
+    organization_id = db.Column(db.String(36), db.ForeignKey('organizations.id'), nullable=True)
+    tool_id = db.Column(db.String(36), db.ForeignKey('tool_catalog.id'), nullable=False)
+    tool_name = db.Column(db.String(255))
+    action_type = db.Column(db.String(50))
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    extra = db.Column(db.JSON)  # Renamed from metadata
+    source = db.Column(db.String(50))
+    anonymized = db.Column(db.Boolean, default=False)
+    raw_log_id = db.Column(db.String(36), nullable=True)
+
+    # Relationships
+    user = db.relationship('User', backref='usage_logs')
+    organization = db.relationship('Organization', backref='usage_logs')
+    tool = db.relationship('ToolCatalog', back_populates='usage_logs')
+
+class ToolCatalog(db.Model):
+    __tablename__ = 'tool_catalog'
+    id = db.Column(db.String(36), primary_key=True)  # UUID
+    name = db.Column(db.String(255), unique=True, nullable=False)
+    type = db.Column(db.String(100))  # e.g., 'chatbot', 'api', 'extension', etc.
+    vendor = db.Column(db.String(100))  # e.g., 'OpenAI', 'Anthropic', 'Microsoft'
+    description = db.Column(db.Text)
+    website = db.Column(db.String(255))
+    api_available = db.Column(db.Boolean, default=False)
+    integration_method = db.Column(db.String(100))  # 'api', 'browser_agent', etc.
+    extra = db.Column(db.JSON)  # Renamed from metadata
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    usage_logs = db.relationship('UsageLog', back_populates='tool')
+
+class ComplianceEvent(db.Model):
+    __tablename__ = 'compliance_events'
+    id = db.Column(db.String(36), primary_key=True)  # UUID
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=True)
+    organization_id = db.Column(db.String(36), db.ForeignKey('organizations.id'), nullable=True)
+    tool_id = db.Column(db.String(36), db.ForeignKey('tool_catalog.id'), nullable=True)
+    event_type = db.Column(db.String(50))  # e.g., 'policy_violation', 'consent_granted', etc.
+    event_time = db.Column(db.DateTime, default=datetime.utcnow)
+    severity = db.Column(db.String(20), default='info')  # 'info', 'warning', 'critical'
+    description = db.Column(db.Text)
+    details = db.Column(db.JSON)  # Structured event data
+    source = db.Column(db.String(50))  # 'api', 'browser_agent', 'system', etc.
+    resolved = db.Column(db.Boolean, default=False)
+    resolved_at = db.Column(db.DateTime, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    user = db.relationship('User', backref='compliance_events')
+    organization = db.relationship('Organization', backref='compliance_events')
+    tool = db.relationship('ToolCatalog', backref='compliance_events')

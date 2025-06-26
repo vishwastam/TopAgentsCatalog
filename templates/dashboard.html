@@ -184,6 +184,14 @@
                 </div>
             </div>
         </div>
+
+        <!-- Superadmin Badge -->
+        {% if session.get('is_superadmin') or (user and user.is_superadmin()) %}
+        <div class="mb-6 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-900 rounded">
+            <strong>Superadmin:</strong> You have site-wide administrative privileges.<br>
+            <a href="/superadmin" class="text-blue-700 underline">Go to Superadmin Management</a>
+        </div>
+        {% endif %}
     </div>
 </div>
 

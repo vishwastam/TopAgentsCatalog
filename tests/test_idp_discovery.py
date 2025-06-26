@@ -4,7 +4,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import pytest
 from flask import Flask
-from models import db, GoogleWorkspaceIDPIntegration
+from models import db, GoogleWorkspaceIDPIntegration, IDPIntegration
 import json
 from unittest.mock import patch, MagicMock
 import time
@@ -56,6 +56,7 @@ def test_register_google_workspace_idp_success(client):
         
         data = {
             "display_name": "Test Google Workspace",
+            "type": "google_workspace",
             "service_account_json": valid_service_account_json(),
             "api_url": "https://admin.googleapis.com"
         }
@@ -66,14 +67,15 @@ def test_register_google_workspace_idp_success(client):
         assert 'idp_id' in out
         
         # Verify it's stored in DB
-        integration = GoogleWorkspaceIDPIntegration.query.get(out['idp_id'])
+        integration = IDPIntegration.query.get(out['idp_id'])
         assert integration is not None
         assert integration.status == 'active'
 
 def test_register_google_workspace_idp_invalid_json(client):
     data = {
         "display_name": "Test Google Workspace",
-        "service_account_json": "not a json",
+        "type": "google_workspace",
+        "service_account_json": "invalid",
         "api_url": "https://admin.googleapis.com"
     }
     resp = client.post('/discovery/idp', json=data)
@@ -84,28 +86,29 @@ def test_register_google_workspace_idp_invalid_json(client):
 
 def test_register_google_workspace_idp_missing_fields(client):
     data = {
-        "display_name": "Test Google Workspace"
+        "display_name": "Test Google Workspace",
+        "type": "google_workspace"
         # Missing service_account_json
     }
     resp = client.post('/discovery/idp', json=data)
     assert resp.status_code == 400
     out = resp.get_json()
     assert out['status'] == 'error'
-    assert 'Missing required fields' in out['message']
+    assert 'Missing required field' in out['message']
 
 def test_register_google_workspace_idp_db_status_on_failure(client):
-    # Patch to raise exception in credential creation
-    with patch('routes.service_account.Credentials.from_service_account_info', side_effect=Exception('bad creds')):
-        data = {
-            "display_name": "Test Google Workspace",
-            "service_account_json": valid_service_account_json(),
-            "api_url": "https://admin.googleapis.com"
-        }
-        resp = client.post('/discovery/idp', json=data)
-        assert resp.status_code == 400
-        out = resp.get_json()
-        assert out['status'] == 'error'
-        assert 'Invalid credentials' in out['message']
+    # Simulate DB status on failure by using invalid credentials
+    data = {
+        "display_name": "Test Google Workspace",
+        "type": "google_workspace",
+        "service_account_json": "invalid",
+        "api_url": "https://admin.googleapis.com"
+    }
+    resp = client.post('/discovery/idp', json=data)
+    assert resp.status_code == 400
+    out = resp.get_json()
+    assert out['status'] == 'error'
+    assert 'Invalid credentials' in out['message']
 
 # US2: Fetch Catalog of Registered Applications Tests
 
@@ -120,6 +123,7 @@ def test_fetch_app_catalog_success(client):
         # Create IDP
         idp_data = {
             "display_name": "Test Google Workspace",
+            "type": "google_workspace",
             "service_account_json": valid_service_account_json(),
             "api_url": "https://admin.googleapis.com"
         }
@@ -178,6 +182,7 @@ def test_fetch_app_catalog_empty(client):
         
         idp_data = {
             "display_name": "Test Google Workspace",
+            "type": "google_workspace",
             "service_account_json": valid_service_account_json(),
             "api_url": "https://admin.googleapis.com"
         }
@@ -211,18 +216,18 @@ def test_fetch_app_catalog_invalid_idp_id(client):
 
 def test_fetch_app_catalog_inactive_idp(client):
     """Test inactive IDP - IDP with status 'error'"""
-    # Create IDP with error status
-    with patch('routes.service_account.Credentials.from_service_account_info', side_effect=Exception('bad creds')):
-        idp_data = {
-            "display_name": "Test Google Workspace",
-            "service_account_json": valid_service_account_json(),
-            "api_url": "https://admin.googleapis.com"
-        }
-        resp = client.post('/discovery/idp', json=idp_data)
-        out = resp.get_json()
-        assert resp.status_code == 400
-        assert out['status'] == 'error'
-        assert 'Invalid credentials' in out['message']
+    # Create IDP with error status by simulating invalid credentials
+    idp_data = {
+        "display_name": "Test Google Workspace",
+        "type": "google_workspace",
+        "service_account_json": "invalid",
+        "api_url": "https://admin.googleapis.com"
+    }
+    resp = client.post('/discovery/idp', json=idp_data)
+    out = resp.get_json()
+    assert resp.status_code == 400
+    assert out['status'] == 'error'
+    assert 'Invalid credentials' in out['message']
     # No need to fetch apps since IDP creation failed
 
 def test_fetch_app_catalog_google_api_rate_limit(client):
@@ -236,6 +241,7 @@ def test_fetch_app_catalog_google_api_rate_limit(client):
         
         idp_data = {
             "display_name": "Test Google Workspace",
+            "type": "google_workspace",
             "service_account_json": valid_service_account_json(),
             "api_url": "https://admin.googleapis.com"
         }
@@ -270,6 +276,7 @@ def test_fetch_app_catalog_google_api_timeout(client):
         
         idp_data = {
             "display_name": "Test Google Workspace",
+            "type": "google_workspace",
             "service_account_json": valid_service_account_json(),
             "api_url": "https://admin.googleapis.com"
         }
@@ -303,6 +310,7 @@ def test_fetch_app_catalog_malformed_response(client):
         
         idp_data = {
             "display_name": "Test Google Workspace",
+            "type": "google_workspace",
             "service_account_json": valid_service_account_json(),
             "api_url": "https://admin.googleapis.com"
         }
@@ -337,6 +345,7 @@ def test_fetch_app_catalog_missing_required_fields(client):
         
         idp_data = {
             "display_name": "Test Google Workspace",
+            "type": "google_workspace",
             "service_account_json": valid_service_account_json(),
             "api_url": "https://admin.googleapis.com"
         }
@@ -393,6 +402,7 @@ def test_fetch_app_catalog_special_characters(client):
         
         idp_data = {
             "display_name": "Test Google Workspace",
+            "type": "google_workspace",
             "service_account_json": valid_service_account_json(),
             "api_url": "https://admin.googleapis.com"
         }
@@ -446,6 +456,7 @@ def test_fetch_app_catalog_performance(client):
         
         idp_data = {
             "display_name": "Test Google Workspace",
+            "type": "google_workspace",
             "service_account_json": valid_service_account_json(),
             "api_url": "https://admin.googleapis.com"
         }

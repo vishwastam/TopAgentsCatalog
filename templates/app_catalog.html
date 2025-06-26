@@ -2,9 +2,9 @@
 
 {% block title %}Application Catalog - Top Agents{% endblock %}
 
-{% block description %}Discover and manage applications from your Google Workspace integration. View app details, usage statistics, and manage access permissions.{% endblock %}
+{% block description %}Discover and manage applications from your connected identity provider(s). View app details, usage statistics, and manage access permissions.{% endblock %}
 
-{% block og_description %}Discover and manage applications from your Google Workspace integration. View app details, usage statistics, and manage access permissions.{% endblock %}
+{% block og_description %}Discover and manage applications from your connected identity provider(s). View app details, usage statistics, and manage access permissions.{% endblock %}
 
 {% block content %}
 <div class="min-h-screen bg-gray-50">
@@ -13,14 +13,10 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <div class="text-center">
                 <h1 class="text-4xl md:text-5xl font-bold mb-6">Application Catalog</h1>
-                <p class="text-xl md:text-2xl mb-8 opacity-90">Discover and manage applications from your Google Workspace</p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="#apps-list" class="bg-white text-green-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
-                        View Apps
-                    </a>
-                    <a href="#filters" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-green-600 transition-colors">
-                        Filter & Search
-                    </a>
+                <p class="text-xl md:text-2xl mb-8 opacity-90">Discover and manage applications from your connected identity provider(s)</p>
+                <p class="text-lg text-yellow-700 font-semibold mb-4">Discover and manage applications from your Google Workspace</p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+                    <select id="idp-select" class="w-full sm:w-auto px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" style="display:none;"></select>
                 </div>
             </div>
         </div>
@@ -262,6 +258,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let pageSize = 25;
     let allApps = [];
     let filteredApps = [];
+    let idpList = [];
+    let activeIdpId = null;
 
     // DOM elements
     const searchInput = document.getElementById('search-input');
@@ -279,6 +277,34 @@ document.addEventListener('DOMContentLoaded', function() {
     const emptyState = document.getElementById('empty-state');
     const appModal = document.getElementById('app-modal');
     const closeModal = document.getElementById('close-modal');
+    const idpSelect = document.getElementById('idp-select');
+
+    // Fetch available IDPs on page load
+    fetch('/discovery/idps')
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success' && Array.isArray(data.idps) && data.idps.length > 0) {
+                idpList = data.idps;
+                idpSelect.innerHTML = '';
+                data.idps.forEach(idp => {
+                    const opt = document.createElement('option');
+                    opt.value = idp.id;
+                    opt.textContent = idp.display_name + ' (' + idp.type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) + ')';
+                    idpSelect.appendChild(opt);
+                });
+                idpSelect.style.display = data.idps.length > 1 ? '' : 'none';
+                activeIdpId = data.idps[0].id;
+                idpSelect.value = activeIdpId;
+                idpSelect.addEventListener('change', function() {
+                    activeIdpId = this.value;
+                    loadApps();
+                });
+                loadApps();
+            } else {
+                showError();
+            }
+        })
+        .catch(() => showError());
 
     // Event listeners
     searchInput.addEventListener('input', filterApps);
@@ -290,22 +316,13 @@ document.addEventListener('DOMContentLoaded', function() {
     viewListBtn.addEventListener('click', () => switchView('list'));
     closeModal.addEventListener('click', () => appModal.classList.add('hidden'));
 
-    // Load apps on page load
-    loadApps();
-
     async function loadApps() {
         showLoading();
-        
+        if (!activeIdpId) return showError();
         try {
-            // Get the first available IDP ID (in a real app, you'd have a way to select which IDP to use)
-            const response = await fetch('/discovery/apps?idp_id=1');
-            
-            if (!response.ok) {
-                throw new Error('Failed to load applications');
-            }
-
+            const response = await fetch(`/discovery/apps?idp_id=${activeIdpId}`);
+            if (!response.ok) throw new Error('Failed to load applications');
             const result = await response.json();
-            
             if (result.status === 'success') {
                 allApps = result.apps || [];
                 updateStats();

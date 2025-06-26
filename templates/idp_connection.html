@@ -2,9 +2,9 @@
 
 {% block title %}IDP Connection - Top Agents{% endblock %}
 
-{% block description %}Configure Google Workspace IDP connection for seamless enterprise application discovery and integration with Top Agents.{% endblock %}
+{% block description %}Configure your identity provider integration for application discovery and SSO with Top Agents.{% endblock %}
 
-{% block og_description %}Configure Google Workspace IDP connection for seamless enterprise application discovery and integration with Top Agents.{% endblock %}
+{% block og_description %}Configure your identity provider integration for application discovery and SSO with Top Agents.{% endblock %}
 
 {% block content %}
 <div class="min-h-screen bg-gray-50">
@@ -13,7 +13,8 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <div class="text-center">
                 <h1 class="text-4xl md:text-5xl font-bold mb-6">IDP Connection Setup</h1>
-                <p class="text-xl md:text-2xl mb-8 opacity-90">Configure Google Workspace integration for application discovery</p>
+                <p class="text-xl md:text-2xl mb-8 opacity-90">Configure your identity provider integration for application discovery and SSO.</p>
+                <p class="text-lg text-yellow-700 font-semibold mb-4">Configure Google Workspace IDP connection</p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
                     <a href="#setup-form" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
                         Configure IDP
@@ -30,45 +31,52 @@
     <div id="setup-form" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div class="bg-white rounded-xl shadow-lg p-8">
             <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold text-gray-900 mb-4">Google Workspace IDP Configuration</h2>
-                <p class="text-lg text-gray-600">Connect your Google Workspace to enable application discovery and user management</p>
+                <h2 id="idp-config-title" class="text-3xl font-bold text-gray-900 mb-4">IDP Configuration</h2>
+                <p id="idp-config-desc" class="text-lg text-gray-600">Connect your identity provider to enable application discovery and user management</p>
             </div>
 
             <!-- Configuration Steps -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div id="idp-steps" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8" style="display:none;">
                 <div class="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-500">
                     <div class="flex items-center mb-3">
                         <div class="bg-blue-100 w-8 h-8 rounded-full flex items-center justify-center mr-3">
                             <span class="text-blue-600 font-bold text-sm">1</span>
                         </div>
-                        <h3 class="font-semibold text-gray-900">Service Account</h3>
+                        <h3 id="step1-title" class="font-semibold text-gray-900">Step 1</h3>
                     </div>
-                    <p class="text-sm text-gray-600">Create a Google Cloud service account with Admin SDK API access</p>
+                    <p id="step1-desc" class="text-sm text-gray-600">Select your provider and prepare credentials</p>
                 </div>
-
                 <div class="bg-green-50 p-6 rounded-lg border-l-4 border-green-500">
                     <div class="flex items-center mb-3">
                         <div class="bg-green-100 w-8 h-8 rounded-full flex items-center justify-center mr-3">
                             <span class="text-green-600 font-bold text-sm">2</span>
                         </div>
-                        <h3 class="font-semibold text-gray-900">Download JSON</h3>
+                        <h3 id="step2-title" class="font-semibold text-gray-900">Step 2</h3>
                     </div>
-                    <p class="text-sm text-gray-600">Download the service account JSON key file from Google Cloud Console</p>
+                    <p id="step2-desc" class="text-sm text-gray-600">Enter or upload your credentials below</p>
                 </div>
-
                 <div class="bg-purple-50 p-6 rounded-lg border-l-4 border-purple-500">
                     <div class="flex items-center mb-3">
                         <div class="bg-purple-100 w-8 h-8 rounded-full flex items-center justify-center mr-3">
                             <span class="text-purple-600 font-bold text-sm">3</span>
                         </div>
-                        <h3 class="font-semibold text-gray-900">Configure</h3>
+                        <h3 id="step3-title" class="font-semibold text-gray-900">Step 3</h3>
                     </div>
-                    <p class="text-sm text-gray-600">Upload the JSON file and configure the connection settings below</p>
+                    <p id="step3-desc" class="text-sm text-gray-600">Test and save your connection</p>
                 </div>
             </div>
 
             <!-- IDP Configuration Form -->
             <form id="idp-form" class="space-y-6">
+                <div class="mb-6">
+                    <label for="idp_type" class="block text-sm font-medium text-gray-700 mb-2">Provider Type</label>
+                    <select id="idp_type" name="idp_type" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="" selected disabled>Select Provider...</option>
+                        <option value="google_workspace">Google Workspace</option>
+                        <option value="azure_ad">Azure AD</option>
+                        <option value="okta">Okta</option>
+                    </select>
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label for="display_name" class="block text-sm font-medium text-gray-700 mb-2">
@@ -76,41 +84,63 @@
                         </label>
                         <input type="text" id="display_name" name="display_name" required
                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                               placeholder="My Google Workspace">
+                               placeholder="My IDP Connection">
                     </div>
-
                     <div>
                         <label for="api_url" class="block text-sm font-medium text-gray-700 mb-2">
                             API URL
                         </label>
-                        <input type="url" id="api_url" name="api_url" required
+                        <input type="url" id="api_url" name="api_url"
                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                               value="https://admin.googleapis.com"
                                placeholder="https://admin.googleapis.com">
                     </div>
                 </div>
-
-                <div>
+                <!-- Google Workspace Fields -->
+                <div id="google-fields" style="display:none;">
                     <label for="service_account_json" class="block text-sm font-medium text-gray-700 mb-2">
                         Service Account JSON
                     </label>
-                    <textarea id="service_account_json" name="service_account_json" required rows="8"
+                    <textarea id="service_account_json" name="service_account_json" rows="8"
                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
                               placeholder='{"type": "service_account", "project_id": "your-project", ...}'></textarea>
                     <p class="mt-2 text-sm text-gray-500">Paste the entire service account JSON key content</p>
                 </div>
-
+                <!-- Azure AD Fields -->
+                <div id="azure-fields" style="display:none;">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label for="tenant_id" class="block text-sm font-medium text-gray-700 mb-2">Tenant ID</label>
+                            <input type="text" id="tenant_id" name="tenant_id" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Azure Tenant ID">
+                        </div>
+                        <div>
+                            <label for="client_id" class="block text-sm font-medium text-gray-700 mb-2">Client ID</label>
+                            <input type="text" id="client_id" name="client_id" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Azure Client ID">
+                        </div>
+                        <div>
+                            <label for="client_secret" class="block text-sm font-medium text-gray-700 mb-2">Client Secret</label>
+                            <input type="password" id="client_secret" name="client_secret" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Azure Client Secret">
+                        </div>
+                    </div>
+                </div>
+                <!-- Okta Fields -->
+                <div id="okta-fields" style="display:none;">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="domain" class="block text-sm font-medium text-gray-700 mb-2">Okta Domain</label>
+                            <input type="text" id="domain" name="domain" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="company.okta.com">
+                        </div>
+                        <div>
+                            <label for="api_token" class="block text-sm font-medium text-gray-700 mb-2">API Token</label>
+                            <input type="password" id="api_token" name="api_token" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Okta API Token">
+                        </div>
+                    </div>
+                </div>
                 <div class="flex items-center justify-between pt-6 border-t border-gray-200">
                     <div class="flex items-center space-x-4">
                         <button type="button" id="test-connection" 
                                 class="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors">
                             <i data-lucide="test-tube" class="h-4 w-4 inline mr-2"></i>
                             Test Connection
-                        </button>
-                        <button type="button" id="validate-json" 
-                                class="bg-blue-100 text-blue-700 px-6 py-3 rounded-lg font-medium hover:bg-blue-200 transition-colors">
-                            <i data-lucide="check-circle" class="h-4 w-4 inline mr-2"></i>
-                            Validate JSON
                         </button>
                     </div>
                     <button type="submit" 
@@ -247,22 +277,97 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('idp-form');
     const statusMessages = document.getElementById('status-messages');
     const testConnectionBtn = document.getElementById('test-connection');
-    const validateJsonBtn = document.getElementById('validate-json');
+    const idpTypeSelect = document.getElementById('idp_type');
     const refreshStatusBtn = document.getElementById('refresh-status');
     const viewAppsBtn = document.getElementById('view-apps');
     const deleteConnectionBtn = document.getElementById('delete-connection');
 
+    // Show/hide fields based on provider type and update steps/help
+    function updateFields() {
+        const type = idpTypeSelect.value;
+        document.getElementById('google-fields').style.display = (type === 'google_workspace') ? '' : 'none';
+        document.getElementById('azure-fields').style.display = (type === 'azure_ad') ? '' : 'none';
+        document.getElementById('okta-fields').style.display = (type === 'okta') ? '' : 'none';
+        // Set API URL placeholder
+        const apiUrl = document.getElementById('api_url');
+        if (type === 'google_workspace') apiUrl.placeholder = 'https://admin.googleapis.com';
+        if (type === 'azure_ad') apiUrl.placeholder = 'https://graph.microsoft.com/v1.0';
+        if (type === 'okta') apiUrl.placeholder = 'https://company.okta.com/api/v1';
+        // Update title and steps
+        const title = document.getElementById('idp-config-title');
+        const desc = document.getElementById('idp-config-desc');
+        const step1Title = document.getElementById('step1-title');
+        const step1Desc = document.getElementById('step1-desc');
+        const step2Title = document.getElementById('step2-title');
+        const step2Desc = document.getElementById('step2-desc');
+        const step3Title = document.getElementById('step3-title');
+        const step3Desc = document.getElementById('step3-desc');
+        const stepsDiv = document.getElementById('idp-steps');
+        if (!type) {
+            stepsDiv.style.display = 'none';
+            title.textContent = 'IDP Configuration';
+            desc.textContent = 'Connect your identity provider to enable application discovery and user management';
+            step1Title.textContent = 'Step 1';
+            step1Desc.textContent = 'Select your provider and prepare credentials';
+            step2Title.textContent = 'Step 2';
+            step2Desc.textContent = 'Enter or upload your credentials below';
+            step3Title.textContent = 'Step 3';
+            step3Desc.textContent = 'Test and save your connection';
+        } else if (type === 'google_workspace') {
+            stepsDiv.style.display = '';
+            title.textContent = 'Google Workspace IDP Configuration';
+            desc.textContent = 'Connect your Google Workspace to enable application discovery and user management';
+            step1Title.textContent = 'Service Account';
+            step1Desc.textContent = 'Create a Google Cloud service account with Admin SDK API access';
+            step2Title.textContent = 'Download JSON';
+            step2Desc.textContent = 'Download the service account JSON key file from Google Cloud Console';
+            step3Title.textContent = 'Configure';
+            step3Desc.textContent = 'Upload the JSON file and configure the connection settings below';
+        } else if (type === 'azure_ad') {
+            stepsDiv.style.display = '';
+            title.textContent = 'Azure AD IDP Configuration';
+            desc.textContent = 'Connect your Azure Active Directory to enable application discovery and user management';
+            step1Title.textContent = 'Register App';
+            step1Desc.textContent = 'Register an application in Azure AD and grant API permissions';
+            step2Title.textContent = 'Get Credentials';
+            step2Desc.textContent = 'Copy the Tenant ID, Client ID, and Client Secret from Azure Portal';
+            step3Title.textContent = 'Configure';
+            step3Desc.textContent = 'Enter the credentials and configure the connection settings below';
+        } else if (type === 'okta') {
+            stepsDiv.style.display = '';
+            title.textContent = 'Okta IDP Configuration';
+            desc.textContent = 'Connect your Okta organization to enable application discovery and user management';
+            step1Title.textContent = 'Create API Token';
+            step1Desc.textContent = 'Generate an API token in Okta Admin Console with read permissions';
+            step2Title.textContent = 'Get Domain';
+            step2Desc.textContent = 'Copy your Okta domain (e.g., company.okta.com)';
+            step3Title.textContent = 'Configure';
+            step3Desc.textContent = 'Enter the domain and API token below';
+        }
+    }
+    idpTypeSelect.addEventListener('change', updateFields);
+    updateFields();
+
     // Form submission
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
-        
+        const type = idpTypeSelect.value;
         const formData = new FormData(form);
-        const data = {
+        let data = {
             display_name: formData.get('display_name'),
-            service_account_json: formData.get('service_account_json'),
+            type: type,
             api_url: formData.get('api_url')
         };
-
+        if (type === 'google_workspace') {
+            data.service_account_json = formData.get('service_account_json');
+        } else if (type === 'azure_ad') {
+            data.tenant_id = formData.get('tenant_id');
+            data.client_id = formData.get('client_id');
+            data.client_secret = formData.get('client_secret');
+        } else if (type === 'okta') {
+            data.domain = formData.get('domain');
+            data.api_token = formData.get('api_token');
+        }
         try {
             const response = await fetch('/discovery/idp', {
                 method: 'POST',
@@ -271,9 +376,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify(data)
             });
-
             const result = await response.json();
-            
             if (response.ok) {
                 showMessage('success', `IDP connection created successfully! ID: ${result.idp_id}`);
                 loadStatus();
@@ -287,27 +390,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Test connection
     testConnectionBtn.addEventListener('click', async function() {
-        const jsonData = document.getElementById('service_account_json').value;
-        if (!jsonData) {
-            showMessage('error', 'Please enter service account JSON first');
-            return;
+        const type = idpTypeSelect.value;
+        let data = {
+            display_name: 'Test Connection',
+            type: type,
+            api_url: document.getElementById('api_url').value
+        };
+        if (type === 'google_workspace') {
+            data.service_account_json = document.getElementById('service_account_json').value;
+        } else if (type === 'azure_ad') {
+            data.tenant_id = document.getElementById('tenant_id').value;
+            data.client_id = document.getElementById('client_id').value;
+            data.client_secret = document.getElementById('client_secret').value;
+        } else if (type === 'okta') {
+            data.domain = document.getElementById('domain').value;
+            data.api_token = document.getElementById('api_token').value;
         }
-
         try {
             const response = await fetch('/discovery/idp', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    display_name: 'Test Connection',
-                    service_account_json: jsonData,
-                    api_url: 'https://admin.googleapis.com'
-                })
+                body: JSON.stringify(data)
             });
-
             const result = await response.json();
-            
             if (response.ok) {
                 showMessage('success', 'Connection test successful!');
             } else {
@@ -315,26 +422,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } catch (error) {
             showMessage('error', 'Network error during connection test');
-        }
-    });
-
-    // Validate JSON
-    validateJsonBtn.addEventListener('click', function() {
-        const jsonData = document.getElementById('service_account_json').value;
-        if (!jsonData) {
-            showMessage('error', 'Please enter JSON data to validate');
-            return;
-        }
-
-        try {
-            const parsed = JSON.parse(jsonData);
-            if (parsed.type === 'service_account' && parsed.project_id) {
-                showMessage('success', 'JSON format is valid');
-            } else {
-                showMessage('error', 'Invalid service account JSON format');
-            }
-        } catch (error) {
-            showMessage('error', 'Invalid JSON format');
         }
     });
 

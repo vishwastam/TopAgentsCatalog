@@ -13,7 +13,7 @@
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="{% block og_title %}Top Agents - AI Agents Directory{% endblock %}">
     <meta property="og:description" content="{% block og_description %}Comprehensive directory of AI agents{% endblock %}">
-    <meta property="og:image" content="{% block og_image %}{{ url_for('static', filename='images/top-agents-logo.svg', _external=True) }}{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{{ url_for('static', filename='images/top-agents-logo.png', _external=True) }}{% endblock %}">
     <meta property="og:type" content="{% block og_type %}website{% endblock %}">
     <meta property="og:url" content="{{ request.url }}">
     <meta property="og:site_name" content="Top Agents">
@@ -22,7 +22,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{% block twitter_title %}Top Agents - AI Agents Directory{% endblock %}">
     <meta name="twitter:description" content="{% block twitter_description %}Comprehensive directory of AI agents{% endblock %}">
-    <meta name="twitter:image" content="{% block twitter_image %}{{ url_for('static', filename='images/top-agents-logo.svg', _external=True) }}{% endblock %}">
+    <meta name="twitter:image" content="{% block twitter_image %}{{ url_for('static', filename='images/top-agents-logo.png', _external=True) }}{% endblock %}">
     
     <!-- Canonical URL -->
     <link rel="canonical" href="{% block canonical_url %}{{ url_for(request.endpoint, _external=True, **(request.view_args or {})) }}{% endblock %}">
@@ -152,6 +152,9 @@
     }
     </script>
     {% endif %}
+    {% if request.endpoint in ['main.enterprise_integration', 'main.app_catalog', 'main.idp_connection', 'main.dashboard', 'main.recipes_hub'] %}
+    <meta name="section" content="Enterprise">
+    {% endif %}
     {% endblock %}
     
     <script>
@@ -190,11 +193,19 @@
                     <a href="{{ url_for('main.index') }}" class="text-gray-700 hover:text-gray-900 font-medium">Home</a>
                     <a href="{{ url_for('main.agents') }}" class="text-gray-700 hover:text-gray-900 font-medium">Agents</a>
                     <a href="{{ url_for('main.recipes') }}" class="text-gray-700 hover:text-gray-900 font-medium">Recipes</a>
-                    <a href="{{ url_for('main.recipes_hub') }}" class="text-gray-700 hover:text-gray-900 font-medium">Stories</a>
                     <a href="{{ url_for('main.blog_list') }}" class="text-gray-700 hover:text-gray-900 font-medium">Blog</a>
-                    <a href="{{ url_for('main.enterprise_integration') }}" class="text-gray-700 hover:text-gray-900 font-medium">Enterprise</a>
-                    <a href="{{ url_for('main.dashboard') }}" class="text-gray-700 hover:text-gray-900 font-medium">Dashboard</a>
                     <a href="{{ url_for('main.api_docs') }}" class="text-gray-700 hover:text-gray-900 font-medium">API</a>
+                    <div class="relative group" tabindex="0" aria-haspopup="true" aria-expanded="false" id="enterprise-dropdown-group">
+                        <button type="button" class="text-gray-700 hover:text-gray-900 font-medium flex items-center focus:outline-none" id="enterprise-dropdown-btn" aria-haspopup="true" aria-expanded="false">
+                            Enterprise
+                            <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div id="enterprise-dropdown-menu" class="absolute left-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity z-50" style="pointer-events:auto;">
+                            <a href="{{ url_for('main.enterprise_integration') }}" class="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-t-lg">Enterprise Overview</a>
+                            <a href="{{ url_for('main.dashboard') }}" class="block px-4 py-3 text-gray-700 hover:bg-gray-100">Dashboard</a>
+                            <a href="{{ url_for('main.recipes_hub') }}" class="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-b-lg">Stories</a>
+                        </div>
+                    </div>
                     
                     {% if current_user %}
                     <div class="flex items-center space-x-3">
@@ -235,11 +246,14 @@
                 <a href="{{ url_for('main.index') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Home</a>
                 <a href="{{ url_for('main.agents') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Agents</a>
                 <a href="{{ url_for('main.recipes') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Recipes</a>
-                <a href="{{ url_for('main.recipes_hub') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Stories</a>
                 <a href="{{ url_for('main.blog_list') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Blog</a>
-                <a href="{{ url_for('main.enterprise_integration') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Enterprise</a>
-                <a href="{{ url_for('main.dashboard') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Dashboard</a>
                 <a href="{{ url_for('main.api_docs') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">API</a>
+                <div class="border-t border-gray-200 pt-3 mt-3">
+                    <span class="block text-gray-500 text-xs font-semibold uppercase mb-2">Enterprise</span>
+                    <a href="{{ url_for('main.enterprise_integration') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Enterprise Overview</a>
+                    <a href="{{ url_for('main.dashboard') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Dashboard</a>
+                    <a href="{{ url_for('main.recipes_hub') }}" class="block text-gray-700 hover:text-gray-900 font-medium py-2">Stories</a>
+                </div>
                 
                 {% if current_user %}
                 <div class="border-t border-gray-200 pt-3 mt-3">
@@ -315,6 +329,63 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             lucide.createIcons();
+            // Enterprise dropdown keyboard/click/mouse accessibility
+            const group = document.getElementById('enterprise-dropdown-group');
+            const btn = document.getElementById('enterprise-dropdown-btn');
+            const menu = document.getElementById('enterprise-dropdown-menu');
+            let open = false;
+            let mouseInMenu = false;
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                open = !open;
+                if (open) {
+                    menu.classList.add('opacity-100');
+                    menu.classList.remove('opacity-0');
+                    btn.setAttribute('aria-expanded', 'true');
+                } else {
+                    menu.classList.remove('opacity-100');
+                    menu.classList.add('opacity-0');
+                    btn.setAttribute('aria-expanded', 'false');
+                }
+            });
+            btn.addEventListener('mouseenter', function() {
+                open = true;
+                menu.classList.add('opacity-100');
+                menu.classList.remove('opacity-0');
+                btn.setAttribute('aria-expanded', 'true');
+            });
+            btn.addEventListener('mouseleave', function() {
+                setTimeout(function() {
+                    if (!mouseInMenu) {
+                        open = false;
+                        menu.classList.remove('opacity-100');
+                        menu.classList.add('opacity-0');
+                        btn.setAttribute('aria-expanded', 'false');
+                    }
+                }, 100);
+            });
+            menu.addEventListener('mouseenter', function() {
+                mouseInMenu = true;
+                open = true;
+                menu.classList.add('opacity-100');
+                menu.classList.remove('opacity-0');
+                btn.setAttribute('aria-expanded', 'true');
+            });
+            menu.addEventListener('mouseleave', function() {
+                mouseInMenu = false;
+                open = false;
+                menu.classList.remove('opacity-100');
+                menu.classList.add('opacity-0');
+                btn.setAttribute('aria-expanded', 'false');
+            });
+            document.addEventListener('click', function(e) {
+                if (!group.contains(e.target)) {
+                    open = false;
+                    menu.classList.remove('opacity-100');
+                    menu.classList.add('opacity-0');
+                    btn.setAttribute('aria-expanded', 'false');
+                }
+            });
         });
         
         function scrollToFilters() {

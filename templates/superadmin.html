@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Super-Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Super-Admin Dashboard</h1>
+
+    <!-- All Organizations -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">All Organizations ({{ orgs|length }})</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-2 text-left">Name</th>
+                        <th class="px-4 py-2 text-left">Domain</th>
+                        <th class="px-4 py-2 text-left">SSO Provider</th>
+                        <th class="px-4 py-2 text-left">Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for org in orgs %}
+                    <tr>
+                        <td class="px-4 py-2">{{ org.name }}</td>
+                        <td class="px-4 py-2">{{ org.domain }}</td>
+                        <td class="px-4 py-2">{{ org.sso_provider }}</td>
+                        <td class="px-4 py-2">{{ org.created_at.strftime('%Y-%m-%d') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- All Users -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">All Users ({{ users|length }})</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-2 text-left">Email</th>
+                        <th class="px-4 py-2 text-left">Organization</th>
+                        <th class="px-4 py-2 text-left">Roles</th>
+                        <th class="px-4 py-2 text-left">Status</th>
+                        <th class="px-4 py-2 text-left">Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td class="px-4 py-2">{{ u.email }}</td>
+                        <td class="px-4 py-2">{{ u.organization.name if u.organization else 'N/A' }}</td>
+                        <td class="px-4 py-2">{{ u.roles|join(', ') }}</td>
+                        <td class="px-4 py-2">{{ u.status }}</td>
+                        <td class="px-4 py-2">{{ u.created_at.strftime('%Y-%m-%d') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %} 

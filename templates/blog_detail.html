@@ -7,7 +7,9 @@
 
 {% block og_title %}{{ post.title }}{% endblock %}
 {% block og_description %}{{ post.meta_description }}{% endblock %}
-{% block og_image %}{{ post.featured_image if post.featured_image else url_for('static', filename='images/blog-default.jpg', _external=True) }}{% endblock %}
+{% block og_image %}{{ url_for('static', filename='images/blogs/' + (blog.slug if blog and blog.slug else 'top-agents-logo.png'), _external=True) }}{% endblock %}
+
+{% block twitter_image %}{{ url_for('static', filename='images/blogs/' + (blog.slug if blog and blog.slug else 'top-agents-logo.png'), _external=True) }}{% endblock %}
 
 {% block structured_data %}
 <script type="application/ld+json">
