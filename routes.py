@@ -7,7 +7,7 @@ import json
 import logging
 import os
 from blog_loader import blog_loader
-from models import db, GoogleWorkspaceIDPIntegration, IDPIntegration, User, Organization, ToolCatalog, UsageLog
+from models import db, GoogleWorkspaceIDPIntegration, IDPIntegration, User, Organization, ToolCatalog, UsageLog, DemoRequest
 import google.auth
 from google.oauth2 import service_account
 import requests as pyrequests
@@ -358,45 +358,33 @@ def index():
 @main_bp.route('/demo-request', methods=['POST'])
 def demo_request():
     """Handle demo request form submissions"""
-    import json
+    from models import DemoRequest, db
+    import uuid
     from datetime import datetime
-    
     try:
-        # Get form data
         data = request.get_json()
-        
-        # Create demo request entry
-        demo_entry = {
-            'id': str(hash(str(datetime.now()) + data.get('email', ''))),
-            'timestamp': datetime.now().isoformat(),
-            'company_name': data.get('company_name', ''),
-            'email': data.get('email', ''),
-            'team_size': data.get('team_size', ''),
-            'ai_usage': data.get('ai_usage', ''),
-            'status': 'pending'
-        }
-        
-        # Load existing demo requests or create new file
-        try:
-            with open('demo_requests.json', 'r') as f:
-                demo_requests = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            demo_requests = []
-        
-        # Add new request
-        demo_requests.append(demo_entry)
-        
-        # Save to file
-        with open('demo_requests.json', 'w') as f:
-            json.dump(demo_requests, f, indent=2)
-        
-        logging.info(f"Demo request saved: {demo_entry['email']} from {demo_entry['company_name']}")
-        
+        # Validate required fields
+        if not data.get('company_name') or not data.get('email'):
+            return jsonify({
+                'success': False,
+                'message': 'Company name and email are required.'
+            }), 400
+        demo_entry = DemoRequest(
+            id=str(uuid.uuid4()),
+            timestamp=datetime.now(),
+            company_name=data.get('company_name', ''),
+            email=data.get('email', ''),
+            team_size=data.get('team_size', ''),
+            ai_usage=data.get('ai_usage', ''),
+            status='pending'
+        )
+        db.session.add(demo_entry)
+        db.session.commit()
+        logging.info(f"Demo request saved: {demo_entry.email} from {demo_entry.company_name}")
         return jsonify({
             'success': True,
             'message': 'Demo request submitted successfully. We will contact you within 24 hours.'
         })
-        
     except Exception as e:
         logging.error(f"Error saving demo request: {e}")
         return jsonify({
@@ -1610,3 +1598,21 @@ def google_auth_demo():
 def logout():
     session.clear()
     return redirect(url_for('main.login'))
+
+@main_bp.route('/admin/demo-requests', methods=['GET', 'POST'])
+@require_superadmin
+def admin_demo_requests(user):
+    from models import DemoRequest, db
+    if request.method == 'POST':
+        # Update status of a request
+        req_id = request.form.get('id')
+        new_status = request.form.get('status')
+        demo_req = DemoRequest.query.get(req_id)
+        if demo_req and new_status in ['pending', 'contacted', 'closed']:
+            demo_req.status = new_status
+            db.session.commit()
+            flash(f"Status updated for {demo_req.email}", 'success')
+        return redirect(url_for('main.admin_demo_requests'))
+    # GET: show all demo requests
+    demo_requests = DemoRequest.query.order_by(DemoRequest.timestamp.desc()).all()
+    return render_template('admin_demo_requests.html', demo_requests=demo_requests)

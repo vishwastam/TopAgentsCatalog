@@ -38,6 +38,7 @@ def enterprise_user(org):
         primary_role='employee',
         roles=['employee', 'manager'],
         department='Engineering',
+        team='Platform',
         status='active'
     )
 

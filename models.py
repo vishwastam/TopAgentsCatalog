@@ -775,3 +775,13 @@ class ComplianceEvent(db.Model):
     user = db.relationship('User', backref='compliance_events')
     organization = db.relationship('Organization', backref='compliance_events')
     tool = db.relationship('ToolCatalog', backref='compliance_events')
+
+class DemoRequest(db.Model):
+    __tablename__ = 'demo_requests'
+    id = db.Column(db.String(36), primary_key=True)  # UUID
+    timestamp = db.Column(db.DateTime, nullable=False)
+    company_name = db.Column(db.String(255), nullable=False)
+    email = db.Column(db.String(255), nullable=False)
+    team_size = db.Column(db.String(100))
+    ai_usage = db.Column(db.Text)
+    status = db.Column(db.String(50), default='pending')

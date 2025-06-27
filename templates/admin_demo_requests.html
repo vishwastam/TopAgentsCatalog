@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Demo Requests Admin{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto py-10">
+  <h1 class="text-3xl font-bold mb-6">Demo Requests</h1>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="mb-4">
+        {% for category, message in messages %}
+          <div class="p-2 rounded bg-green-100 text-green-800 mb-2">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+  <table class="min-w-full bg-white border rounded shadow">
+    <thead>
+      <tr>
+        <th class="px-4 py-2 border">Timestamp</th>
+        <th class="px-4 py-2 border">Company</th>
+        <th class="px-4 py-2 border">Email</th>
+        <th class="px-4 py-2 border">Team Size</th>
+        <th class="px-4 py-2 border">AI Usage</th>
+        <th class="px-4 py-2 border">Status</th>
+        <th class="px-4 py-2 border">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for req in demo_requests %}
+      <tr class="border-t">
+        <td class="px-4 py-2 border">{{ req.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td class="px-4 py-2 border">{{ req.company_name }}</td>
+        <td class="px-4 py-2 border">{{ req.email }}</td>
+        <td class="px-4 py-2 border">{{ req.team_size }}</td>
+        <td class="px-4 py-2 border">{{ req.ai_usage }}</td>
+        <td class="px-4 py-2 border">{{ req.status|capitalize }}</td>
+        <td class="px-4 py-2 border">
+          <form method="post" style="display:inline">
+            <input type="hidden" name="id" value="{{ req.id }}">
+            <select name="status" class="border rounded px-2 py-1">
+              <option value="pending" {% if req.status=='pending' %}selected{% endif %}>Pending</option>
+              <option value="contacted" {% if req.status=='contacted' %}selected{% endif %}>Contacted</option>
+              <option value="closed" {% if req.status=='closed' %}selected{% endif %}>Closed</option>
+            </select>
+            <button type="submit" class="ml-2 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">Update</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7" class="text-center py-6">No demo requests found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %} 

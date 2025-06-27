@@ -30,9 +30,9 @@
                     Built for fast-moving teams experimenting with AI, and for leaders who need visibility.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <button onclick="scrollToDemo()" class="inline-flex items-center px-8 py-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                    <button onclick="openDemoForm()" class="inline-flex items-center px-8 py-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                         <i data-lucide="play-circle" class="h-5 w-5 mr-2"></i>
-                        Request Demo
+                        Book a Demo
                     </button>
                     <a href="{{ url_for('main.dashboard') }}" class="inline-flex items-center px-8 py-4 bg-white text-blue-600 border-2 border-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
                         <i data-lucide="external-link" class="h-5 w-5 mr-2"></i>
@@ -769,7 +769,7 @@
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <button onclick="openDemoForm()" class="inline-flex items-center px-8 py-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                     <i data-lucide="calendar" class="h-5 w-5 mr-2"></i>
-                    Request a Demo
+                    Book a Demo
                 </button>
                 <a href="{{ url_for('main.dashboard') }}" class="inline-flex items-center px-8 py-4 bg-white text-blue-600 border-2 border-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
                     <i data-lucide="eye" class="h-5 w-5 mr-2"></i>
@@ -780,13 +780,82 @@
     </section>
 </div>
 
-<script>
-function scrollToDemo() {
-    document.getElementById('demo').scrollIntoView({ behavior: 'smooth' });
-}
+<!-- Demo Request Modal -->
+<div id="demoModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-8 relative">
+    <button onclick="closeDemoModal()" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
+    <h3 class="text-2xl font-bold mb-4 text-center">Book a Demo</h3>
+    <form id="demoRequestForm" class="space-y-4">
+      <input type="text" name="company_name" placeholder="Company Name" class="w-full border rounded px-3 py-2" required>
+      <input type="text" name="email" placeholder="Work Email" class="w-full border rounded px-3 py-2" required>
+      <input type="text" name="team_size" placeholder="Team Size (e.g. 10-50)" class="w-full border rounded px-3 py-2">
+      <textarea name="ai_usage" placeholder="How do you use AI today?" class="w-full border rounded px-3 py-2"></textarea>
+      <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded font-semibold hover:bg-blue-700 transition">Submit Request</button>
+      <div id="demoRequestMsg" class="text-center mt-2 text-sm"></div>
+    </form>
+  </div>
+</div>
 
+<script>
 function openDemoForm() {
-    alert('Demo request form would open here');
+    document.getElementById('demoModal').classList.remove('hidden');
+}
+function closeDemoModal() {
+    document.getElementById('demoModal').classList.add('hidden');
+    document.getElementById('demoRequestForm').reset();
+    document.getElementById('demoRequestMsg').textContent = '';
+}
+// Wire up modal open to all demo buttons
+window.toggleDemoModal = openDemoForm;
+
+// Handle form submission
+const demoForm = document.getElementById('demoRequestForm');
+if (demoForm) {
+  demoForm.onsubmit = async function(e) {
+    e.preventDefault();
+    const form = e.target;
+    const data = {
+      company_name: form.company_name.value.trim(),
+      email: form.email.value.trim(),
+      team_size: form.team_size.value.trim(),
+      ai_usage: form.ai_usage.value.trim()
+    };
+    const msg = document.getElementById('demoRequestMsg');
+    // Improved frontend validation
+    if (!data.company_name || data.company_name.length < 2) {
+      msg.textContent = 'Please enter a valid company name (at least 2 characters).';
+      msg.className = 'text-center mt-2 text-red-600';
+      return;
+    }
+    // Simple but robust email regex
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    if (!data.email || !emailPattern.test(data.email)) {
+      msg.textContent = 'Please enter a valid email address.';
+      msg.className = 'text-center mt-2 text-red-600';
+      return;
+    }
+    msg.textContent = 'Submitting...';
+    msg.className = 'text-center mt-2 text-sm text-gray-500';
+    try {
+      const resp = await fetch('/demo-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const out = await resp.json();
+      if (out.success) {
+        msg.textContent = out.message;
+        msg.className = 'text-center mt-2 text-green-600';
+        setTimeout(closeDemoModal, 2000);
+      } else {
+        msg.textContent = out.message || (resp.status >= 400 && resp.status < 500 ? 'There was a problem with your submission.' : 'A server error occurred. Please try again.');
+        msg.className = 'text-center mt-2 text-red-600';
+      }
+    } catch (err) {
+      msg.textContent = 'Network error. Please try again.';
+      msg.className = 'text-center mt-2 text-red-600';
+    }
+  };
 }
 </script>
 {% endblock %}
