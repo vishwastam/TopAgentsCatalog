@@ -57,9 +57,9 @@
                             <div class="flex items-center gap-2">
                                 <div class="flex items-center">
                                     {% for i in range(1, 6) %}
-                                        {% if rating_data.average_rating >= i %}
+                                        {% if avg_rating >= i %}
                                             <i data-lucide="star" class="h-5 w-5 text-yellow-400 fill-current"></i>
-                                        {% elif rating_data.average_rating >= i - 0.5 %}
+                                        {% elif avg_rating >= i - 0.5 %}
                                             <i data-lucide="star" class="h-5 w-5 text-yellow-400 fill-current opacity-50"></i>
                                         {% else %}
                                             <i data-lucide="star" class="h-5 w-5 text-gray-300"></i>
@@ -68,7 +68,7 @@
                                 </div>
                                 {% if rating_data.total_ratings > 0 %}
                                     <span class="text-sm text-gray-600">
-                                        {{ rating_data.average_rating }}/5 ({{ rating_data.total_ratings }} review{{ 's' if rating_data.total_ratings != 1 else '' }})
+                                        {{ avg_rating }}/5 ({{ rating_data.total_ratings }} review{{ 's' if rating_data.total_ratings != 1 else '' }})
                                     </span>
                                 {% else %}
                                     <span class="text-sm text-gray-500">No ratings yet</span>
@@ -142,10 +142,11 @@
                 </div>
 
                 <div class="flex flex-wrap gap-2 mb-6">
-                    {% for tag in agent.use_case_list %}
+                    {% set use_cases = agent.use_cases.split(';') if agent.use_cases else [] %}
+                    {% for tag in use_cases %}
                         <span class="inline-flex items-center gap-1 px-2 py-1 border border-gray-300 text-gray-700 text-sm rounded-md">
                             <i data-lucide="tag" class="h-3 w-3"></i>
-                            {{ tag }}
+                            {{ tag.strip() }}
                         </span>
                     {% endfor %}
                 </div>
@@ -197,10 +198,11 @@
                             <div>
                                 <h4 class="font-semibold text-gray-900 mb-3">Key Use Cases</h4>
                                 <ul class="space-y-2">
-                                    {% for use_case in agent.use_case_list %}
+                                    {% set use_cases = agent.use_cases.split(';') if agent.use_cases else [] %}
+                                    {% for use_case in use_cases %}
                                     <li class="flex items-start gap-2">
                                         <div class="w-1.5 h-1.5 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
-                                        <span class="text-gray-700">{{ use_case }}</span>
+                                        <span class="text-gray-700">{{ use_case.strip() }}</span>
                                     </li>
                                     {% endfor %}
                                 </ul>
@@ -209,10 +211,11 @@
                             <div>
                                 <h4 class="font-semibold text-gray-900 mb-3">Domains</h4>
                                 <div class="space-y-2">
-                                    {% for domain in agent.domain_list %}
+                                    {% set domains = agent.domains.split(';') if agent.domains else [] %}
+                                    {% for domain in domains %}
                                     <div class="flex items-center gap-2">
                                         <i data-lucide="check" class="h-4 w-4 text-green-500"></i>
-                                        <span class="text-gray-700">{{ domain }}</span>
+                                        <span class="text-gray-700">{{ domain.strip() }}</span>
                                     </div>
                                     {% endfor %}
                                 </div>

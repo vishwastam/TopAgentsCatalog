@@ -98,17 +98,17 @@ def test_register_google_workspace_idp_missing_fields(client):
 
 def test_register_google_workspace_idp_db_status_on_failure(client):
     # Simulate DB status on failure by using invalid credentials
-    data = {
-        "display_name": "Test Google Workspace",
+        data = {
+            "display_name": "Test Google Workspace",
         "type": "google_workspace",
         "service_account_json": "invalid",
-        "api_url": "https://admin.googleapis.com"
-    }
-    resp = client.post('/discovery/idp', json=data)
-    assert resp.status_code == 400
-    out = resp.get_json()
-    assert out['status'] == 'error'
-    assert 'Invalid credentials' in out['message']
+            "api_url": "https://admin.googleapis.com"
+        }
+        resp = client.post('/discovery/idp', json=data)
+        assert resp.status_code == 400
+        out = resp.get_json()
+        assert out['status'] == 'error'
+        assert 'Invalid credentials' in out['message']
 
 # US2: Fetch Catalog of Registered Applications Tests
 
@@ -217,17 +217,17 @@ def test_fetch_app_catalog_invalid_idp_id(client):
 def test_fetch_app_catalog_inactive_idp(client):
     """Test inactive IDP - IDP with status 'error'"""
     # Create IDP with error status by simulating invalid credentials
-    idp_data = {
-        "display_name": "Test Google Workspace",
+        idp_data = {
+            "display_name": "Test Google Workspace",
         "type": "google_workspace",
         "service_account_json": "invalid",
-        "api_url": "https://admin.googleapis.com"
-    }
-    resp = client.post('/discovery/idp', json=idp_data)
-    out = resp.get_json()
-    assert resp.status_code == 400
-    assert out['status'] == 'error'
-    assert 'Invalid credentials' in out['message']
+            "api_url": "https://admin.googleapis.com"
+        }
+        resp = client.post('/discovery/idp', json=idp_data)
+        out = resp.get_json()
+        assert resp.status_code == 400
+        assert out['status'] == 'error'
+        assert 'Invalid credentials' in out['message']
     # No need to fetch apps since IDP creation failed
 
 def test_fetch_app_catalog_google_api_rate_limit(client):

@@ -7,7 +7,7 @@ import json
 import logging
 import os
 from blog_loader import blog_loader
-from models import db, GoogleWorkspaceIDPIntegration, IDPIntegration, User, Organization, ToolCatalog, UsageLog, DemoRequest
+from models import db, GoogleWorkspaceIDPIntegration, IDPIntegration, User, Organization, ToolCatalog, UsageLog, DemoRequest, AIAgent
 import google.auth
 from google.oauth2 import service_account
 import requests as pyrequests
@@ -409,10 +409,10 @@ def require_enterprise_admin(view_func):
             flash('You must be logged in to view this page.', 'warning')
             return redirect(url_for('main.login', next=request.url))
 
-        if not user.is_enterprise() or not user.is_admin():
+        # Allow superadmin to access admin pages even if not linked to an organization
+        if not (user.is_admin() and (user.is_enterprise() or user.primary_role == 'superadmin')):
             flash('You do not have permission to access this page.', 'danger')
             return render_template('403.html'), 403
-            
         return view_func(user, *args, **kwargs)
     return wrapper
 
@@ -421,9 +421,9 @@ def require_enterprise_admin(view_func):
 def dashboard(user):
     """Enterprise dashboard for admins only, scoped to their organization."""
     org_id = user.organization_id
-    if not org_id:
+    if not org_id and user.primary_role != 'superadmin':
         flash('No organization found for your account.', 'danger')
-        return redirect(url_for('main_bp.login'))
+        return redirect(url_for('main.login'))
 
     # Example: Only show agents, recipes, and metrics for this org
     # (Replace with real queries as needed)
@@ -576,7 +576,6 @@ def recipes_hub():
 @main_bp.route('/agents')
 def agents():
     """Full agents listing page with search and filters"""
-    # Get filter parameters from URL
     query = request.args.get('q', '').strip()
     filters = {
         'domain': request.args.get('domain'),
@@ -587,20 +586,30 @@ def agents():
         'category': request.args.get('category'),
         'pricing': request.args.get('pricing')
     }
-    
-    # Remove empty filters
     filters = {k: v for k, v in filters.items() if v}
-    
-    # Get filtered agents
-    agents = data_loader.search_agents(query, filters)
-    
-    # Get filter options for the UI
-    filter_options = data_loader.get_filter_options()
-    
-    # Generate canonical URL
+
+    # Query AIAgent model for filtered agents
+    query_obj = AIAgent.query
+    if query:
+        query_obj = query_obj.filter(AIAgent.name.ilike(f"%{query}%"))
+    if 'domain' in filters:
+        query_obj = query_obj.filter(AIAgent.domains.ilike(f"%{filters['domain']}%"))
+    if 'use_case' in filters:
+        query_obj = query_obj.filter(AIAgent.use_cases.ilike(f"%{filters['use_case']}%"))
+    if 'platform' in filters:
+        query_obj = query_obj.filter(AIAgent.platform.ilike(f"%{filters['platform']}%"))
+    if 'model' in filters:
+        query_obj = query_obj.filter(AIAgent.underlying_model.ilike(f"%{filters['model']}%"))
+    if 'creator' in filters:
+        query_obj = query_obj.filter(AIAgent.creator.ilike(f"%{filters['creator']}%"))
+    if 'pricing' in filters:
+        query_obj = query_obj.filter(AIAgent.pricing.ilike(f"%{filters['pricing']}%"))
+    agents = query_obj.all()
+
+    # For now, filter_options can be empty or static
+    filter_options = {}
     base_url = os.environ.get('BASE_URL', 'https://top-agents.us')
     canonical_url = base_url + '/agents'
-    
     return render_template('agents.html',
                          agents=agents,
                          filter_options=filter_options,
@@ -611,42 +620,33 @@ def agents():
 @main_bp.route('/agents/<slug>')
 def agent_detail(slug):
     """Individual agent detail page"""
-    try:
-        agent = data_loader.get_agent_by_slug(slug)
-        
-        if not agent:
-            abort(404)
-        
-        # Get related agents (same primary domain or use case)
-        all_agents = data_loader.get_all_agents()
-        related_agents = [
-            a for a in all_agents 
-            if a.slug != slug and (
-                a.primary_domain == agent.primary_domain or 
-                a.primary_use_case == agent.primary_use_case
-            )
-        ][:6]  # Limit to 6 related agents
-        
-        # Get rating data for this agent
-        rating_data = data_loader.rating_system.get_agent_ratings(agent.slug)
-        
-        # Generate unique SEO metadata
-        page_title = f"{agent.name} by {agent.creator} - AI Agent | Top Agents"
-        meta_description = f"{agent.short_desc} | {agent.pricing_clean} AI agent for {agent.primary_use_case}. Created by {agent.creator}."
-        h1_title = f"{agent.name} - {agent.primary_use_case} AI Agent"
-        
-        return render_template('agent_detail.html', 
-                             agent=agent,
-                             related_agents=related_agents,
-                             rating_data=rating_data,
-                             json_ld=json.dumps(agent.get_json_ld(), indent=2),
-                             rating_success=request.args.get('rating_success'),
-                             rating_error=request.args.get('error'),
-                             page_title=page_title,
-                             meta_description=meta_description,
-                             h1_title=h1_title)
-    except ValueError:
+    from flask import abort
+    agent = AIAgent.query.filter_by(slug=slug).first()
+    if not agent:
         abort(404)
+    # Related agents: same domain or use case
+    related_agents = AIAgent.query.filter(
+        (AIAgent.domains.ilike(f"%{agent.domains.split(';')[0]}%")) |
+        (AIAgent.use_cases.ilike(f"%{agent.use_cases.split(';')[0]}%")),
+        AIAgent.slug != slug
+    ).limit(6).all()
+    # For now, rating_data and json_ld can be empty or static
+    rating_data = {"average_rating": 0, "total_ratings": 0}
+    avg_rating = rating_data.get('average_rating', 0)
+    page_title = f"{agent.name} by {agent.creator} - AI Agent | Top Agents"
+    meta_description = f"{agent.short_desc} | {agent.pricing} AI agent for {agent.use_cases}. Created by {agent.creator}."
+    h1_title = f"{agent.name} - {agent.use_cases} AI Agent"
+    return render_template('agent_detail.html',
+                         agent=agent,
+                         related_agents=related_agents,
+                         rating_data=rating_data,
+                         avg_rating=avg_rating,
+                         json_ld="{}",
+                         rating_success=request.args.get('rating_success'),
+                         rating_error=request.args.get('error'),
+                         page_title=page_title,
+                         meta_description=meta_description,
+                         h1_title=h1_title)
 
 @main_bp.route('/agent/<slug>')
 def agent_detail_redirect(slug):
@@ -1481,9 +1481,9 @@ def app_catalog():
 def usage_analytics(user):
     """Analytics dashboard for enterprise admins: tool usage by employees in their org only."""
     org_id = user.organization_id
-    if not org_id:
+    if not org_id and user.primary_role != 'superadmin':
         flash('No organization found for your account.', 'danger')
-        return redirect(url_for('main_bp.login'))
+        return redirect(url_for('main.login'))
 
     # --- Filters ---
     period = request.args.get('period', 'monthly')  # daily, weekly, monthly

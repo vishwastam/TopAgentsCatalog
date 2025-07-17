@@ -408,12 +408,12 @@ class TestDiscoveryRoutes:
                 type='google_workspace',
                 config={
                     'service_account_json': json.dumps({
-                        'type': 'service_account',
-                        'project_id': 'test-project',
-                        'private_key_id': 'test-key-id',
-                        'private_key': '-----BEGIN PRIVATE KEY-----\ntest\n-----END PRIVATE KEY-----\n',
-                        'client_email': 'test@test-project.iam.gserviceaccount.com',
-                        'client_id': 'test-client-id'
+                    'type': 'service_account',
+                    'project_id': 'test-project',
+                    'private_key_id': 'test-key-id',
+                    'private_key': '-----BEGIN PRIVATE KEY-----\ntest\n-----END PRIVATE KEY-----\n',
+                    'client_email': 'test@test-project.iam.gserviceaccount.com',
+                    'client_id': 'test-client-id'
                     })
                 },
                 api_url='https://admin.googleapis.com/admin/directory/v1'

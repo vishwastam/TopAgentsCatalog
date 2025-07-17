@@ -175,14 +175,16 @@
 
                             <!-- Tags -->
                             <div class="flex flex-wrap gap-2 mb-4">
-                                {% for domain in agent.domain_list[:2] %}
+                                {# Replace domain_list with split domains #}
+                                {% set domains = agent.domains.split(';') if agent.domains else [] %}
+                                {% for domain in domains[:2] %}
                                     <span class="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">
-                                        {{ domain }}
+                                        {{ domain.strip() }}
                                     </span>
                                 {% endfor %}
-                                {% if agent.domain_list|length > 2 %}
+                                {% if domains|length > 2 %}
                                     <span class="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">
-                                        +{{ agent.domain_list|length - 2 }} more
+                                        +{{ domains|length - 2 }} more
                                     </span>
                                 {% endif %}
                             </div>

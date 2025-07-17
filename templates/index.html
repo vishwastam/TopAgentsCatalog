@@ -444,9 +444,10 @@
                     <p class="text-gray-600 mb-4 line-clamp-3">{{ agent.short_desc }}</p>
                     
                     <div class="flex flex-wrap gap-2 mb-4">
-                        {% for tag in agent.use_case_list[:3] %}
+                        {% set use_cases = agent.use_cases.split(';') if agent.use_cases else [] %}
+                        {% for tag in use_cases[:3] %}
                             <span class="inline-block px-2 py-1 border border-gray-300 text-gray-700 text-xs rounded-md">
-                                {{ tag }}
+                                {{ tag.strip() }}
                             </span>
                         {% endfor %}
                     </div>
@@ -540,9 +541,10 @@
                         <p class="text-gray-600 mb-4 line-clamp-3">{{ agent.short_desc }}</p>
                         
                         <div class="flex flex-wrap gap-2 mb-4">
-                            {% for tag in agent.use_case_list[:3] %}
+                            {% set use_cases = agent.use_cases.split(';') if agent.use_cases else [] %}
+                            {% for tag in use_cases[:3] %}
                                 <span class="inline-block px-2 py-1 border border-gray-300 text-gray-700 text-xs rounded-md">
-                                    {{ tag }}
+                                    {{ tag.strip() }}
                                 </span>
                             {% endfor %}
                         </div>

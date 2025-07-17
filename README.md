@@ -39,48 +39,72 @@ A comprehensive B2B AI agents marketplace platform that enables enterprise teams
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Python 3.11+
-- PostgreSQL database
-- Flask and dependencies (see `pyproject.toml`)
+- Python 3.9+ (recommended)
+- [pip](https://pip.pypa.io/en/stable/)
+- (Optional) [virtualenv](https://virtualenv.pypa.io/en/latest/) for isolated environments
 
-### Installation
+### Installation & Setup
 
-1. Clone the repository:
+1. **Clone the repository:**
 ```bash
 git clone https://github.com/vishwastam/ai-agents-directory.git
 cd ai-agents-directory
 ```
 
-2. Install dependencies:
+2. **Install dependencies:**
 ```bash
-pip install -r dependencies.txt
-# or if using uv:
-uv sync
+pip install -r requirements.txt
 ```
 
-3. Set up environment variables:
+3. **Initialize the database:**
+- By default, the app uses SQLite at `instance/app.db`.
+- To create the database schema, run:
 ```bash
-export DATABASE_URL="your_postgresql_url"
-export SESSION_SECRET="your_secret_key"
-export GITHUB_TOKEN="your_github_token"  # Optional, for discovery system
+export FLASK_APP=app.py
+flask db upgrade
 ```
 
-4. Run the application:
+4. **Load agents from CSV:**
+- To populate the agent directory from the CSV file, run:
 ```bash
-python main.py
-# or with gunicorn:
-gunicorn --bind 0.0.0.0:5000 --reuse-port --reload main:app
+python scripts/load_agents_from_csv.py
 ```
 
-5. Visit `http://localhost:5000` to see the directory
+5. **Run the application:**
+```bash
+export FLASK_APP=app.py
+flask run
+```
+- Visit [http://localhost:5000](http://localhost:5000) in your browser.
+
+#### Troubleshooting
+- If you see errors like `no such table: ai_agents`, ensure you have run the migration and are using the correct database file (`instance/app.db`).
+- If port 5000 is in use, stop any other Flask processes or use `flask run -p 5001` to use a different port.
 
 ## 📊 Database Schema
 
-The application uses a PostgreSQL database with the following key data:
+The application now uses a relational database (SQLite by default, can be configured for PostgreSQL) with Alembic migrations. Key data tables include:
 
-- **Agents**: Stored in CSV format (`combined_ai_agents_directory.csv`)
+- **AIAgent**: All AI agents are now stored in the `ai_agents` table (see `models.py`).
+- **Recipes**: User-created recipes, linked to agents.
 - **User Ratings**: JSON-based storage (`ratings.json`)
 - **User Submissions**: JSON-based storage (`user_agents.json`)
+
+### Alembic Migrations
+
+To create or upgrade the database schema, use:
+```bash
+export FLASK_APP=app.py
+flask db upgrade
+```
+
+### Loading Agents from CSV
+
+To bulk load the agent directory from `combined_ai_agents_directory.csv` into the database, run:
+```bash
+python scripts/load_agents_from_csv.py
+```
+This will populate the `ai_agents` table with all agents from the CSV, generating slugs and skipping duplicates.
 
 ## 🤖 Automated Discovery System
 
@@ -106,8 +130,9 @@ python scheduler.py
 - `main.py`: Application entry point
 - `app.py`: Flask application setup
 - `routes.py`: URL routing and view logic
-- `models.py`: Data models and structures
-- `data_loader.py`: Agent data management
+- `models.py`: Data models and structures (now includes `AIAgent` and `Recipe` as database models)
+- `scripts/load_agents_from_csv.py`: Bulk loader for agents from CSV to database
+- `data_loader.py`: (Legacy) Agent data management
 - `rating_system.py`: User rating functionality
 
 ### Frontend (HTML/CSS/JavaScript)

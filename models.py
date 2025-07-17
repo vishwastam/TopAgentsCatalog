@@ -7,6 +7,7 @@ from datetime import datetime
 import json
 import logging
 from werkzeug.security import check_password_hash
+import uuid
 
 @dataclass
 class Agent:
@@ -203,6 +204,51 @@ class Agent:
         return json_ld
 
 db = SQLAlchemy()
+
+# Association table for many-to-many relationship between AIAgent and Recipe
+aiagent_recipe = db.Table(
+    'aiagent_recipe',
+    db.Column('aiagent_id', db.String(36), db.ForeignKey('ai_agents.id'), primary_key=True),
+    db.Column('recipe_id', db.String(36), db.ForeignKey('recipes.id'), primary_key=True)
+)
+
+class AIAgent(db.Model):
+    __tablename__ = 'ai_agents'
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    name = db.Column(db.String(255), unique=True, nullable=False)
+    slug = db.Column(db.String(255), unique=True, nullable=False)
+    short_desc = db.Column(db.Text, nullable=False)
+    long_desc = db.Column(db.Text, nullable=False)
+    creator = db.Column(db.String(255), nullable=False)
+    url = db.Column(db.String(255), nullable=False)
+    platform = db.Column(db.String(255), nullable=False)
+    pricing = db.Column(db.String(100), nullable=False)
+    domains = db.Column(db.String(255), nullable=False)
+    use_cases = db.Column(db.String(255), nullable=False)
+    underlying_model = db.Column(db.String(255), nullable=True)
+    deployment = db.Column(db.String(255), nullable=True)
+    legitimacy = db.Column(db.String(255), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    recipes = db.relationship('Recipe', secondary=aiagent_recipe, back_populates='agents')
+
+class Recipe(db.Model):
+    __tablename__ = 'recipes'
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    name = db.Column(db.String(255), nullable=False)
+    synopsis = db.Column(db.Text, nullable=False)
+    detailed_synopsis = db.Column(db.Text, nullable=False)
+    target_audience = db.Column(db.String(255), nullable=False)
+    why_it_works = db.Column(db.Text, nullable=False)
+    source_links = db.Column(db.Text, nullable=True)
+    slug = db.Column(db.String(255), unique=True, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    agents = db.relationship('AIAgent', secondary=aiagent_recipe, back_populates='recipes')
 
 class IDPIntegration(db.Model):
     """Generic IDP Integration model supporting multiple providers"""
