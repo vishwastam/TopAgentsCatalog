@@ -1,6 +1,7 @@
 {
   "blog_index": {
     "total_posts": 40,
+    "total_recipes": 30,
     "last_updated": "2025-08-20",
     "base_url": "https://top-agents.us",
     "posts": [
@@ -472,6 +473,71 @@
         "reading_time": 5,
         "featured_image": "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?fm=jpg&q=80"
       }
+    ],
+    "new_recipes": [
+      {
+        "title": "AI Research Assistant Agent",
+        "slug": "ai-research-assistant-agent",
+        "url": "https://top-agents.us/recipes/ai-research-assistant-agent",
+        "publish_date": "2025-08-20",
+        "category": "Research & Academia",
+        "tags": ["Research", "Literature Review", "Data Analysis", "Academic", "Automation"],
+        "excerpt": "Automates literature reviews and data analysis to accelerate academic research.",
+        "reading_time": 4
+      },
+      {
+        "title": "Multimodal Content Creator Agent",
+        "slug": "multimodal-content-creator-agent",
+        "url": "https://top-agents.us/recipes/multimodal-content-creator-agent",
+        "publish_date": "2025-08-20",
+        "category": "Content Creation",
+        "tags": ["Content Creation", "Multimodal", "Marketing", "Brand Consistency", "Automation"],
+        "excerpt": "Generates consistent content across text, image, and video formats simultaneously.",
+        "reading_time": 4
+      },
+      {
+        "title": "AI Compliance Monitor Agent",
+        "slug": "ai-compliance-monitor-agent",
+        "url": "https://top-agents.us/recipes/ai-compliance-monitor-agent",
+        "publish_date": "2025-08-20",
+        "category": "Legal & Compliance",
+        "tags": ["Compliance", "Regulatory", "Legal", "Monitoring", "Risk Management"],
+        "excerpt": "Continuously monitors business operations for regulatory compliance and violations.",
+        "reading_time": 4
+      },
+      {
+        "title": "AI Customer Success Agent",
+        "slug": "ai-customer-success-agent",
+        "url": "https://top-agents.us/recipes/ai-customer-success-agent",
+        "publish_date": "2025-08-20",
+        "category": "Customer Success",
+        "tags": ["Customer Success", "Churn Prevention", "Upselling", "Retention", "Analytics"],
+        "excerpt": "Proactively identifies at-risk accounts and upsell opportunities through behavior monitoring.",
+        "reading_time": 4
+      },
+      {
+        "title": "AI Supply Chain Optimizer Agent",
+        "slug": "ai-supply-chain-optimizer-agent",
+        "url": "https://top-agents.us/recipes/ai-supply-chain-optimizer-agent",
+        "publish_date": "2025-08-20",
+        "category": "Supply Chain",
+        "tags": ["Supply Chain", "Optimization", "Logistics", "Inventory", "Real-time"],
+        "excerpt": "Dynamically optimizes supply chain operations in real-time for cost efficiency and resilience.",
+        "reading_time": 4
+      },
+      {
+        "title": "AI Learning Path Designer Agent",
+        "slug": "ai-learning-path-designer-agent",
+        "url": "https://top-agents.us/recipes/ai-learning-path-designer-agent",
+        "publish_date": "2025-08-20",
+        "category": "Education",
+        "tags": ["Education", "Personalized Learning", "Adaptive", "Student Success", "Curriculum"],
+        "excerpt": "Creates personalized learning experiences adapted to individual student needs and progress.",
+        "reading_time": 4
+      }
+    ]
+  }
+}
     ]
   }
 }

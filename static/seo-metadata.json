@@ -93,7 +93,8 @@
       },
       "recipes": {
         "description": "AI agent recipes and automation workflows",
-        "url": "https://top-agents.us/recipes"
+        "url": "https://top-agents.us/recipes",
+        "total_count": 30
       },
       "enterprise": {
         "description": "Enterprise AI solutions and integration services",

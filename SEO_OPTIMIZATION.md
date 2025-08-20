@@ -92,6 +92,38 @@ This document outlines the comprehensive SEO and LLM crawler optimizations imple
 - **July 2025**: 5 posts  
 - **August 2025**: 6 posts
 
+## Recipe Coverage
+
+### New AI Agent Recipes (August 2025)
+1. **AI Research Assistant Agent**
+   - Category: Research & Academia
+   - Tags: Research, Literature Review, Data Analysis, Academic, Automation
+
+2. **Multimodal Content Creator Agent**
+   - Category: Content Creation
+   - Tags: Content Creation, Multimodal, Marketing, Brand Consistency, Automation
+
+3. **AI Compliance Monitor Agent**
+   - Category: Legal & Compliance
+   - Tags: Compliance, Regulatory, Legal, Monitoring, Risk Management
+
+4. **AI Customer Success Agent**
+   - Category: Customer Success
+   - Tags: Customer Success, Churn Prevention, Upselling, Retention, Analytics
+
+5. **AI Supply Chain Optimizer Agent**
+   - Category: Supply Chain
+   - Tags: Supply Chain, Optimization, Logistics, Inventory, Real-time
+
+6. **AI Learning Path Designer Agent**
+   - Category: Education
+   - Tags: Education, Personalized Learning, Adaptive, Student Success, Curriculum
+
+### Total Recipes: 30
+- **Original recipes**: 24 recipes
+- **New recipes**: 6 recipes (August 2025)
+- **Complete coverage**: All recipes have detail pages and SEO optimization
+
 ## SEO Features Implemented
 
 ### Meta Tags
@@ -124,13 +156,14 @@ This document outlines the comprehensive SEO and LLM crawler optimizations imple
 
 ```
 static/
-├── sitemap.xml              # Complete blog sitemap
+├── sitemap.xml              # Complete blog and recipe sitemap
 ├── sitemap-index.xml        # Sitemap index
-├── blog-index.json          # Blog post metadata
+├── blog-index.json          # Blog post and recipe metadata
 └── seo-metadata.json        # Site-wide SEO data
 
 routes.py                    # Dynamic sitemap generation
 robots.txt                   # Crawler guidance
+recipes_full_content.csv     # Recipe data source
 ```
 
 ## Usage

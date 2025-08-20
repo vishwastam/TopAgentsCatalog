@@ -136,6 +136,44 @@
 
   <!-- Blog Posts - All 40 posts with proper metadata -->
   <!-- New AI Agent Posts (August 2025) -->
+  
+  <!-- New AI Agent Recipes (August 2025) -->
+  <url>
+    <loc>https://top-agents.us/recipes/ai-research-assistant-agent</loc>
+    <lastmod>2025-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/recipes/multimodal-content-creator-agent</loc>
+    <lastmod>2025-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/recipes/ai-compliance-monitor-agent</loc>
+    <lastmod>2025-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/recipes/ai-customer-success-agent</loc>
+    <lastmod>2025-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/recipes/ai-supply-chain-optimizer-agent</loc>
+    <lastmod>2025-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/recipes/ai-learning-path-designer-agent</loc>
+    <lastmod>2025-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
   <url>
     <loc>https://top-agents.us/blog/inside-aws-agentcore-next-frontier-enterprise-ai-agents</loc>
     <lastmod>2025-08-20</lastmod>
