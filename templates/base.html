@@ -195,6 +195,12 @@
                     <a href="{{ url_for('main.recipes') }}" class="text-gray-700 hover:text-gray-900 font-medium">Recipes</a>
                     <a href="{{ url_for('main.blog_list') }}" class="text-gray-700 hover:text-gray-900 font-medium">Blog</a>
                     <a href="{{ url_for('main.api_docs') }}" class="text-gray-700 hover:text-gray-900 font-medium">API</a>
+                    <!-- === Dashboards Section === -->
+                    <div class="flex items-center space-x-3 pl-4 border-l border-gray-200 ml-2">
+                        <a href="{{ url_for('main.dashboard') }}" class="text-blue-700 hover:text-blue-900 font-semibold">Org Dashboard</a>
+                        <a href="{{ url_for('main.cursor_dashboard_sample') }}" class="text-purple-700 hover:text-purple-900 font-semibold">Cursor Analytics</a>
+                    </div>
+                    <!-- === End Dashboards Section === -->
                     <div class="relative group" tabindex="0" aria-haspopup="true" aria-expanded="false" id="enterprise-dropdown-group">
                         <button type="button" class="text-gray-700 hover:text-gray-900 font-medium flex items-center focus:outline-none" id="enterprise-dropdown-btn" aria-haspopup="true" aria-expanded="false">
                             Enterprise

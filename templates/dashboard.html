@@ -1,12 +1,93 @@
 {% extends "base.html" %}
 
-{% block title %}Top Agents Dashboard{% endblock %}
+{% block title %}{% if show_cursor_dashboard %}Cursor Analytics Dashboard{% else %}Top Agents Dashboard{% endif %}{% endblock %}
 
-{% block meta_description %}Your centralized AI agent marketplace for enterprise teams. Discover, organize, and deploy AI agents across your organization.{% endblock %}
+{% block meta_description %}{% if show_cursor_dashboard %}Cursor Admin API analytics and usage metrics dashboard.{% else %}Your centralized AI agent marketplace for enterprise teams. Discover, organize, and deploy AI agents across your organization.{% endif %}{% endblock %}
 
 {% block content %}
 <div class="min-h-screen bg-gray-50">
-    <!-- Page Header -->
+    {% if show_cursor_dashboard %}
+        <!-- === Cursor Analytics Demo (Cursor Analytics Only) === -->
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <h1 class="text-3xl font-bold text-gray-900 mb-8">Cursor Analytics Dashboard</h1>
+            <div class="flex flex-col gap-8">
+                <!-- Card 1: AI Code Metrics -->
+                <div class="card-glass p-6 min-h-[220px] mb-2 w-full">
+                    <div class="flex flex-wrap items-center gap-4 mb-2">
+                        <select class="rounded border-gray-300 px-3 py-1 text-sm focus:ring-2 focus:ring-blue-400" name="team">
+                            <option>All Teams</option>
+                            <option>Dev Team</option>
+                            <option>Support</option>
+                        </select>
+                        <select class="rounded border-gray-300 px-3 py-1 text-sm focus:ring-2 focus:ring-blue-400" name="user">
+                            <option>All Users</option>
+                            <option>Alice</option>
+                            <option>Bob</option>
+                        </select>
+                        <input type="date" class="rounded border-gray-300 px-3 py-1 text-sm focus:ring-2 focus:ring-blue-400" name="from_date" placeholder="From">
+                        <span class="text-gray-400">to</span>
+                        <input type="date" class="rounded border-gray-300 px-3 py-1 text-sm focus:ring-2 focus:ring-blue-400" name="to_date" placeholder="To">
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-1">Cursor AI Code Metrics</h3>
+                        <p class="text-gray-500 text-sm mb-2">Tracks the number of lines of code suggested and accepted by AI features. Helps you understand AI code contribution and adoption.</p>
+                    </div>
+                    <canvas id="aiLinesChart" height="120"></canvas>
+                </div>
+                <!-- Card 2: Feature Usage -->
+                <div class="card-glass p-6 min-h-[220px] mb-2 w-full">
+                    <div class="flex flex-wrap items-center gap-4 mb-2">
+                        <select class="rounded border-gray-300 px-3 py-1 text-sm focus:ring-2 focus:ring-blue-400" name="team">
+                            <option>All Teams</option>
+                            <option>Dev Team</option>
+                            <option>Support</option>
+                        </select>
+                        <select class="rounded border-gray-300 px-3 py-1 text-sm focus:ring-2 focus:ring-blue-400" name="user">
+                            <option>All Users</option>
+                            <option>Alice</option>
+                            <option>Bob</option>
+                        </select>
+                        <input type="date" class="rounded border-gray-300 px-3 py-1 text-sm focus:ring-2 focus:ring-blue-400" name="from_date" placeholder="From">
+                        <span class="text-gray-400">to</span>
+                        <input type="date" class="rounded border-gray-300 px-3 py-1 text-sm focus:ring-2 focus:ring-blue-400" name="to_date" placeholder="To">
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-1">Cursor Feature Usage</h3>
+                        <p class="text-gray-500 text-sm mb-2">Shows how often key AI features (applies, accepts, rejects) are used. Useful for tracking feature adoption and engagement.</p>
+                    </div>
+                    <canvas id="featureUsageChart" height="120"></canvas>
+                </div>
+                <!-- Card 3: Request Types -->
+                <div class="card-glass p-6 min-h-[220px] w-full">
+                    <div class="flex flex-wrap items-center gap-4 mb-2">
+                        <select class="rounded border-gray-300 px-3 py-1 text-sm focus:ring-2 focus:ring-blue-400" name="team">
+                            <option>All Teams</option>
+                            <option>Dev Team</option>
+                            <option>Support</option>
+                        </select>
+                        <select class="rounded border-gray-300 px-3 py-1 text-sm focus:ring-2 focus:ring-blue-400" name="user">
+                            <option>All Users</option>
+                            <option>Alice</option>
+                            <option>Bob</option>
+                        </select>
+                        <input type="date" class="rounded border-gray-300 px-3 py-1 text-sm focus:ring-2 focus:ring-blue-400" name="from_date" placeholder="From">
+                        <span class="text-gray-400">to</span>
+                        <input type="date" class="rounded border-gray-300 px-3 py-1 text-sm focus:ring-2 focus:ring-blue-400" name="to_date" placeholder="To">
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-1">Cursor Request Types</h3>
+                        <p class="text-gray-500 text-sm mb-2">Breaks down the types of requests made (edit, ask, agent, Cmd+K). Reveals how users interact with AI and automation tools.</p>
+                    </div>
+                    <canvas id="requestTypesChart" height="120"></canvas>
+                </div>
+            </div>
+            <div class="flex justify-end mt-8">
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode">🌙/☀️</button>
+            </div>
+        </div>
+        <!-- === End Cursor Analytics Demo === -->
+    {% else %}
+        <!-- Org Dashboard Content (unchanged) -->
     <div class="bg-white border-b border-gray-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div class="flex items-center space-x-4">
@@ -20,10 +101,7 @@
             </div>
         </div>
     </div>
-
-    <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
@@ -37,7 +115,6 @@
                     </div>
                 </div>
             </div>
-            
             <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
                 <div class="flex items-center justify-between">
                     <div>
@@ -49,7 +126,6 @@
                     </div>
                 </div>
             </div>
-            
             <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
                 <div class="flex items-center justify-between">
                     <div>
@@ -61,7 +137,6 @@
                     </div>
                 </div>
             </div>
-            
             <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
                 <div class="flex items-center justify-between">
                     <div>
@@ -74,7 +149,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Main Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Left Column - Trending Agents -->
@@ -84,7 +158,6 @@
                         <h3 class="text-lg font-semibold text-gray-900">Trending Agents</h3>
                         <a href="/agents" class="text-blue-600 hover:text-blue-700 text-sm font-medium">View all</a>
                     </div>
-                    
                     <div class="space-y-4">
                         {% for agent in trending_agents[:5] %}
                         <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
@@ -109,7 +182,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- Right Column - Quick Actions & Stats -->
             <div class="space-y-6">
                 <!-- Quick Actions -->
@@ -123,7 +195,6 @@
                             </div>
                             <i data-lucide="chevron-right" class="h-4 w-4 text-blue-600 group-hover:translate-x-1 transition-transform"></i>
                         </button>
-                        
                         <a href="/recipes" class="w-full flex items-center justify-between p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors group">
                             <div class="flex items-center space-x-3">
                                 <i data-lucide="book-open" class="h-5 w-5 text-green-600"></i>
@@ -131,7 +202,6 @@
                             </div>
                             <i data-lucide="chevron-right" class="h-4 w-4 text-green-600 group-hover:translate-x-1 transition-transform"></i>
                         </a>
-                        
                         <button class="w-full flex items-center justify-between p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors group">
                             <div class="flex items-center space-x-3">
                                 <i data-lucide="users" class="h-5 w-5 text-purple-600"></i>
@@ -141,7 +211,6 @@
                         </button>
                     </div>
                 </div>
-
                 <!-- Team Performance -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Team Performance</h3>
@@ -164,7 +233,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Recent Activity -->
         <div class="mt-8">
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -184,7 +252,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Superadmin Badge -->
         {% if session.get('is_superadmin') or (user and user.is_superadmin()) %}
         <div class="mb-6 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-900 rounded">
@@ -193,6 +260,33 @@
         </div>
         {% endif %}
     </div>
+    {% endif %}
 </div>
+{% endblock %}
 
+{% block scripts %}
+{{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% if show_cursor_dashboard %}
+<script type="module">
+import { renderAiLinesChart, renderFeatureUsageChart, renderRequestTypesChart, updateAllAnalyticsCharts } from "/static/js/analytics-charts.js";
+
+// Render charts on page load
+renderAiLinesChart('aiLinesChart');
+renderFeatureUsageChart('featureUsageChart');
+renderRequestTypesChart('requestTypesChart');
+
+// Theme toggle logic
+window.toggleTheme = function() {
+    document.body.classList.toggle('theme-dark');
+    localStorage.setItem('theme', document.body.classList.contains('theme-dark') ? 'dark' : 'light');
+    updateAllAnalyticsCharts();
+};
+// On page load, set theme from localStorage
+if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('theme-dark');
+    updateAllAnalyticsCharts();
+}
+</script>
+{% endif %}
 {% endblock %}

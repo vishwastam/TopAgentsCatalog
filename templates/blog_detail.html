@@ -7,9 +7,9 @@
 
 {% block og_title %}{{ post.title }}{% endblock %}
 {% block og_description %}{{ post.meta_description }}{% endblock %}
-{% block og_image %}{{ url_for('static', filename='images/blogs/' + (blog.slug if blog and blog.slug else 'top-agents-logo.png'), _external=True) }}{% endblock %}
+{% block og_image %}{{ post.featured_image if post.featured_image else url_for('static', filename='images/top-agents-logo.png', _external=True) }}{% endblock %}
 
-{% block twitter_image %}{{ url_for('static', filename='images/blogs/' + (blog.slug if blog and blog.slug else 'top-agents-logo.png'), _external=True) }}{% endblock %}
+{% block twitter_image %}{{ post.featured_image if post.featured_image else url_for('static', filename='images/top-agents-logo.png', _external=True) }}{% endblock %}
 
 {% block structured_data %}
 <script type="application/ld+json">
@@ -21,9 +21,11 @@
 <div class="magazine-bg">
     <!-- Magazine Hero Section -->
     <div class="magazine-hero-detail">
-        {% if post.featured_image %}
         <div class="magazine-hero-img-wrap">
-            <img src="{{ post.featured_image }}" alt="{{ post.title }}" class="magazine-hero-img">
+            <img src="{{ post.featured_image if post.featured_image else url_for('static', filename='images/top-agents-logo.png') }}"
+                 alt="{{ post.title }}"
+                 class="magazine-hero-img"
+                 onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/top-agents-logo.png') }}';">
             <div class="magazine-hero-img-overlay"></div>
             <div class="magazine-hero-content">
                 <div class="magazine-hero-breadcrumbs">
@@ -40,7 +42,6 @@
                 </div>
             </div>
         </div>
-        {% endif %}
     </div>
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <!-- Premium Markdown Content -->

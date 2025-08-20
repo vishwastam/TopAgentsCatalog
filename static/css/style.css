@@ -1,3 +1,47 @@
+/* === THEME VARIABLES & GLASSMORPHISM === */
+:root {
+  --bg-main: #f7f9fb;
+  --bg-card: rgba(255,255,255,0.7);
+  --text-main: #1a1a1a;
+  --text-secondary: #555;
+  --accent: #4f8cff;
+  --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  --blur: 16px;
+}
+.theme-dark {
+  --bg-main: #181c22;
+  --bg-card: rgba(24,28,34,0.7);
+  --text-main: #f7f9fb;
+  --text-secondary: #aaa;
+  --accent: #4f8cff;
+  --shadow: 0 8px 32px 0 rgba(0,0,0,0.35);
+  --blur: 16px;
+}
+body {
+  background: var(--bg-main);
+  color: var(--text-main);
+  transition: background 0.3s, color 0.3s;
+}
+.card-glass {
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
+  border-radius: 18px;
+  padding: 2rem;
+  backdrop-filter: blur(var(--blur));
+  border: 1px solid rgba(255,255,255,0.18);
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+/* Theme toggle button (example) */
+.theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: var(--accent);
+  transition: color 0.3s;
+}
+
 /* Custom styles for Top Agents directory with Tailwind compatibility */
 
 /* Override Tailwind utilities when needed */

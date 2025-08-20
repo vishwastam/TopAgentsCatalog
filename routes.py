@@ -446,6 +446,47 @@ def dashboard(user):
                          team_performance=team_performance,
                          recent_activities=recent_activities)
 
+@main_bp.route('/cursor-dashboard')
+def cursor_dashboard_sample():
+    # Sample data for dashboard
+    total_agents = 42
+    active_teams = 7
+    total_usage_this_month = 12345
+    success_rate = 97.2
+    trending_agents = [
+        {'name': 'CodeGenie', 'short_desc': 'AI code assistant for dev teams', 'domains': 'Dev, IT'},
+        {'name': 'InsightBot', 'short_desc': 'Business analytics and reporting', 'domains': 'Analytics'},
+        {'name': 'SupportAI', 'short_desc': 'Automates support ticket triage', 'domains': 'Support'},
+        {'name': 'DesignPilot', 'short_desc': 'AI for creative design workflows', 'domains': 'Design'},
+        {'name': 'OpsGen', 'short_desc': 'AI-driven operations automation', 'domains': 'Ops'}
+    ]
+    team_performance = [
+        {'name': 'Dev Team', 'color': 'blue', 'icon': 'activity', 'agents_used': 12},
+        {'name': 'Support', 'color': 'green', 'icon': 'headphones', 'agents_used': 8},
+        {'name': 'Analytics', 'color': 'purple', 'icon': 'bar-chart-2', 'agents_used': 10}
+    ]
+    recent_activities = [
+        {'color': 'blue', 'icon': 'zap', 'message': 'CodeGenie deployed to Dev Team', 'time': '2 hours ago'},
+        {'color': 'green', 'icon': 'check-circle', 'message': 'SupportAI resolved 120 tickets', 'time': 'Today'},
+        {'color': 'purple', 'icon': 'bar-chart-2', 'message': 'InsightBot generated Q2 report', 'time': 'Yesterday'}
+    ]
+    # Dummy user/session for template logic
+    user = None
+    session = {'is_superadmin': True}
+    return render_template(
+        'dashboard.html',
+        total_agents=total_agents,
+        active_teams=active_teams,
+        total_usage_this_month=total_usage_this_month,
+        success_rate=success_rate,
+        trending_agents=trending_agents,
+        team_performance=team_performance,
+        recent_activities=recent_activities,
+        user=user,
+        session=session,
+        show_cursor_dashboard=True
+    )
+
 @main_bp.route('/recipes-hub')
 def recipes_hub():
     """Team Recipes & Stories Hub for regular employees"""

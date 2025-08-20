@@ -37,12 +37,14 @@
                 <div class="magazine-grid">
                     {% for post in posts %}
                     <article class="magazine-card animate-fadein">
-                        {% if post.featured_image %}
                         <div class="magazine-card-img-wrap">
-                            <img src="{{ post.featured_image }}" alt="{{ post.title }}" class="magazine-card-img">
+                            <img src="{{ post.featured_image if post.featured_image else url_for('static', filename='images/top-agents-logo.png') }}"
+                                 alt="{{ post.title }}"
+                                 class="magazine-card-img"
+                                 loading="lazy"
+                                 onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/top-agents-logo.png') }}';">
                             <span class="magazine-card-category">{{ post.category }}</span>
                         </div>
-                        {% endif %}
                         <div class="magazine-card-body">
                             <h2 class="magazine-card-title">
                                 <a href="{{ url_for('main.blog_detail', slug=post.slug) }}">{{ post.title }}</a>
