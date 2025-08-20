@@ -1,0 +1,140 @@
+{
+  "site_metadata": {
+    "site_name": "Top Agents",
+    "site_url": "https://top-agents.us",
+    "description": "Comprehensive directory and insights for AI agents, automation tools, and enterprise AI solutions. Discover the best AI agents for your business needs.",
+    "keywords": ["AI Agents", "Artificial Intelligence", "Enterprise AI", "Automation", "AI Tools", "Machine Learning", "Business Intelligence", "AI Solutions"],
+    "author": "Top Agents Team",
+    "language": "en",
+    "last_updated": "2025-08-20",
+    "content_types": {
+      "blog_posts": {
+        "total_count": 40,
+        "categories": [
+          "Enterprise AI",
+          "AI Security", 
+          "MSP & IT",
+          "Government & Enterprise",
+          "AI Strategy",
+          "Productivity",
+          "Product Management",
+          "AI Hacks",
+          "Design",
+          "Customer Support",
+          "Business Automation",
+          "Business Impact",
+          "DevOps",
+          "Tutorials",
+          "Development",
+          "Code Recipes",
+          "UI/UX",
+          "Enterprise",
+          "AI Evaluation",
+          "Getting Started",
+          "Implementation",
+          "Integration",
+          "Mini Tutorials",
+          "Monthly Digest",
+          "One-Line Snippets",
+          "Trends",
+          "Data Analytics",
+          "ROI Analysis",
+          "Legal Tech",
+          "Top Lists",
+          "Enterprise Automation",
+          "Marketing",
+          "Templates",
+          "OpenAI",
+          "Future of Work"
+        ],
+        "tags": [
+          "AWS", "AgentCore", "Enterprise", "AI Agents", "Cloud Computing",
+          "AI Security", "Threat Models", "Autonomous Agents", "Cybersecurity", "AI Safety",
+          "SuperOps", "MSP", "IT Automation", "Marketplace", "AI Agents",
+          "OpenAI", "Anthropic", "GSA", "Government Contracts", "AI Pricing",
+          "Specialized AI", "Generalist AI", "Domain Expertise", "AI Strategy", "Enterprise AI",
+          "Browser AI", "Comet", "Productivity", "Web Automation", "AI Agents",
+          "Product Management", "AI Agents", "Productivity", "Tools", "PM",
+          "Sentiment Analysis", "AI Hacks", "Quick Tips", "NLP", "Automation",
+          "Agentic AI", "Enterprise", "Workflows", "Automation", "2025",
+          "Design", "AI Agents", "Creativity", "Design Tools", "UX/UI",
+          "Customer Support", "AI Agents", "Automation", "CX", "Service",
+          "Business Automation", "AI Agents", "Process Optimization", "Efficiency",
+          "Autonomous Agents", "Business Impact", "2025", "AI Trends", "Transformation",
+          "DevOps", "AI Agents", "Enterprise", "Automation", "CI/CD",
+          "GPT", "AI Agents", "Quick Start", "Tutorial", "OpenAI",
+          "Custom Agents", "LLM APIs", "Development", "Integration", "AI",
+          "Code Recipe", "Lead Enrichment", "Custom Agents", "Sales", "Automation",
+          "Conversational UI", "AI Agents", "Software Interfaces", "UX", "Chatbots",
+          "Enterprise", "Benchmark Report", "Department Usage", "AI Adoption", "Metrics",
+          "AI Evaluation", "Metrics", "Performance", "ROI", "Assessment",
+          "Getting Started", "AI Agents", "Beginner", "Guide", "Tutorial",
+          "Internal AI", "Launch Guide", "Implementation", "Enterprise", "First Steps",
+          "Integration", "Enterprise Workflows", "AI Agents", "Automation", "Process",
+          "Release Notes", "Mini Tutorial", "Automation", "Development", "AI Snippets",
+          "Monthly Digest", "New AI Agents", "Trends", "Innovation", "Updates",
+          "Support Tickets", "One-Line Snippet", "Summarization", "Automation", "Quick Tips",
+          "Q2 2025", "AI Adoption", "Enterprise Trends", "Market Analysis", "AI Agents",
+          "Data Analytics", "AI Agents", "Ultimate Guide", "Data Science", "BI",
+          "ROI", "Top 10", "AI Agents", "Cost Analysis", "Usage Metrics",
+          "Legal Operations", "Top 15", "AI Agents", "Legal Tech", "2025",
+          "Top 20", "AI Agents", "2025", "Complete Guide", "Best of",
+          "Enterprise Automation", "Top AI Agents", "2025", "Automation", "Enterprise",
+          "Marketing", "AI Agents", "Growth", "Trends", "Marketing Tech",
+          "YAML Template", "Agent Chaining", "Product Launch", "Workflow", "Automation",
+          "Agent Mode", "Task Automation", "AI Agents", "Productivity",
+          "Full Automation", "AI Agents", "CX", "Service",
+          "Future of Work", "Knowledge Work", "AI Agents", "Productivity", "Transformation"
+        ]
+      },
+      "ai_agents": {
+        "description": "Comprehensive directory of AI agents and tools",
+        "url": "https://top-agents.us/agents"
+      },
+      "recipes": {
+        "description": "AI agent recipes and automation workflows",
+        "url": "https://top-agents.us/recipes"
+      },
+      "enterprise": {
+        "description": "Enterprise AI solutions and integration services",
+        "url": "https://top-agents.us/enterprise"
+      }
+    },
+    "social_media": {
+      "twitter": "@topagents",
+      "linkedin": "top-agents",
+      "github": "top-agents"
+    },
+    "contact": {
+      "email": "contact@top-agents.us",
+      "support": "support@top-agents.us"
+    },
+    "technical": {
+      "framework": "Flask",
+      "database": "SQLite",
+      "hosting": "AWS/EC2",
+      "ssl": true,
+      "mobile_friendly": true,
+      "structured_data": true
+    },
+    "seo_features": {
+      "meta_tags": true,
+      "open_graph": true,
+      "twitter_cards": true,
+      "json_ld": true,
+      "sitemaps": true,
+      "robots_txt": true,
+      "canonical_urls": true,
+      "breadcrumbs": true
+    },
+    "ai_llm_optimization": {
+      "structured_content": true,
+      "semantic_markup": true,
+      "content_hierarchy": true,
+      "metadata_completeness": true,
+      "crawl_friendly": true,
+      "api_endpoints": true,
+      "json_responses": true
+    }
+  }
+}

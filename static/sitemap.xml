@@ -3,7 +3,7 @@
   <!-- Homepage -->
   <url>
     <loc>https://top-agents.us/</loc>
-    <lastmod>2025-06-11</lastmod>
+    <lastmod>2025-08-20</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -11,7 +11,7 @@
   <!-- Agents main page -->
   <url>
     <loc>https://top-agents.us/agents</loc>
-    <lastmod>2025-06-11</lastmod>
+    <lastmod>2025-08-20</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
   </url>
@@ -19,61 +19,61 @@
   <!-- Agent detail pages (examples) -->
   <url>
     <loc>https://top-agents.us/agents/chatgpt</loc>
-    <lastmod>2025-06-11</lastmod>
+    <lastmod>2025-08-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://top-agents.us/agents/midjourney</loc>
-    <lastmod>2025-06-11</lastmod>
+    <lastmod>2025-08-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://top-agents.us/agents/claude</loc>
-    <lastmod>2025-06-11</lastmod>
+    <lastmod>2025-08-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://top-agents.us/agents/github-copilot</loc>
-    <lastmod>2025-06-11</lastmod>
+    <lastmod>2025-08-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://top-agents.us/agents/zapier-ai</loc>
-    <lastmod>2025-06-11</lastmod>
+    <lastmod>2025-08-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://top-agents.us/agents/notion-ai</loc>
-    <lastmod>2025-06-11</lastmod>
+    <lastmod>2025-08-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://top-agents.us/agents/jasper-ai</loc>
-    <lastmod>2025-06-11</lastmod>
+    <lastmod>2025-08-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://top-agents.us/agents/copy-ai</loc>
-    <lastmod>2025-06-11</lastmod>
+    <lastmod>2025-08-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://top-agents.us/agents/grammarly</loc>
-    <lastmod>2025-06-11</lastmod>
+    <lastmod>2025-08-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://top-agents.us/agents/writesonic</loc>
-    <lastmod>2025-06-11</lastmod>
+    <lastmod>2025-08-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
@@ -81,7 +81,7 @@
   <!-- Recipes main page -->
   <url>
     <loc>https://top-agents.us/recipes</loc>
-    <lastmod>2025-06-11</lastmod>
+    <lastmod>2025-08-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -89,15 +89,15 @@
   <!-- Blog main page -->
   <url>
     <loc>https://top-agents.us/blog</loc>
-    <lastmod>2025-06-11</lastmod>
-    <changefreq>weekly</changefreq>
+    <lastmod>2025-08-20</lastmod>
+    <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- API Docs -->
   <url>
     <loc>https://top-agents.us/api-docs</loc>
-    <lastmod>2025-06-11</lastmod>
+    <lastmod>2025-08-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -105,35 +105,271 @@
   <!-- Enterprise Section -->
   <url>
     <loc>https://top-agents.us/enterprise</loc>
-    <lastmod>2025-06-11</lastmod>
+    <lastmod>2025-08-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://top-agents.us/discovery/app-catalog</loc>
-    <lastmod>2025-06-11</lastmod>
+    <lastmod>2025-08-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://top-agents.us/discovery/idp-connection</loc>
-    <lastmod>2025-06-11</lastmod>
+    <lastmod>2025-08-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://top-agents.us/dashboard</loc>
-    <lastmod>2025-06-11</lastmod>
+    <lastmod>2025-08-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://top-agents.us/recipes-hub</loc>
-    <lastmod>2025-06-11</lastmod>
+    <lastmod>2025-08-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-  <!-- End Enterprise Section -->
 
-  <!-- Add more URLs as needed for new features/pages -->
+  <!-- Blog Posts - All 40 posts with proper metadata -->
+  <!-- New AI Agent Posts (August 2025) -->
+  <url>
+    <loc>https://top-agents.us/blog/inside-aws-agentcore-next-frontier-enterprise-ai-agents</loc>
+    <lastmod>2025-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/securing-agentic-ai-threat-models-autonomous-agents</loc>
+    <lastmod>2025-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/superops-agentic-marketplace-msp-it-automation</loc>
+    <lastmod>2025-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/one-dollar-ai-agent-deal-openai-anthropic-gsa</loc>
+    <lastmod>2025-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/specialized-vs-generalist-ai-agents-domain-expertise</loc>
+    <lastmod>2025-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/browser-based-ai-agents-comet-transforming-web-productivity</loc>
+    <lastmod>2025-08-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Existing Blog Posts -->
+  <url>
+    <loc>https://top-agents.us/blog/10_Must-Have_AI_Agents_for_Product_Managers_long</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/agent-hack-orchestrate-sentiment-analysis-in-5-lines</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/agentic-ai-demystified-enterprise-workflows-2025</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/AI_Agents_for_Designers_12_Tools_to_Supercharge_Creativity_long</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/ai-agents-customer-support</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/ai-agents-in-business-automation</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/autonomous-agents-impact-on-business</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/Best_AI_Agents_for_Enterprise_DevOps_Workflows</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/build-gpt-agent-15-minutes</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/building-custom-agent-layer-llm-apis-guide</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/code-recipe-building-custom-agent-for-lead-enrichment</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/conversational-uis-ai-agents-software-interfaces</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/Enterprise_Agent_Usage_by_Department_Benchmark_Report</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/evaluating-ai-agents-metrics-that-matter</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/getting-started-with-ai-agents</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/how-to-launch-first-internal-ai-agent</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/integrating-ai-agents-enterprise-workflows</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/mini-tutorial-agent-snippet-to-auto-generate-release-notes</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/Monthly_Digest_New_AI_Agents_That_Moved_the_Needle</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/one-line-agent-snippet-to-summarize-support-tickets-automatically</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/Q2_2025_AI_Agent_Adoption_Trends_Across_Enterprises</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/The_Ultimate_Guide_to_AI_Agents_for_Data_Analytics_Teams</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/Top_10_AI_Agents_Driving_ROI_Usage_and_Cost_Analysis_long</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/Top_15_AI_Agents_for_Legal_Operations_2025_long</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/top-20-ai-agents-2025</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/top-ai-agents-enterprise-automation-2025</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/Which_AI_Agents_Are_Growing_Fastest_in_Marketing_Teams</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/yaml-template-chaining-agents-for-end-to-end-product-launch</loc>
+    <lastmod>2025-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/agent-mode-unleashed-openai-agent-task-automation</loc>
+    <lastmod>2025-07-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/ai-agents-customer-support-full-automation</loc>
+    <lastmod>2025-07-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/ai-agents-future-of-knowledge-work</loc>
+    <lastmod>2025-07-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/browser-based-ai-agents-productivity-comet</loc>
+    <lastmod>2025-07-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://top-agents.us/blog/specialized-vs-generalist-ai-agents</loc>
+    <lastmod>2025-07-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
 </urlset>

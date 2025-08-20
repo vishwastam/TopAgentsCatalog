@@ -26,8 +26,30 @@ Allow: /.well-known/ai-plugin.json
 Allow: /openapi.json
 
 # Sitemaps
+Sitemap: https://top-agents.us/sitemap-index.xml
 Sitemap: https://top-agents.us/sitemap.xml
 Sitemap: https://top-agents.us/static/sitemap.xml
+Sitemap: https://top-agents.us/static/blog-index.json
+Sitemap: https://top-agents.us/seo-metadata.json
+
+# Additional SEO and LLM crawler guidance
+# Allow crawling of all blog content for comprehensive indexing
+Allow: /blog/
+Allow: /agents/
+Allow: /recipes/
+Allow: /enterprise/
+
+# Optimize for AI/LLM crawlers
+User-agent: *
+Allow: /blog/
+Allow: /agents/
+Allow: /recipes/
+Allow: /enterprise/
+Allow: /api-docs
+Allow: /.well-known/ai-plugin.json
+Allow: /openapi.json
+Allow: /sitemap.xml
+Allow: /static/sitemap.xml
 
 # Crawl-delay for polite crawling
 Crawl-delay: 1

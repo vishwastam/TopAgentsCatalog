@@ -764,6 +764,49 @@ def sitemap():
             'priority': '0.7'
         })
     
+    # Add enterprise and other important pages
+    urls.append({
+        'loc': f"{base_url}/enterprise",
+        'lastmod': datetime.now().strftime('%Y-%m-%d'),
+        'changefreq': 'weekly',
+        'priority': '0.85'
+    })
+    
+    urls.append({
+        'loc': f"{base_url}/discovery/app-catalog",
+        'lastmod': datetime.now().strftime('%Y-%m-%d'),
+        'changefreq': 'weekly',
+        'priority': '0.8'
+    })
+    
+    urls.append({
+        'loc': f"{base_url}/discovery/idp-connection",
+        'lastmod': datetime.now().strftime('%Y-%m-%d'),
+        'changefreq': 'weekly',
+        'priority': '0.8'
+    })
+    
+    urls.append({
+        'loc': f"{base_url}/dashboard",
+        'lastmod': datetime.now().strftime('%Y-%m-%d'),
+        'changefreq': 'weekly',
+        'priority': '0.8'
+    })
+    
+    urls.append({
+        'loc': f"{base_url}/recipes-hub",
+        'lastmod': datetime.now().strftime('%Y-%m-%d'),
+        'changefreq': 'weekly',
+        'priority': '0.8'
+    })
+    
+    urls.append({
+        'loc': f"{base_url}/api-docs",
+        'lastmod': datetime.now().strftime('%Y-%m-%d'),
+        'changefreq': 'monthly',
+        'priority': '0.7'
+    })
+    
     # Generate XML sitemap
     sitemap_xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
     sitemap_xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
@@ -791,6 +834,48 @@ def robots_txt():
     response = make_response(content, 200)
     response.mimetype = 'text/plain'
     return response
+
+@main_bp.route('/blog-index.json')
+def blog_index_json():
+    """Serve comprehensive blog index for SEO and LLM crawlers"""
+    try:
+        with open('static/blog-index.json', 'r') as f:
+            content = f.read()
+        
+        response = make_response(content, 200)
+        response.mimetype = 'application/json'
+        response.headers['Cache-Control'] = 'public, max-age=3600'  # Cache for 1 hour
+        return response
+    except FileNotFoundError:
+        return jsonify({'error': 'Blog index not found'}), 404
+
+@main_bp.route('/sitemap-index.xml')
+def sitemap_index():
+    """Serve sitemap index for search engines"""
+    try:
+        with open('static/sitemap-index.xml', 'r') as f:
+            content = f.read()
+        
+        response = make_response(content, 200)
+        response.mimetype = 'application/xml'
+        response.headers['Cache-Control'] = 'public, max-age=3600'  # Cache for 1 hour
+        return response
+    except FileNotFoundError:
+        return jsonify({'error': 'Sitemap index not found'}), 404
+
+@main_bp.route('/seo-metadata.json')
+def seo_metadata():
+    """Serve comprehensive SEO metadata for search engines and LLM crawlers"""
+    try:
+        with open('static/seo-metadata.json', 'r') as f:
+            content = f.read()
+        
+        response = make_response(content, 200)
+        response.mimetype = 'application/json'
+        response.headers['Cache-Control'] = 'public, max-age=3600'  # Cache for 1 hour
+        return response
+    except FileNotFoundError:
+        return jsonify({'error': 'SEO metadata not found'}), 404
 
 @main_bp.route('/.well-known/ai-plugin.json')
 def ai_plugin_manifest():
